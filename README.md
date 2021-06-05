@@ -17,10 +17,11 @@ skripts 폴더에 저장된 사용가능한 모든 스크립트 문서에서 함
 	- 헥사컬러코드에 마우스를 올리면 컬러 피커를 사용할 수 있습니다.
 3. 아웃라인 (OutLine)
 	- Options, Aliases, Command, Event, Function의 심볼이 아웃라인에 등록됩니다.
-4. 툴팁 (Tootip)
-	- Options, Aliases, Function에 툴팁이 적용됩니다.
-	- ![screensh](https://github.com/vhone/vskript/blob/main/img/tooltip.gif)
-5. 함수 확장 (Function Extensions)
+4. 툴팁 (Tootip)  
+	![screensh](https://github.com/vhone/vskript/blob/main/img/tooltip.gif)
+	- Options, Aliases, Function에 툴팁이 적용됩니다.  
+5. 함수 확장 (Function Extensions)  
+![screensh](https://github.com/vhone/vskript/blob/main/img/function%20docs.gif)
     - 문서 (Docs)
 		- 함수 위에 '#>'를 입력하면 '#> DOCS'로 변경됩니다.
 		- 그대로 Enter를 입력하면 함수 설명에 필요한 요소들이 생성됩니다.
@@ -35,14 +36,4 @@ skripts 폴더에 저장된 사용가능한 모든 스크립트 문서에서 함
 		- 단축키(Ctrl+T)를 사용해 WorkSapce의 심볼을 사용할 수 있습니다.
 	- 바로가기 (go to Definition)
 		- 단축키(f12)를 눌러 함수가 정의된 페이지로이동 할 수 있습니다.
-		- 함수이름에 커서를 올리고 Ctrl + Click으로 함수 바로가기를 사용할 수 있습니다.
-
-# 추가 예정 (to be added Features)
- - 함수 자동완성 목록에서 제외 될 수 있는 키워드
- - 함수가 참조된 위치 표시
- - 함수가 변경 될 때 오류 표시
- - 없는 함수 작성 시 오류 표시
- - 없는 함수 오토 생성...?
- - [완] Option, Alias 툴팁
- - [완] Options, Aliases, Command, Event, Function 심볼 생성
- - [완] @Docs 컬러 추가 
+		- 함수이름에 커서를 올리고 Ctrl + Click으로 함수 바로가기를 사용할 수 있습니다.'
