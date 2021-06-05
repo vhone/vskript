@@ -1,3 +1,7 @@
+<p align="center"><img src="img/cover.png"></p>
+
+<br>
+
 # VSkript 
 VSkript는 마인크래프트(JE)의 Skript플러그인을 위한 Extension입니다.  
 
@@ -9,6 +13,8 @@ skripts 폴더에 저장된 사용가능한 모든 스크립트 문서에서 함
 [[마켓플레이스 Q&A](https://marketplace.visualstudio.com/items?itemName=Vhone.vskript&ssr=false#qna)],
 [[네이버 블로그](https://blog.naver.com/v_hone)]
 
+<br>
+
 # 기능 (Features)
 1. 코드 하이라이트 (Code Highlight)
 	- 몇몇 이벤트와 타입에 대해서는 표시되지 않을 수 있습니다.
@@ -18,10 +24,10 @@ skripts 폴더에 저장된 사용가능한 모든 스크립트 문서에서 함
 3. 아웃라인 (OutLine)
 	- Options, Aliases, Command, Event, Function의 심볼이 아웃라인에 등록됩니다.
 4. 툴팁 (Tootip)  
-	![screensh](https://github.com/vhone/vskript/blob/main/img/tooltip.gif)
+	![tooltip](img/tooltip.gif)
 	- Options, Aliases, Function에 툴팁이 적용됩니다.  
 5. 함수 확장 (Function Extensions)  
-![screensh](https://github.com/vhone/vskript/blob/main/img/function%20docs.gif)
+![function_docs](img/function_docs.gif)
     - 문서 (Docs)
 		- 함수 위에 '#>'를 입력하면 '#> DOCS'로 변경됩니다.
 		- 그대로 Enter를 입력하면 함수 설명에 필요한 요소들이 생성됩니다.
