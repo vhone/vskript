@@ -12,6 +12,7 @@
 		"type": "git",
 		"url": "https://github.com/vhone/vskript.git"
 	},
+	"icon": "https://github.com/vhone/vskript/blob/main/img/cover.png",
 	"categories": [
 		"Themes",
 		"Snippets"
