@@ -1,0 +1,123 @@
+{
+	"$schema": "vscode://schemas/color-theme",
+	"name": "VSkript",
+	"type": "dark",
+	"include": "./dark_plus.json",
+	"colors": {
+		"editor.background": "#121212",
+		"editor.foreground": "#a0a0a0",
+		"editorHoverWidget.background": "#181818"
+	},
+	"tokenColors": [
+		{ "settings": { "foreground": "#ff0000" }, "scope": "color.red" },
+		{ "settings": { "foreground": "#ff8000" }, "scope": "color.orange" },
+		{ "settings": { "foreground": "#ffff00" }, "scope": "color.yellow" },
+		{ "settings": { "foreground": "#00ff00" }, "scope": "color.lightgreen" },
+		{ "settings": { "foreground": "#008000" }, "scope": "color.green" },
+		{ "settings": { "foreground": "#00ffff" }, "scope": "color.lightblue" },
+		{ "settings": { "foreground": "#0080ff" }, "scope": "color.blue" },
+		{ "settings": { "foreground": "#8000ff" }, "scope": "color.puple" },
+		{ "settings": { "foreground": "#ff00ff" }, "scope": "color.pink" },
+		{
+			"name": "VSkript Comment",
+			"scope": [ "vskript.comment" ],
+			"settings": { "foreground": "#FFFFFF", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Docs Type",
+			"scope": [ "vskript.docs.type" ],
+			"settings": { "foreground": "#00FFFF", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Docs Annotation",
+			"scope": [ "vskript.docs.anno" ],
+			"settings": { "foreground": "#A0A0A0", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Options",
+			"scope": "vskript.options",
+			"settings": { "foreground": "#FF0080", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Aliases",
+			"scope": "vskript.aliases",
+			"settings": { "foreground": "#00ffff", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Event, Command",
+			"scope": [
+				"vskript.event",
+				"vskript.command"
+			],
+			"settings": { "foreground": "#FFFF00", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Command Options",
+			"scope": "vskript.command.options",
+			"settings": { "foreground": "#FFFF00", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Function",
+			"scope": "vskript.function",
+			"settings": { "foreground": "#0080FF", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Grammar",
+			"scope":  "vskript.grammar",
+			"settings": { "foreground": "#ff8000", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Type",
+			"scope": "vskript.type",
+			"settings": { "foreground": "#00FFFF", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Expression Text",
+			"scope": "vskript.expr.text",
+			"settings": { "foreground": "#8080FF", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Expression Number",
+			"scope": "vskript.expr.number",
+			"settings": { "foreground": "#FFFFFF", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Expression Grammar",
+			"scope": "vskript.expr.grammar",
+			"settings": { "fontStyle": "italic" }
+		},
+		{
+			"name": "VSkript Expression Minecraft Item",
+			"scope": "vskript.expr.minecraftitem",
+			"settings": { "foreground": "#80FFFF", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Expression Aliases",
+			"scope": "vskript.expr.aliases",
+			"settings": { "foreground": "#80FFFF", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Expression Function",
+			"scope": "vskript.expr.function",
+			"settings": { "foreground": "#0080FF", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Variable Option",
+			"scope": "vskript.variable.option",
+			"settings": { "foreground": "#FF0080", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Variable Local",
+			"scope": "vskript.variable.local",
+			"settings": { "foreground": "#505050", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Variable Normal, Runtime",
+			"scope": [
+				"vskript.variable.normal",
+				"vskript.variable.runtime"
+			],
+			"settings": { "foreground": "#505050", "fontStyle": "bold" }
+		}
+	]
+}

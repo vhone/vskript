@@ -1,0 +1,214 @@
+{
+	"Function Void Inner": {
+		"prefix": [ "_fx" ],
+		"body": "function fx${TM_FILENAME_BASE:FileName}${1:Name}($2):"
+	},
+	"Function Return Inner": {
+		"prefix": [ "_fxr" ],
+		"body": [
+            "function fx${TM_FILENAME_BASE:FileName}${1:Name}($2) :: ${3:return_type}:",
+            "\t${LINE_COMMENT} code",
+            "\treturn {_${3:return}}"
+        ]
+	},
+	"Function Void": {
+		"prefix": [ "_func" ],
+		"body": "function ${TM_FILENAME_BASE:FileName}_${1:Name}($2):"
+	},
+	"Function Return": {
+		"prefix": [ "_funcr" ],
+		"body": [
+            "function ${TM_FILENAME_BASE:FileName}_${1:Name}($2) :: ${3:return_type}:",
+            "\t# code",
+            "\treturn {_${3:return}}"
+        ]
+	},
+
+
+
+    /*
+	"VSkript Bar": {
+		"prefix": [ "_bar" ],
+		"body": "# ============================== "
+	},
+    "VSkript Label": {
+		"prefix": [ "_label" ],
+		"body": [
+            "# 저작자표시-비영리-동일조건 변경 허락 (BY-NC-SA)",
+            "# 저작자 : Vhone",
+            "# 블로그 : https://blog.naver.com/v_hone",
+            "",
+            "# ${CURRENT_YEAR_SHORT:YY}${CURRENT_MONTH:MM}${CURRENT_DATE:DD}",
+            ""
+        ]
+    },
+	"VSkript Today": {
+		"prefix": [ "_today" ],
+		"body": [
+            "# ${CURRENT_YEAR_SHORT:YY}${CURRENT_MONTH:MM}${CURRENT_DATE:DD}",
+            ""
+        ]
+	},
+	"VSkript ID": {
+		"prefix": [ "_id" ],
+		"body": [
+            "options:",
+            "\tID: ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}",
+            ""
+        ]
+	},
+	"VSkript Suppress Warning": {
+		"prefix": [ "_warning" ],
+		"body": [
+            "on load:",
+            "\t# suppress conflict warning",
+            "\t# suppress starting expression warning",
+            "\t# suppress conjunction warning",
+            "\t# suppress variable save warning",
+            ""
+        ]
+	},
+    "VSkript Form": {
+		"prefix": [ "_basic format" ],
+		"body": [
+            "# 저작자표시-비영리-동일조건 변경 허락 (BY-NC-SA)",
+            "# 저작자 : Vhone",
+            "# 블로그 : https://blog.naver.com/v_hone",
+            "",
+            "# ${CURRENT_YEAR_SHORT:YY}${CURRENT_MONTH:MM}${CURRENT_DATE:DD}",
+            "",
+            "# ============================== Options",
+            "",
+            "options:",
+            "\tID: ${TM_FILENAME_BASE:FileName}",
+            "",
+            "on load:",
+            "\t# suppress conflict warning",
+            "\t# suppress starting expression warning",
+            "\t# suppress conjunction warning",
+            "\t# suppress variable save warning",
+            "",
+            "# ==============================",
+            ""
+        ]
+    },
+    */
+
+
+    
+    "Color": {
+        "prefix": [ "<#" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}<##${1:000000}>"
+        ]
+    },
+
+
+    "Grammar If": {
+        "prefix": [ "if" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}if ${1:condition}:",
+            "${TM_CURRENT_LINE/(.*)//}\t"
+        ]
+    },
+    "Grammar Else IF": {
+        "prefix": [ "else if" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}else if ${1:condition}:",
+            "${TM_CURRENT_LINE/(.*)//}\t"
+        ]
+    },
+    "Grammar Else": {
+        "prefix": [ "else" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}else:",
+            "${TM_CURRENT_LINE/(.*)//}\t"
+        ]
+    },
+    "Grammar If Else": {
+        "prefix": [ "if else" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}if ${1:condition}:",
+            "${TM_CURRENT_LINE/(.*)//}\t ${2}",
+            "${TM_CURRENT_LINE/(.*)//}else:",
+            "${TM_CURRENT_LINE/(.*)//}\t ${3}"
+        ]
+    },
+    "Grammar While": {
+        "prefix": [ "while" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}while ${1:condition}:",
+            "${TM_CURRENT_LINE/(.*)//}\t"
+        ]
+    },
+    "Grammar Loop": {
+        "prefix": [ "loop" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}loop ${1:number} times:",
+            "${TM_CURRENT_LINE/(.*)//}\t"
+        ]
+    },
+
+
+
+    "Effect Set": {
+        "prefix": [ "set" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}set ${1:%objects%} to ${2:%objects%}"
+        ]
+    },
+    "Effect Remove": {
+        "prefix": [ "remove" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}remove ${1:%objects%} from ${2:%objects%}"
+        ]
+    },
+    "Effect Add": {
+        "prefix": [ "add" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}add ${1:%objects%} to ${2:%objects%}"
+        ]
+    },
+    "Effect Give": {
+        "prefix": [ "give" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}give ${1:%objects%} to ${2:%objects%}"
+        ],
+    },
+    "Effect Send": {
+        "prefix": [ "send", "message" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}send ${2:\"${1:}\"} ${3:to ${4:%sender%}}"
+        ]
+    },
+    "Effect Send Action Bar": {
+        "prefix": [ "send action bar" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}send action bar ${2:\"${1:}\"} ${3:to ${4:%players%}}"
+        ],
+    },
+    "Effect Break": {
+        "prefix": [ "break" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}break ${1:%blocks%}${2: naturally}${3: using ${4:%itemtype%}}"
+        ]
+    },
+    "Effect Broadcast": {
+        "prefix": [ "broadcast" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}broadcast ${1:%texts%}${2: to ${3:%worlds%}}"
+        ]
+    },
+    "Effect Wait": {
+        "prefix": [ "wait" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}wait ${1:%integer%} ${2:${3|minecraft,real|}} ${4|ticks,seconds,minutes,days|}"
+        ],
+    },
+    "Effect Teleport": {
+        "prefix": [ "teleport" ],
+        "body": [
+            "${TM_CURRENT_LINE/(.*)//}teleport ${1:%entities%} to ${2:%location%}"
+        ],
+    }
+}
