@@ -3,7 +3,7 @@
 	"displayName": "VSkript",
 	"description": "Visual Skript",
 	"author": {"name": "vhone", "email": "v_hone@naver.com", "url": "https://blog.naver.com/v_hone"},
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -12,7 +12,7 @@
 		"type": "git",
 		"url": "https://github.com/vhone/vskript.git"
 	},
-	"icon": "https://github.com/vhone/vskript/blob/main/img/cover.png",
+	"icon": "img/cover.png",
 	"categories": [
 		"Themes",
 		"Snippets"
