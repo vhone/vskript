@@ -19,7 +19,7 @@ skripts 폴더에 저장된 사용가능한 모든 스크립트 문서에서 함
 	- Options, Aliases, Command, Event, Function의 심볼이 아웃라인에 등록됩니다.
 4. 툴팁 (Tootip)
 	- Options, Aliases, Function에 툴팁이 적용됩니다.
-	- ![screensh](./img/tootip.gif)
+	- ![screensh](https://github.com/vhone/vskript/blob/main/img/tooltip.gif)
 5. 함수 확장 (Function Extensions)
     - 문서 (Docs)
 		- 함수 위에 '#>'를 입력하면 '#> DOCS'로 변경됩니다.
