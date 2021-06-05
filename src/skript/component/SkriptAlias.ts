@@ -1,0 +1,36 @@
+import { Range, SymbolKind } from "vscode";
+import SkriptFile from "../SkriptFile";
+import { SkriptComponent, SkriptComponentBuilder } from "./SkriptComponent";
+
+export class SkriptAlias extends SkriptComponent {
+
+    constructor(_skFile: SkriptFile, _range: Range, _docs: string[], _name: string,
+        protected readonly _itemtypes: Map<string,string[]>
+    ) {
+        super(_skFile, _range, _docs, _name);
+    }
+
+    public get itemtypes(): Map<string,string[]> {
+        return Object.assign(this._itemtypes, {});
+    }
+    public get symbol(): SymbolKind {
+        return SymbolKind.Constant;
+    }
+    
+}
+
+export class SkriptAliasBuilder extends SkriptComponentBuilder<SkriptAlias> {
+    public regExp(): RegExp {
+        return /^(?<head>aliases):(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+)/i
+    }
+    public build(): SkriptAlias | undefined {
+        let itemtypes = new Map<string,string[]>();
+        for (const line of this._body.split(/\r\n|\r|\n/i)) {
+            let groups = line.match(/^(?:\t|\s{4})*(?<key>[^\=]+)\s*\=\s*(?<values>[^\=]*)/i)?.groups;
+            if (groups) {
+                itemtypes.set(groups.key.trim(), groups.values.split(/\s*\,\s*/i));
+            }
+        }
+        return new SkriptAlias(this._skFile, this._range, this._docs, this._head, itemtypes);
+    }
+}
