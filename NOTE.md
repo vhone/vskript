@@ -36,4 +36,5 @@
 - 레포지토리 remote: git remote origin add https://github.com/vhone/testrp.git
 - remote 확인: git remote -v
 - commit 대상 선택: stage로 이동시키기
-- commit : V체크
+- commit : V체크 - 커밋 메세지 남기기
+- push : git push origin master
