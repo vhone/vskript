@@ -8,21 +8,25 @@ import { CancellationToken, Color, ColorInformation, ColorPresentation, Document
 export class SkriptDocumentColorProvider implements DocumentColorProvider {
     provideDocumentColors(document: TextDocument /*token: CancellationToken*/ ) {
         let array = new Array<ColorInformation>();
-        document.getText().split(/\r\n|\r|\n/i).forEach((line, i) => {
+        
+        let lines = document.getText().split(/\r\n|\r|\n/);
+        for (let i=0; i < lines.length; i++ ) {
+            let line = lines[i];
             let match = line.match(/\<\#\#[0-9a-fA-F]{6}\>/ig);
-            if (match) {
-                match.forEach((tag) => {
-                    let index = line.indexOf(tag);
-                    let range = new Range(new Position(i, index), new Position(i, index + tag.length));
-                    let color = this.hexToColor(tag.replace(/\<|\#|\>/, ''));
-                    if (!color) {
-                        return;
-                    }
-                    let info = new ColorInformation(range, color);
-                    array.push(info);
-                });
+            let pos = 0;
+            if (match) for (const tag of match) {
+                let start = line.indexOf(tag, pos);
+                let end = start + tag.length;
+                pos = end;
+
+                let range = new Range(new Position(i, start), new Position(i, end));
+                let color = this.hexToColor(tag.replace(/\<|\#|\>/, ''));
+                if (!color)
+                    continue;
+                array.push(new ColorInformation(range, color));
             }
-        });
+
+        }
         return array;
     }
     provideColorPresentations(color: Color, context: {document: TextDocument; range: Range;} /*token: CancellationToken*/ ) {

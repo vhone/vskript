@@ -10,21 +10,23 @@ const vscode_1 = require("vscode");
 class SkriptDocumentColorProvider {
     provideDocumentColors(document /*token: CancellationToken*/) {
         let array = new Array();
-        document.getText().split(/\r\n|\r|\n/i).forEach((line, i) => {
+        let lines = document.getText().split(/\r\n|\r|\n/);
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
             let match = line.match(/\<\#\#[0-9a-fA-F]{6}\>/ig);
-            if (match) {
-                match.forEach((tag) => {
-                    let index = line.indexOf(tag);
-                    let range = new vscode_1.Range(new vscode_1.Position(i, index), new vscode_1.Position(i, index + tag.length));
+            let pos = 0;
+            if (match)
+                for (const tag of match) {
+                    let start = line.indexOf(tag, pos);
+                    let end = start + tag.length;
+                    pos = end;
+                    let range = new vscode_1.Range(new vscode_1.Position(i, start), new vscode_1.Position(i, end));
                     let color = this.hexToColor(tag.replace(/\<|\#|\>/, ''));
-                    if (!color) {
-                        return;
-                    }
-                    let info = new vscode_1.ColorInformation(range, color);
-                    array.push(info);
-                });
-            }
-        });
+                    if (!color)
+                        continue;
+                    array.push(new vscode_1.ColorInformation(range, color));
+                }
+        }
         return array;
     }
     provideColorPresentations(color, context /*token: CancellationToken*/) {

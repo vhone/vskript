@@ -1,5 +1,6 @@
 import { Position, Range, Selection, SnippetString, TextDocument, TextDocumentChangeEvent, TextDocumentContentChangeEvent, window } from 'vscode'
 import * as Skript from '../Skript';
+import { SkriptComponent } from '../skript/Component';
 
 let pass:boolean = false;
 
@@ -9,16 +10,15 @@ let pass:boolean = false;
 export default function TextDocumentChangeEvent(event:TextDocumentChangeEvent) {
     let document = event.document;
     let changes = event.contentChanges;
-    if (changes.length > 0) {
-        // console.log('TextDocumentChangeEvent: '+ document.isDirty);
-        Skript.findFile(document.uri.fsPath)?.update(document.getText());
-    }
-    for (const context of event.contentChanges) {
+    if (changes.length < 0)
+        return;
+
+    Skript.findFile(document.uri.fsPath)?.update(document.getText());
+    
+    for (const context of changes) {
         let text = context.text;
 
         // 개행 입력
-
-        // console.log('start');
         if (text.match(/^(\r\n|\r|\n)(\t|\s)*$/i)) {
             inputEnter(context, document);
 
@@ -26,12 +26,7 @@ export default function TextDocumentChangeEvent(event:TextDocumentChangeEvent) {
         } else if (text.match(/^\>$/i)) {
             inputRightAngleBraket(context, document);
         }
-        // console.log('end');
     }
-    // event.contentChanges.forEach(context => {
-
-
-    // });
 }
 
 
@@ -41,38 +36,58 @@ export default function TextDocumentChangeEvent(event:TextDocumentChangeEvent) {
  * @param i 
  * @returns 
  */
-function findSkriptFunction(fsPath: string, loc: Position) {
+function findSkriptCompnent(fsPath: string, position: Position): SkriptComponent | undefined {
 	let skFile = Skript.findFile(fsPath);
 	if (!skFile)
-		return;
-	// skFile.update();
-	let skFunc: Skript.Component.SkriptFunction | undefined;
-	let i = loc.line;
-	// for (let func of skFile.functions) {
-	for (let comp of skFile.components) if (comp instanceof Skript.Component.SkriptFunction) {
+		return undefined;
+
+	let skComponent: SkriptComponent | undefined;
+	let i = position.line;
+	for (let comp of skFile.components) {
 		if (i < comp.range.start.line) {
-		    skFunc = comp;
+		    skComponent = comp;
 			break;
         }
 	}
-	return skFunc;
+	return skComponent;
 }
-
 function inputEnter(context: TextDocumentContentChangeEvent, document: TextDocument) {
     // docs 기호 선입력 확인
     let i = context.range.start.line;
     let line = document.lineAt(i).text;
-    // let docs = document.getText();
-    // console.log(document.eol);
-    // let eol = (document.eol. === 1) ? '\r' : '\r\n';
+    console.log(context);
 
     let match = line.match(/^((\t|\s)*)(\#\>)(\s)?(.*)?$/i);
     if (match) {
 
         // 함수 선언부 탐색
-        let skFunc = findSkriptFunction(document.uri.fsPath, context.range.start);
-        if (!skFunc)
+        let skFile = Skript.findFile(document.uri.fsPath);
+        if (!skFile)
             return;
+        let skComponent = skFile.componentOf(context.range.start);
+        if (!skComponent)
+            return;
+        console.log(skComponent);
+
+        let v = JSON.parse('{search:false,complete:false}');
+        console.log(v);
+        // ==========================================
+
+        /* 컴포넌트에 따른 DOCS 샘플 및 어노테이션
+         *
+         * DOCS
+         * @param - docs 파라메터
+         * @return - docs 리턴
+         * 
+         * 어노테이션
+         * @Search(false) 서칭 제외 - WorkspaceSymbolProvider
+         * @Complete(false) 자동완성 제외 - CompletionItemProvider
+         * @options(search:false,complete:false)
+         * 
+         * 시매틱 구문강조 프로바이더 검색해볼것.
+         */
+
+        // ==========================================
             
         // 입력값 제거
         let editor = window.activeTextEditor;
@@ -85,27 +100,27 @@ function inputEnter(context: TextDocumentContentChangeEvent, document: TextDocum
             edit.delete(range);
         });
         
-        // docs 생성
-        let space = (match[1]) ? match[1] : '';
-        let key = [ '#>', ` DOCS` ];
-        if (line.substr(context.range.end.character-key[0].length, key[0].length) === key[0]
-            && document.lineAt(i+1).text.substr(space.length, key[1].length) === key[1] ) {
+        // // docs 생성
+        // let space = (match[1]) ? match[1] : '';
+        // let key = [ '#>', ` DOCS` ];
+        // if (line.substr(context.range.end.character-key[0].length, key[0].length) === key[0]
+        //     && document.lineAt(i+1).text.substr(space.length, key[1].length) === key[1] ) {
             
-            // docs 생성
-            let insert = new Array<string>();
-            let j = 1;
-            for (const param of skFunc.parameters)
-                insert.push(`#> @parm ${param.name} \${${j++}}`);
-            if (skFunc.type)
-                insert.push(`#> @return \${${j++}}`);
-            insert.unshift(` \${${j}:${skFunc.name}}`);
-            editor.insertSnippet(new SnippetString(insert.join('\r\n')), context.range, {undoStopAfter:true,undoStopBefore:false});
-            // console.log('에딧2');
+        //     // docs 생성
+        //     let insert = new Array<string>();
+        //     let j = 1;
+        //     for (const param of skComponent.parameters)
+        //         insert.push(`#> @parm ${param.name} \${${j++}}`);
+        //     if (skComponent.type)
+        //         insert.push(`#> @return \${${j++}}`);
+        //     insert.unshift(` \${${j}:${skComponent.name}}`);
+        //     editor.insertSnippet(new SnippetString(insert.join('\r\n')), context.range, {undoStopAfter:true,undoStopBefore:false});
+        //     // console.log('에딧2');
 
-        } else {
-            editor.insertSnippet(new SnippetString('\r\n' + '#> '), context.range, {undoStopAfter:true,undoStopBefore:false});
-            // console.log('에딧3');
-        }
+        // } else {
+        //     editor.insertSnippet(new SnippetString('\r\n' + '#> '), context.range, {undoStopAfter:true,undoStopBefore:false});
+        //     // console.log('에딧3');
+        // }
     }
 
 }

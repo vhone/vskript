@@ -116,9 +116,10 @@ export default class SkriptFile {
     
 	/** Positon에 맞는 요소를 반환 */
 	public componentOf(pos:Position): SkriptComponent | undefined {
-		for (const comp of this._components) {
+		for (let i=0; i < this._components.length; i++) {
+			let comp = this._components[i];
 			if (comp.range.contains(pos))
-				return comp;
+				return this._components[i + 1];
 		}
 		return;
 	}

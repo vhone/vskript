@@ -41,6 +41,18 @@
 				"scopeName": "source.sk",
 				"path": "theme/vskript.tmLanguage.json"
 			}
+		],
+		"themes": [
+			{
+				"label": "VSkript (Rainbow Vivid)",
+				"uiTheme": "vs-dark",
+				"path": "theme/vskript_rainbow_vivid.json"
+			},
+			{
+				"label": "VSkript (Default)",
+				"uiTheme": "vs-dark",
+				"path": "theme/vskript_default.json"
+			}
 		]
 	},
 	"scripts": {

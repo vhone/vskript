@@ -26,21 +26,29 @@
 			"name": "vskript.comment",
 			"match": "\\#(.*)",
 			"captures": {
-				"1": { "patterns": [ {"include": "#docs"} ] }
+				"1": { "patterns": [
+					{"include": "#docs.parm"},
+					{"include": "#docs.return"}
+
+				] }
 			}
 		},
-		"docs": {
-			"match": "(\\@(parm|return))\\s(\\w*)",
+		"docs.parm": {
+			"match": "(\\@parm)\\s(\\w*)",
 			"captures": {
-				"1": { "name": "vskript.docs.type" },
-				"3": { "name": "vskript.docs.anno" }
+				"1": { "name": "vskript.docs.annotation" },
+				"2": { "name": "vskript.docs.parm" }
 			}
+		},
+		"docs.return": {
+			"match": "\\@return",
+			"name": "vskript.docs.annotation"
 		},
 
 
 		"options": {
 			"begin": "^(options\\:)",
-			"end": "^(?=[^\\t])",
+			"end": "^(?!(?:\\t|\\s{4}|$))",
 			"beginCaptures": {
 				"1": { "name": "vskript.options" }
 			},
@@ -52,12 +60,8 @@
 		"options.list": {
 			"match": "([^:]+)\\:(.+)",
 			"captures": {
-				"1": { "name": "vskript.options.list" },
-				"2": {
-					"patterns": [
-						{ "include": "#comment" }
-					]
-				}
+				"1": { "name": "vskript.options.variable" },
+				"2": { "patterns": [ { "include": "#comment" } ] }
 			}
 		},
 
