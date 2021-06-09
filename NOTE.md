@@ -38,3 +38,5 @@
 - commit 대상 선택: stage로 이동시키기
 - commit : V체크 - 커밋 메세지 남기기
 - push : git push origin master
+  <br>
+- remote origin 삭제 : git remote remove orgin
