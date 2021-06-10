@@ -29,7 +29,6 @@
 				"1": { "patterns": [
 					{"include": "#docs.parm"},
 					{"include": "#docs.return"}
-
 				] }
 			}
 		},
@@ -47,18 +46,18 @@
 
 
 		"options": {
-			"begin": "^(options\\:)",
+			"begin": "^(options)\\:",
 			"end": "^(?!(?:\\t|\\s{4}|$))",
 			"beginCaptures": {
 				"1": { "name": "vskript.options" }
 			},
 			"patterns": [
 				{ "include": "#comment" },
-				{ "include": "#options.list" }
+				{ "include": "#options.variable" }
 			]
 		},
-		"options.list": {
-			"match": "([^:]+)\\:(.+)",
+		"options.variable": {
+			"match": "([^:]+)\\s*?\\:\\s*?(.+)",
 			"captures": {
 				"1": { "name": "vskript.options.variable" },
 				"2": { "patterns": [ { "include": "#comment" } ] }
@@ -67,26 +66,24 @@
 
 
 		"aliases": {
-			"begin": "^(aliases\\:)",
-			"end": "^(?=[^\\t])",
+			"begin": "^(aliases)\\:",
+			"end": "^(?!(?:\\t|\\s{4}|$))",
 			"beginCaptures": {
 				"1": { "name": "vskript.aliases" }
 			},
 			"patterns": [
 				{ "include": "#comment" },
-				{ "include": "#aliases.list" }
+				{ "include": "#aliases.variable" }
 			]
 		},
-		"aliases.list": {
-			"match": "([^=]+)\\=(.+)",
+		"aliases.variable": {
+			"match": "([^=]+)\\s*?\\=\\s*?(.+)",
 			"captures": {
-				"1": { "name": "vskript.aliases.list" },
-				"2": {
-					"patterns": [
+				"1": { "name": "vskript.aliases.variable" },
+				"2": { "patterns": [
 						{ "include": "#comment" },
 						{ "include": "#expr.minecraftitem" }
-					]
-				}
+				] }
 			}
 		},
 
@@ -98,18 +95,39 @@
 			]
 		},
 		"command.define": {
-			"name": "vskript.command",
-			"begin": "^command",
-			"end": "\\:",
-			"patterns": [
-				{	"include": "#variable.option"	}
-			]
+			"match": "^(command)\\s(\/?[^\\s]+)((?:\\s+?[^\\s\\:]+)*)\\s*?\\:",
+			"captures": {
+				"1": { "name": "vskript.command" },
+				"2": { "patterns": [
+					{ "include": "#command.label" }
+				]},
+				"3": { "patterns": [
+					{ "include": "#command.aguments" },
+					{ "include": "#variable.option" }
+				]}
+			}
+		},
+		"command.label": {
+			"match": "(.*)",
+			"captures": {
+				"1": { "patterns": [
+					{ "include": "#variable.option" }
+				]}
+			}
+		},
+		"command.aguments": {
+			"match": "\\<([^\\>\\=]+)(\\=[^\\>]+)?\\>",
+			"captures": {
+				"1": { "patterns": [
+					{ "include": "#type" }
+				]}
+			}
 		},
 		"command.options": {
-			"match": "\\t(aliases|permission|trigger|description|usage)\\:(.*)",
+			"match": "^(\\t|\\s{4})(aliases|permission|trigger|description|usage)\\:",
 			"captures": {
-				"1": {	"name": "vskript.command.options"},
-				"2": {	
+				"2": {	"name": "vskript.command.options"},
+				"3": {	
 					"patterns": [
 						{	"include": "#variable"	}
 					]
@@ -119,8 +137,10 @@
 
 
 		"event": {
-			"name": "vskript.event",
-			"match": "^on.*\\:"
+			"match": "^(on\\s+?(?:[^\\:]*))\\:",
+			"captures": {
+				"1": { "name": "vskript.event" }
+			}
 		},
 
 
@@ -493,7 +513,7 @@
 			]
 		},
 		"variable.option": {
-			"name": "vskript.variable.option",
+			"name": "vskript.options.variable",
 			"begin": "\\{\\@",
 			"end": "\\}"
 		},

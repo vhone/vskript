@@ -1,0 +1,133 @@
+{
+	"$schema": "vscode://schemas/color-theme",
+	"name": "VSkript",
+	"type": "dark",
+	"include": "./dark_plus.json",
+	"colors": {
+		"editor.background": "#1c1c1c",
+		"editor.foreground": "#afafaf"
+	},
+	"tokenColors": [
+
+
+		{
+			"name": "VSkript Comment",
+			"scope": [ "vskript.comment" ],
+			"settings": { "foreground": "#e4e4e4", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Docs Annotation",
+			"scope": [ "vskript.docs.annotation" ],
+			"settings": { "foreground": "#3992a3", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Docs Parameter",
+			"scope": [ "vskript.docs.parm" ],
+			"settings": { "foreground": "#c0c0c0", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Options",
+			"scope": "vskript.options",
+			"settings": { "foreground": "#ff2e97", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Options Variable ",
+			"scope": "vskript.options.variable",
+			"settings": { "foreground": "#ff2e97", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Aliases",
+			"scope": "vskript.aliases",
+			"settings": { "foreground": "#5fd3ff", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Aliases",
+			"scope": [
+				"vskript.aliases.variable",
+				"vskript.expr.minecraftitem",
+				"vskript.expr.aliases",
+				"vskript.type",
+			],
+			"settings": { "foreground": "#5fd3ff", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Event, Command",
+			"scope": [
+				"vskript.event",
+				"vskript.command"
+			],
+			"settings": { "foreground": "#fbf84a", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Command Label & Options",
+			"scope": [
+				"vskript.command.label",
+				"vskript.command.options"
+			],
+			"settings": { "foreground": "#fbf84a", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Function",
+			"scope": "vskript.function",
+			"settings": { "foreground": "#3769ff", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Expression Function",
+			"scope": "vskript.expr.function",
+			"settings": { "foreground": "#3769ff", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Grammar",
+			"scope":  "vskript.grammar",
+			"settings": { "foreground": "#ff8000", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Expression Grammar",
+			"scope": "vskript.expr.grammar",
+			"settings": { "fontStyle": "italic" }
+		},
+		{
+			"name": "VSkript Expression Number",
+			"scope": "vskript.expr.number",
+			"settings": { "foreground": "#FFFFFF", "fontStyle": "" }
+		},
+
+
+		
+		{
+			"name": "VSkript Expression Text",
+			"scope": "vskript.expr.text",
+			"settings": { "foreground": "#8080ff", "fontStyle": "" }
+		},
+
+		
+		{
+			"name": "VSkript Variable Local",
+			"scope": "vskript.variable.local",
+			"settings": { "foreground": "#616161", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Variable Normal, Runtime",
+			"scope": [
+				"vskript.variable.normal",
+				"vskript.variable.runtime"
+			],
+			"settings": { "foreground": "#616161", "fontStyle": "bold" }
+		}
+	]
+}

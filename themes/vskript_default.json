@@ -17,38 +17,23 @@
 		{ "settings": { "foreground": "#00ffff" }, "scope": "color.lightblue" },
 		{ "settings": { "foreground": "#0080ff" }, "scope": "color.blue" },
 		{ "settings": { "foreground": "#8000ff" }, "scope": "color.puple" },
-		{ "settings": { "foreground": "#ff80ff" }, "scope": "color.pink" },
-
-		{ "settings": { "foreground": "#f16745" }, "scope": "color.pink2" },
-		{ "settings": { "foreground": "#ffc65d" }, "scope": "color.pink3" },
-		{ "settings": { "foreground": "#7bc8a4" }, "scope": "color.pink4" },
-		{ "settings": { "foreground": "#4cc3d9" }, "scope": "color.pink5" },
-		{ "settings": { "foreground": "#93648d" }, "scope": "color.pink6" },
-		{ "settings": { "foreground": "#333333" }, "scope": "color.pink7" },
-		{ "settings": { "foreground": "#b54d34" }, "scope": "color.pink8" },
-		{ "settings": { "foreground": "#bf9546" }, "scope": "color.pink9" },
-		{ "settings": { "foreground": "#5c967b" }, "scope": "color.pink10" },
-		{ "settings": { "foreground": "#3992a3" }, "scope": "color.pink11" },
-		{ "settings": { "foreground": "#6e4b6a" }, "scope": "color.pink12" },
-		{ "settings": { "foreground": "#303030" }, "scope": "color.pink13" },
-
-
+		{ "settings": { "foreground": "#ff00ff" }, "scope": "color.pink" },
 
 
 		{
 			"name": "VSkript Comment",
 			"scope": [ "vskript.comment" ],
-			"settings": { "foreground": "#808080", "fontStyle": "" }
+			"settings": { "foreground": "#FFFFFF", "fontStyle": "" }
 		},
 		{
-			"name": "VSkript Docs Annotation",
+			"name": "VSkript Docs annotation",
 			"scope": [ "vskript.docs.annotation" ],
-			"settings": { "foreground": "#3992a3", "fontStyle": "" }
+			"settings": { "foreground": "#00FFFF", "fontStyle": "" }
 		},
 		{
 			"name": "VSkript Docs Parameter",
 			"scope": [ "vskript.docs.parm" ],
-			"settings": { "foreground": "#c0c0c0", "fontStyle": "" }
+			"settings": { "foreground": "#A0A0A0", "fontStyle": "" }
 		},
 
 
@@ -56,12 +41,12 @@
 		{
 			"name": "VSkript Options",
 			"scope": "vskript.options",
-			"settings": { "foreground": "#ff00ff", "fontStyle": "bold" }
+			"settings": { "foreground": "#FF0080", "fontStyle": "bold" }
 		},
 		{
 			"name": "VSkript Options Variable ",
 			"scope": "vskript.options.variable",
-			"settings": { "foreground": "#ff00ff", "fontStyle": "" }
+			"settings": { "foreground": "#FF0080", "fontStyle": "" }
 		},
 
 
