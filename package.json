@@ -26,8 +26,13 @@
 		"languages": [
 			{
 				"id": "vskript",
-				"aliases": ["skript","sk"],
-				"extensions": [".sk"]
+				"aliases": [
+					"skript",
+					"sk"
+				],
+				"extensions": [
+					".sk"
+				]
 			}
 		],
 		"grammars": [
@@ -43,6 +48,14 @@
 				"id": "vskript",
 				"uiTheme": "vs-dark",
 				"path": "./themes/vskript_vivid.json"
+			}
+		],
+		"semanticTokenScopes": [
+			{
+				"language": "vskript",
+				"scopes": {
+					"templeType": [ "entity.name.type.template" ]	
+				}
 			}
 		]
 	},

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SkriptWorkspaceSymbolProvider = exports.SkriptHoverProvider = exports.SkriptDocumentSymbolProvider = exports.SkriptDocumentColorProvider = exports.SkriptDefinitionProvider = exports.SkriptCompletionItemProvider = void 0;
+exports.SkriptDocumentSemanticTokensProvider = exports.SkriptWorkspaceSymbolProvider = exports.SkriptHoverProvider = exports.SkriptDocumentSymbolProvider = exports.SkriptDocumentColorProvider = exports.SkriptDefinitionProvider = exports.SkriptCompletionItemProvider = void 0;
 var SkriptCompletionItemProvider_1 = require("./provider/SkriptCompletionItemProvider");
 Object.defineProperty(exports, "SkriptCompletionItemProvider", { enumerable: true, get: function () { return SkriptCompletionItemProvider_1.SkriptCompletionItemProvider; } });
 var SkriptDefinitionProvider_1 = require("./provider/SkriptDefinitionProvider");
@@ -13,4 +13,6 @@ var SkriptHoverProvider_1 = require("./provider/SkriptHoverProvider");
 Object.defineProperty(exports, "SkriptHoverProvider", { enumerable: true, get: function () { return SkriptHoverProvider_1.SkriptHoverProvider; } });
 var SkriptWorkspaceSymbolProvider_1 = require("./provider/SkriptWorkspaceSymbolProvider");
 Object.defineProperty(exports, "SkriptWorkspaceSymbolProvider", { enumerable: true, get: function () { return SkriptWorkspaceSymbolProvider_1.SkriptWorkspaceSymbolProvider; } });
+var SkriptDocumentSemanticTokensProvider_1 = require("./provider/SkriptDocumentSemanticTokensProvider");
+Object.defineProperty(exports, "SkriptDocumentSemanticTokensProvider", { enumerable: true, get: function () { return SkriptDocumentSemanticTokensProvider_1.SkriptDocumentSemanticTokensProvider; } });
 //# sourceMappingURL=Provider.js.map

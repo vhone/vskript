@@ -5,9 +5,51 @@
 	"include": "./dark_plus.json",
 	"colors": {
 		"editor.background": "#1c1c1c",
-		"editor.foreground": "#afafaf"
+		"editor.foreground": "#a0a0a0"
+	},
+	"semanticHighlighting": true,
+	"semanticTokenColors": {
+		"variable": "#ff0000"
 	},
 	"tokenColors": [
+
+
+		{
+			"name": "type01 - red",
+			"scope" : "",
+			"settings": { "foreground": "#df3939", "fontStyle": "" }
+		},
+		{
+			"name": "type01 - orange",
+			"scope" : "",
+			"settings": { "foreground": "#ff7a6c", "fontStyle": "" }
+		},
+		{
+			"name": "type01 - yellow",
+			"scope" : "",
+			"settings": { "foreground": "#ffe26d", "fontStyle": "" }
+		},
+		{
+			"name": "type01 - green",
+			"scope" : "",
+			"settings": { "foreground": "#8fd126", "fontStyle": "" }
+		},
+		{
+			"name": "type01 - green2",
+			"scope" : "",
+			"settings": { "foreground": "#48aa1e", "fontStyle": "" }
+		},
+		{
+			"name": "type01 - blue",
+			"scope" : "",
+			"settings": { "foreground": "#45aaff", "fontStyle": "" }
+		},
+		{
+			"name": "type01 - blue2",
+			"scope" : "",
+			"settings": { "foreground": "#2cb2ff", "fontStyle": "" }
+		},
+
 
 
 		{
@@ -44,7 +86,7 @@
 		{
 			"name": "VSkript Aliases",
 			"scope": "vskript.aliases",
-			"settings": { "foreground": "#5fd3ff", "fontStyle": "bold" }
+			"settings": { "foreground": "#9cdcfe", "fontStyle": "bold" }
 		},
 		{
 			"name": "VSkript Aliases",
@@ -54,7 +96,7 @@
 				"vskript.expr.aliases",
 				"vskript.type",
 			],
-			"settings": { "foreground": "#5fd3ff", "fontStyle": "" }
+			"settings": { "foreground": "#9cdcfe", "fontStyle": "" }
 		},
 
 
@@ -65,7 +107,7 @@
 				"vskript.event",
 				"vskript.command"
 			],
-			"settings": { "foreground": "#fbf84a", "fontStyle": "bold" }
+			"settings": { "foreground": "#ffe26d", "fontStyle": "bold" }
 		},
 		{
 			"name": "VSkript Command Label & Options",
@@ -73,7 +115,7 @@
 				"vskript.command.label",
 				"vskript.command.options"
 			],
-			"settings": { "foreground": "#fbf84a", "fontStyle": "" }
+			"settings": { "foreground": "#ffe26d", "fontStyle": "" }
 		},
 
 
@@ -94,7 +136,7 @@
 		{
 			"name": "VSkript Grammar",
 			"scope":  "vskript.grammar",
-			"settings": { "foreground": "#ff8000", "fontStyle": "bold" }
+			"settings": { "foreground": "#ff7a6c", "fontStyle": "bold" }
 		},
 		{
 			"name": "VSkript Expression Grammar",
