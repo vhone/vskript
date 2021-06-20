@@ -1,6 +1,6 @@
 import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
 import * as Skript from '../Skript';
-import { SkriptAlias, SkriptCommand, SkriptEvent, SkriptFunction, SkriptOption } from '../skript/Component';
+import { SkriptAliases, SkriptCommand, SkriptEvent, SkriptFunction, SkriptOptions } from '../skript/Component';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
 

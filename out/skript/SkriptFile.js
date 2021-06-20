@@ -44,9 +44,9 @@ class SkriptFile {
         if (elements)
             for (let element of elements) {
                 element = this.trim(element);
-                if (this.registerComponent(element, new Component_1.SkriptOptionBuilder(this)))
+                if (this.registerComponent(element, new Component_1.SkriptOptionsBuilder(this)))
                     continue;
-                if (this.registerComponent(element, new Component_1.SkriptAliasBuilder(this)))
+                if (this.registerComponent(element, new Component_1.SkriptAliasesBuilder(this)))
                     continue;
                 if (this.registerComponent(element, new Component_1.SkriptCommandBuilder(this)))
                     continue;
@@ -72,6 +72,19 @@ class SkriptFile {
         let end = this.positionAt(index + element.length);
         return new vscode_1.Range(start, end);
     }
+    /** 글자에 해당하는 범위 반환 */
+    getRanges(text) {
+        let rages = new Array();
+        let position = 0;
+        do {
+            let index = this._document.indexOf(text, position);
+            let start = this.positionAt(index);
+            let end = this.positionAt(index + text.length);
+            rages.push(new vscode_1.Range(start, end));
+            position = index + 1;
+        } while (position > 0);
+        return rages;
+    }
     /** Position을 Offset으로 반환 */
     offsetAt(position) {
         return this._lineIndexs[position.line] + position.character;
@@ -93,8 +106,12 @@ class SkriptFile {
     componentOf(pos) {
         for (let i = 0; i < this._components.length; i++) {
             let comp = this._components[i];
-            if (comp.range.contains(pos))
-                return this._components[i + 1];
+            if (comp.range.contains(pos)) {
+                return;
+            }
+            else if (pos.isBeforeOrEqual(comp.range.start)) {
+                return this._components[i];
+            }
         }
         return;
     }
@@ -129,8 +146,10 @@ class SkriptFile {
         let docs = (this._components.length === 0)
             ? this.getText(new vscode_1.Range(this.positionAt(0), range.start)).trim()
             : this.getText(new vscode_1.Range(this._components[this._components.length - 1].range.end, range.start)).trim();
-        let skEvent = builder.setRange(range).setDocs(docs).setHead(groups.head).setBody(groups.body).build();
-        this._components.push(skEvent);
+        let skComp = builder.setRange(range).setDocs(docs).setHead(groups.head).setBody(groups.body).build();
+        if (skComp) {
+            this._components.push(skComp);
+        }
         return true;
     }
 }

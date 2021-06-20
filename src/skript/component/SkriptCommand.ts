@@ -1,7 +1,7 @@
 import { Range, SymbolKind } from "vscode";
 import SkriptFile from "../SkriptFile";
 import { SkriptComponent, SkriptComponentBuilder } from "./SkriptComponent";
-import { SkriptOption } from "./SkriptOption";
+import { SkriptOptions } from "./SkriptOptions";
 
 export class SkriptCommand extends SkriptComponent {
 
@@ -26,9 +26,9 @@ export class SkriptCommandBuilder extends SkriptComponentBuilder<SkriptCommand> 
     }
     public build(): SkriptCommand | undefined {
         
-        let options = this._skFile.components.filter(comp => comp instanceof SkriptOption).reverse();
+        let options = this._skFile.components.filter(comp => comp instanceof SkriptOptions).reverse();
         // for (const option of this._skFile.components) if (option instanceof SkriptOption) {
-        for (const option of options) if (option instanceof SkriptOption) {
+        for (const option of options) if (option instanceof SkriptOptions) {
             if (option.range.end.isBefore(this._range.start)) for (const key of option.variables.keys()){
                 this._head = this._head.replace(`{@${key}}`, `${option.variables.get(key)}`);
             }

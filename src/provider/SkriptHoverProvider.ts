@@ -1,7 +1,7 @@
 import { create } from 'node:domain';
 import { Hover, HoverProvider, MarkdownString, Position, Range, TextDocument, Uri } from 'vscode'
 import * as Skript from "../Skript"
-import { SkriptAlias, SkriptFunction, SkriptOption } from '../skript/Component';
+import { SkriptAliases, SkriptFunction, SkriptOptions } from '../skript/Component';
 
 export class SkriptHoverProvider implements HoverProvider {
 
@@ -37,7 +37,7 @@ export class SkriptHoverProvider implements HoverProvider {
                 }
 
                 if (docThis) {
-                    if (comp instanceof SkriptOption) {
+                    if (comp instanceof SkriptOptions) {
                         for (const variable of comp.variables) {
                             hover = this.createHover(lineText, position,
                                 `{@${variable[0]}}`,
@@ -45,7 +45,7 @@ export class SkriptHoverProvider implements HoverProvider {
                             if (hover) 
                                 return hover;
                         }
-                    } else if (comp instanceof SkriptAlias)  {
+                    } else if (comp instanceof SkriptAliases)  {
                         for (const itemtype of comp.itemtypes) {
                             let hover = this.createHover(lineText, position,
                                 itemtype[0],

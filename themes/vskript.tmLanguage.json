@@ -24,7 +24,16 @@
 
 		"comment": {
 			"name": "vskript.comment",
-			"match": "\\#(.*)",
+			"match": "(\\#.*)",
+			"captures": {
+				"1": { "patterns": [
+					{"include": "#docs"}
+				] }
+			}
+		},
+		"docs": {
+			"name": "vskript.docs",
+			"match": "(\\#\\>.*)",
 			"captures": {
 				"1": { "patterns": [
 					{"include": "#docs.parm"},
@@ -33,7 +42,7 @@
 			}
 		},
 		"docs.parm": {
-			"match": "(\\@parm)\\s(\\w*)",
+			"match": "(\\@parm)\\s([^\\s]*)",
 			"captures": {
 				"1": { "name": "vskript.docs.annotation" },
 				"2": { "name": "vskript.docs.parm" }

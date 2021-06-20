@@ -1,4 +1,4 @@
-import { workspace, window, EndOfLine } from 'vscode'
+import { workspace, window, EndOfLine, TextEditorDecorationType, DocumentSymbol, Range } from 'vscode'
 import { readdirSync, readFileSync } from 'fs'
 import { extname, join } from 'path'
 import SkriptFile from "./skript/SkriptFile";
@@ -8,8 +8,7 @@ export * as Component from './skript/Component';
 
 
 
-const FILE_LIST: Array<SkriptFile> = new Array<SkriptFile>();
-
+const FILE_LIST = new Array<SkriptFile>();
 
 
 
@@ -30,7 +29,7 @@ export function onSkriptEnable() {
 	}
 	if (amtFunc > 0) window.showInformationMessage(`Loaded ${amtFunc} functions.`);
 	if (FILE_LIST.length > 0) window.showInformationMessage(`Loaded ${FILE_LIST.length} skript files.`);
-
+	
 }
 
 

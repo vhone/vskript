@@ -1,14 +1,15 @@
 import { join as joinPath } from 'path';
-import { EndOfLine, Position, Range } from 'vscode';
+import { EndOfLine, Position, Range, window } from 'vscode';
 import {
-	SkriptAliasBuilder,
+	SkriptAliasesBuilder,
 	SkriptCommandBuilder,
 	SkriptComponent,
 	SkriptComponentBuilder,
 	SkriptEventBuilder,
 	SkriptFunctionBuilder,
-	SkriptOptionBuilder
+	SkriptOptionsBuilder
 } from './Component';
+import * as Skript from '../Skript';
 
 /**
  * 작업영역으로부터 포함된 sk파일을 모두 읽어서 객체를 생성함
@@ -70,8 +71,8 @@ export default class SkriptFile {
 		if (elements) for (let element of elements) {
 
 			element = this.trim(element);
-			if (this.registerComponent(element, new SkriptOptionBuilder(this))) continue;
-			if (this.registerComponent(element, new SkriptAliasBuilder(this))) continue;
+			if (this.registerComponent(element, new SkriptOptionsBuilder(this))) continue;
+			if (this.registerComponent(element, new SkriptAliasesBuilder(this))) continue;
 			if (this.registerComponent(element, new SkriptCommandBuilder(this))) continue;
 			if (this.registerComponent(element, new SkriptEventBuilder(this))) continue;
 			if (this.registerComponent(element, new SkriptFunctionBuilder(this))) continue;
@@ -96,6 +97,21 @@ export default class SkriptFile {
 		return new Range(start, end);
 	}
 
+	/** 글자에 해당하는 범위 반환 */
+	public getRanges(text:string): Range[] {
+		let rages = new Array<Range>();
+		let position = 0;
+		do {
+			let index = this._document.indexOf(text, position);
+			let start = this.positionAt(index);
+			let end = this.positionAt(index + text.length);
+			rages.push( new Range(start, end) );
+			position = index + 1;
+		} while (position > 0);
+
+		return rages;
+	}
+
 	/** Position을 Offset으로 반환 */
 	public offsetAt(position:Position): number {
 		return this._lineIndexs[position.line] + position.character;
@@ -118,8 +134,11 @@ export default class SkriptFile {
 	public componentOf(pos:Position): SkriptComponent | undefined {
 		for (let i=0; i < this._components.length; i++) {
 			let comp = this._components[i];
-			if (comp.range.contains(pos))
-				return this._components[i + 1];
+			if (comp.range.contains(pos)) {
+				return;
+			} else if (pos.isBeforeOrEqual(comp.range.start)){
+				return this._components[i];
+			}
 		}
 		return;
 	}
@@ -158,14 +177,14 @@ export default class SkriptFile {
 			? this.getText(new Range(this.positionAt(0), range.start)).trim()
 			: this.getText(new Range(this._components[this._components.length - 1].range.end, range.start)).trim();
 
-		let skEvent = builder.setRange(range).setDocs(docs).setHead(groups.head).setBody(groups.body).build();
-		this._components.push(skEvent!);
+		let skComp = builder.setRange(range).setDocs(docs).setHead(groups.head).setBody(groups.body).build();
+		if (skComp!){
+			this._components.push(skComp);
+		}
 		
 		return true;
 	}
 
 
 }
-
-
 

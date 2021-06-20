@@ -2,7 +2,7 @@ import { Range, SymbolKind } from "vscode";
 import SkriptFile from "../SkriptFile";
 import { SkriptComponent, SkriptComponentBuilder } from "./SkriptComponent";
 
-export class SkriptAlias extends SkriptComponent {
+export class SkriptAliases extends SkriptComponent {
 
     constructor(_skFile: SkriptFile, _range: Range, _docs: string[], _name: string,
         protected readonly _itemtypes: Map<string,string[]>
@@ -19,11 +19,11 @@ export class SkriptAlias extends SkriptComponent {
     
 }
 
-export class SkriptAliasBuilder extends SkriptComponentBuilder<SkriptAlias> {
+export class SkriptAliasesBuilder extends SkriptComponentBuilder<SkriptAliases> {
     public regExp(): RegExp {
         return /^(?<head>aliases):(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+)/i
     }
-    public build(): SkriptAlias | undefined {
+    public build(): SkriptAliases | undefined {
         let itemtypes = new Map<string,string[]>();
         for (const line of this._body.split(/\r\n|\r|\n/i)) {
             let groups = line.match(/^(?:\t|\s{4})*(?<key>[^\=]+)\s*\=\s*(?<values>[^\=]*)/i)?.groups;
@@ -31,6 +31,6 @@ export class SkriptAliasBuilder extends SkriptComponentBuilder<SkriptAlias> {
                 itemtypes.set(groups.key.trim(), groups.values.split(/\s*\,\s*/i));
             }
         }
-        return new SkriptAlias(this._skFile, this._range, this._docs, this._head, itemtypes);
+        return new SkriptAliases(this._skFile, this._range, this._docs, this._head, itemtypes);
     }
 }
