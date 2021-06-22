@@ -15,7 +15,7 @@ class SkriptFile {
         this._components = new Array();
         this._fsPath = path_1.join(this._skDir, this._skName);
         this._eol = (eol === vscode_1.EndOfLine.LF) ? '\n' : '\r\n';
-        this.updateLineIndexArray();
+        this._updateLineIndexArray();
         this.update(this._document);
     }
     get fsPath() {
@@ -38,21 +38,21 @@ class SkriptFile {
     }
     update(document) {
         this._document = document;
-        this.updateLineIndexArray();
+        this._updateLineIndexArray();
         this._components.length = 0;
         let elements = this._document.match(/^[a-zA-Z].*((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+/igm);
         if (elements)
             for (let element of elements) {
-                element = this.trim(element);
-                if (this.registerComponent(element, new Component_1.SkriptOptionsBuilder(this)))
+                element = this._trim(element);
+                if (this._registerComponent(element, new Component_1.SkriptOptionsBuilder(this)))
                     continue;
-                if (this.registerComponent(element, new Component_1.SkriptAliasesBuilder(this)))
+                if (this._registerComponent(element, new Component_1.SkriptAliasesBuilder(this)))
                     continue;
-                if (this.registerComponent(element, new Component_1.SkriptCommandBuilder(this)))
+                if (this._registerComponent(element, new Component_1.SkriptCommandBuilder(this)))
                     continue;
-                if (this.registerComponent(element, new Component_1.SkriptEventBuilder(this)))
+                if (this._registerComponent(element, new Component_1.SkriptEventBuilder(this)))
                     continue;
-                if (this.registerComponent(element, new Component_1.SkriptFunctionBuilder(this)))
+                if (this._registerComponent(element, new Component_1.SkriptFunctionBuilder(this)))
                     continue;
             }
     }
@@ -65,14 +65,14 @@ class SkriptFile {
             return this._document.substring(this.offsetAt(range.start), this.offsetAt(range.end));
         }
     }
-    /** 글자에 해당하는 범위 반환 */
+    /** 글자에 해당하는 첫번째 범위 반환 */
     getRange(element) {
         let index = this._document.indexOf(element);
         let start = this.positionAt(index);
         let end = this.positionAt(index + element.length);
         return new vscode_1.Range(start, end);
     }
-    /** 글자에 해당하는 범위 반환 */
+    /** 글자에 해당하는 모든 범위 반환 */
     getRanges(text) {
         let rages = new Array();
         let position = 0;
@@ -85,6 +85,9 @@ class SkriptFile {
         } while (position > 0);
         return rages;
     }
+    // /** 위치에 해당하는 패턴 타입 반환 */
+    // public getPatternType(pos:Position): PatternType {
+    // }
     /** Position을 Offset으로 반환 */
     offsetAt(position) {
         return this._lineIndexs[position.line] + position.character;
@@ -116,7 +119,7 @@ class SkriptFile {
         return;
     }
     /** 좌, 우 여백 제거 */
-    trim(element) {
+    _trim(element) {
         let split = element.split(/\r\n|\r|\n/i);
         for (let i = split.length - 1; i >= 0; i--) {
             if (split[i].match(/^((\t|\s)*(\#.*)?)?$/i))
@@ -127,7 +130,7 @@ class SkriptFile {
         return split.join('\r\n');
     }
     /** 글줄 위치값을 세팅 */
-    updateLineIndexArray() {
+    _updateLineIndexArray() {
         this._lineIndexs.length = 0;
         this._lineIndexs.push(0);
         let index = 0;
@@ -137,7 +140,7 @@ class SkriptFile {
         }
     }
     /** 컴포넌트 생성 */
-    registerComponent(element, builder) {
+    _registerComponent(element, builder) {
         var _a;
         let groups = (_a = element.match(builder.regExp())) === null || _a === void 0 ? void 0 : _a.groups;
         if (!groups)

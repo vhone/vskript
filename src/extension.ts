@@ -1,11 +1,8 @@
-import { CancellationToken, EvaluatableExpression, ExtensionContext, IndentAction, languages, Position, Range, SemanticTokensLegend, TextDocument, workspace } from 'vscode';
+import { CancellationToken, EvaluatableExpression, ExtensionContext, IndentAction, languages, Position, Range, TextDocument, workspace } from 'vscode';
 import { onSkriptEnable } from './Skript';
 import * as Provider from './provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
-
-const tokenTypes = ['class', 'interface', 'enum', 'function', 'variable'];
-const tokenModifiers = ['declaration', 'documentation'];
-const legend = new SemanticTokensLegend(tokenTypes, tokenModifiers);
+import { LEGEND } from './provider/SkriptDocumentSemanticTokensProvider';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -28,7 +25,7 @@ export function activate(_context:ExtensionContext) {
 	languages.registerWorkspaceSymbolProvider(new Provider.SkriptWorkspaceSymbolProvider());
 	languages.registerHoverProvider('vskript', new Provider.SkriptHoverProvider());
 	languages.registerDefinitionProvider('vskript', new Provider.SkriptDefinitionProvider());
-	languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), legend);
+	languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), LEGEND);
 
 	// Event;
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);

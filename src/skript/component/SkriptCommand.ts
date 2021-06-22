@@ -26,13 +26,26 @@ export class SkriptCommandBuilder extends SkriptComponentBuilder<SkriptCommand> 
     }
     public build(): SkriptCommand | undefined {
         
+        // 명령어에 사용된 Options 바꾸기
         let options = this._skFile.components.filter(comp => comp instanceof SkriptOptions).reverse();
-        // for (const option of this._skFile.components) if (option instanceof SkriptOption) {
         for (const option of options) if (option instanceof SkriptOptions) {
-            if (option.range.end.isBefore(this._range.start)) for (const key of option.variables.keys()){
-                this._head = this._head.replace(`{@${key}}`, `${option.variables.get(key)}`);
+            if (option.range.end.isBefore(this._range.start)) for (const key of option.options.keys()){
+                this._head = this._head.replace(`{@${key}}`, `${option.options.get(key)}`);
             }
         }
+
+        // /^command\s(\/?[^\s]+)((?:\s+?[^\s\:]+)*)\s*?\:/i
+        let groups = this._head.match(/^command\s\/?(?<label>[^\s]+)(?<arguments>[^\:]*)/i)?.groups;
+        console.log(groups);
+
+        /* 
+         * 명령어 구체적으로 나누기
+         * [label]
+         * [arguemnts]
+         * [command option]
+         * [trigger]
+         */
+
         return new SkriptCommand(this._skFile, this._range, this._docs, this._head, this._body);
     }
 }

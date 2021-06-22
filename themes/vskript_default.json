@@ -9,7 +9,7 @@
 	},
 	"semanticHighlighting": true,
 	"semanticTokenColors": {
-		"variable": "#ff0000"
+		"aliases": { "foreground": "#7fcceb" }
 	},
 	"tokenColors": [
 		

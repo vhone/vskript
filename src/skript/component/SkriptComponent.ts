@@ -1,4 +1,5 @@
 import { MarkdownString, Range, SymbolKind } from "vscode";
+import { SkriptCodeContainer } from "../SkriptCodeCOntainer";
 import SkriptFile from "../SkriptFile";
 
 /** SkriptComponent 최상위 클래스 */

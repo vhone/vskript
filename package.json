@@ -50,6 +50,24 @@
 				"path": "./themes/vskript_default.json"
 			}
 		],
+		"semanticTokenTypes": [
+			{
+				"id": "templateType",
+				"superType": "type",
+				"description": "A templete type"
+			}
+		],
+		"semanticTokenModifiers": [
+			{
+				"id": "native",
+				"description" : "test token modifiers"
+			}
+		],
+		"configurationDefaults": {
+			"[vskript]": {
+				"editor.semanticHighlighting.enabled": true
+			}
+		},
 		"configuration":[
 			{
 				"title": "VSkript",

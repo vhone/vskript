@@ -29,17 +29,19 @@ class SkriptHoverProvider {
                 }
                 if (docThis) {
                     if (comp instanceof Component_1.SkriptOptions) {
-                        for (const variable of comp.variables) {
+                        for (const variable of comp.options) {
                             hover = this.createHover(lineText, position, `{@${variable[0]}}`, new vscode_1.MarkdownString().appendCodeblock(variable[1], 'vskript'));
-                            if (hover)
+                            if (hover) {
                                 return hover;
+                            }
                         }
                     }
                     else if (comp instanceof Component_1.SkriptAliases) {
-                        for (const itemtype of comp.itemtypes) {
+                        for (const itemtype of comp.aliases) {
                             let hover = this.createHover(lineText, position, itemtype[0], new vscode_1.MarkdownString().appendCodeblock(itemtype[1].join('\r\n')));
-                            if (hover)
+                            if (hover) {
                                 return hover;
+                            }
                         }
                     }
                 }

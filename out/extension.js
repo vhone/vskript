@@ -5,9 +5,7 @@ const vscode_1 = require("vscode");
 const Skript_1 = require("./Skript");
 const Provider = require("./provider");
 const TextDocumentChangeEvent_1 = require("./event/TextDocumentChangeEvent");
-const tokenTypes = ['class', 'interface', 'enum', 'function', 'variable'];
-const tokenModifiers = ['declaration', 'documentation'];
-const legend = new vscode_1.SemanticTokensLegend(tokenTypes, tokenModifiers);
+const SkriptDocumentSemanticTokensProvider_1 = require("./provider/SkriptDocumentSemanticTokensProvider");
 // Options
 vscode_1.languages.setLanguageConfiguration('vskript', {
     onEnterRules: [{
@@ -26,7 +24,7 @@ function activate(_context) {
     vscode_1.languages.registerWorkspaceSymbolProvider(new Provider.SkriptWorkspaceSymbolProvider());
     vscode_1.languages.registerHoverProvider('vskript', new Provider.SkriptHoverProvider());
     vscode_1.languages.registerDefinitionProvider('vskript', new Provider.SkriptDefinitionProvider());
-    vscode_1.languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), legend);
+    vscode_1.languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), SkriptDocumentSemanticTokensProvider_1.LEGEND);
     // Event;
     vscode_1.workspace.onDidChangeTextDocument(TextDocumentChangeEvent_1.default);
     vscode_1.languages.registerEvaluatableExpressionProvider('vskript', {

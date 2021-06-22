@@ -1,6 +1,6 @@
-import { ColorThemeKind, languages, Position, Range, Selection, SnippetString, TextDocument, TextDocumentChangeEvent, TextDocumentContentChangeEvent, ThemeColor, window, workspace } from 'vscode'
+import { Position, Range, SnippetString, TextDocument, TextDocumentChangeEvent, TextDocumentContentChangeEvent, window } from 'vscode'
 import * as Skript from '../Skript';
-import { SkriptComponent, SkriptFunction } from '../skript/Component';
+import { SkriptFunction } from '../skript/Component';
 
 let pass:boolean = false;
 

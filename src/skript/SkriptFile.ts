@@ -31,7 +31,7 @@ export default class SkriptFile {
         this._fsPath = joinPath(this._skDir, this._skName);
 		this._eol = (eol === EndOfLine.LF) ? '\n' : '\r\n';
 		
-		this.updateLineIndexArray();
+		this._updateLineIndexArray();
 		this.update(this._document);
 	}
 
@@ -63,19 +63,19 @@ export default class SkriptFile {
 
 	public update(document:string) {
 		this._document = document;
-		this.updateLineIndexArray();
+		this._updateLineIndexArray();
 
 		this._components.length = 0;
 
 		let elements = this._document.match(/^[a-zA-Z].*((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+/igm);
 		if (elements) for (let element of elements) {
 
-			element = this.trim(element);
-			if (this.registerComponent(element, new SkriptOptionsBuilder(this))) continue;
-			if (this.registerComponent(element, new SkriptAliasesBuilder(this))) continue;
-			if (this.registerComponent(element, new SkriptCommandBuilder(this))) continue;
-			if (this.registerComponent(element, new SkriptEventBuilder(this))) continue;
-			if (this.registerComponent(element, new SkriptFunctionBuilder(this))) continue;
+			element = this._trim(element);
+			if (this._registerComponent(element, new SkriptOptionsBuilder(this))) continue;
+			if (this._registerComponent(element, new SkriptAliasesBuilder(this))) continue;
+			if (this._registerComponent(element, new SkriptCommandBuilder(this))) continue;
+			if (this._registerComponent(element, new SkriptEventBuilder(this))) continue;
+			if (this._registerComponent(element, new SkriptFunctionBuilder(this))) continue;
 
 		}
 	}
@@ -89,7 +89,7 @@ export default class SkriptFile {
 		}
 	}
 
-	/** 글자에 해당하는 범위 반환 */
+	/** 글자에 해당하는 첫번째 범위 반환 */
 	public getRange(element:string): Range {
 		let index = this._document.indexOf(element);
 		let start = this.positionAt(index);
@@ -97,7 +97,7 @@ export default class SkriptFile {
 		return new Range(start, end);
 	}
 
-	/** 글자에 해당하는 범위 반환 */
+	/** 글자에 해당하는 모든 범위 반환 */
 	public getRanges(text:string): Range[] {
 		let rages = new Array<Range>();
 		let position = 0;
@@ -111,6 +111,11 @@ export default class SkriptFile {
 
 		return rages;
 	}
+
+	// /** 위치에 해당하는 패턴 타입 반환 */
+	// public getPatternType(pos:Position): PatternType {
+
+	// }
 
 	/** Position을 Offset으로 반환 */
 	public offsetAt(position:Position): number {
@@ -144,7 +149,7 @@ export default class SkriptFile {
 	}
 
 	/** 좌, 우 여백 제거 */
-	public trim(element: string): string {
+	private _trim(element: string): string {
 		let split = element.split(/\r\n|\r|\n/i);
 		for (let i=split.length - 1; i>=0; i--) {
 			if (split[i].match(/^((\t|\s)*(\#.*)?)?$/i))
@@ -156,7 +161,7 @@ export default class SkriptFile {
 	}
 
 	/** 글줄 위치값을 세팅 */
-	private updateLineIndexArray() {
+	private _updateLineIndexArray() {
 		this._lineIndexs.length = 0;
 		this._lineIndexs.push(0);
 		let index=0;
@@ -167,7 +172,7 @@ export default class SkriptFile {
 	}
 
 	/** 컴포넌트 생성 */
-	private registerComponent(element:string, builder:SkriptComponentBuilder<SkriptComponent>): boolean {
+	private _registerComponent(element:string, builder:SkriptComponentBuilder<SkriptComponent>): boolean {
 		let groups = element.match(builder.regExp())?.groups;
 		if (!groups)
 			return false;
