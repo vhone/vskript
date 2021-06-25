@@ -1,6 +1,7 @@
 import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
 import * as Skript from '../Skript';
 import { SkriptAliases, SkriptCommand, SkriptEvent, SkriptFunction, SkriptOptions } from '../skript/Component';
+import { OptionType, SkriptCommandOptionTypes as SkriptCommandOptionType } from '../skript/component/SkriptCommand';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
 
@@ -20,11 +21,22 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
             SYMBOLS_MAP.set(fsPath, symbols);
         
             let skFile = Skript.findFile(fsPath);
-            if (!skFile)
+            if (!skFile) {
                 return symbols;
+            }
         
-            for (const comp of skFile.components)
-                symbols.push(new DocumentSymbol(comp.name, '', comp.symbol, comp.range, comp.range));
+            for (const comp of skFile.components) {
+                let docSymbol = new DocumentSymbol(comp.name, '', comp.symbol, comp.range, comp.range);
+                
+                if (comp instanceof SkriptCommand) {
+                    for (const type of SkriptCommandOptionType.values()) {
+                        
+                    }
+                    comp.options.getOption()
+                }
+
+                symbols.push(docSymbol);
+            }
             
             return symbols;
 

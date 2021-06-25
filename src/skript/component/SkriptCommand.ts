@@ -1,4 +1,5 @@
-import { Range, SymbolKind } from "vscode";
+import { group } from "node:console";
+import { Position, Range, SymbolKind } from "vscode";
 import SkriptFile from "../SkriptFile";
 import { SkriptComponent, SkriptComponentBuilder } from "./SkriptComponent";
 import { SkriptOptions } from "./SkriptOptions";
@@ -7,7 +8,8 @@ export class SkriptCommand extends SkriptComponent {
 
     constructor(skFile:SkriptFile, range: Range, docs: string[],
         private readonly _header: SkriptCommandHeader,
-        private readonly _body: string
+        private readonly _options: SkriptCommandOptions,
+        private readonly _trigger: string[]
     ) {
         super(skFile, range, docs, _header.toString());
     }
@@ -18,8 +20,11 @@ export class SkriptCommand extends SkriptComponent {
     public get argument(): string | undefined {
         return this._header.argument;
     }
-    public get body(): string {
-        return this._body;
+    public get options(): SkriptCommandOptions {
+        return this._options;
+    }
+    public get trigger(): string[] {
+        return this._trigger;
     }
     public get symbol(): SymbolKind {
         return SymbolKind.Property;
@@ -33,24 +38,50 @@ export class SkriptCommandBuilder extends SkriptComponentBuilder<SkriptCommand> 
     }
     public build(): SkriptCommand | undefined {
         
-        // 명령어에 사용된 Options 바꾸기
+        // 명령어 해드에 사용된 Options 바꾸기
         let options = this._skFile.components.filter(comp => comp instanceof SkriptOptions).reverse();
         for (const option of options) if (option instanceof SkriptOptions) {
             if (option.range.end.isBefore(this._range.start)) for (const key of option.options.keys()){
                 this._head = this._head.replace(`{@${key}}`, `${option.options.get(key)}`);
             }
         }
-
         let header = new SkriptCommandHeader(this._head);
-        let optionConfig: SkriptCommandOptionConfig = {};
-        for (const line of this._body.split(/\r\n|\r|\n/i)) {
-            let groups = line.match(/^(\t|\s{4})(?<option>aliases|description|usage|permission message|executable by|permission|cooldown|cooldown message|cooldown bypass|cooldown storage)\:\s*(?<value>.*)/i)?.groups;
+
+        // 명령어 옵션
+        let position = this._range.start;
+
+        let cmdOptions = new SkriptCommandOptions();
+        let lines = this._body.split(/\r\n|\r|\n/i);
+        let triggerPos = 0;
+        let trigger = new Array<string>();
+        for (var i=0; i<lines.length; i++) {
+            let line = lines[i];
+            let groups = line.match(/^(?<space>\t|\s{4})(?<option>aliases|description|usage|permission message|executable by|permission|cooldown|cooldown message|cooldown bypass|cooldown storage|trigger)\:\s*(?<value>.*)/i)?.groups;
             if  (groups) {
-                // cmdOptions.set(groups.option, groups.value)
+                let type: SkriptCommandOptionType | undefined;
+                if (groups.option === 'aliases') type = SkriptCommandOptionType.ALIASES;
+                else if (groups.option === 'description') type = SkriptCommandOptionType.DESCRIPTION;
+                else if (groups.option === 'usage') type = SkriptCommandOptionType.USAGE;
+                else if (groups.option === 'permission') type = SkriptCommandOptionType.PERMISSION;
+                else if (groups.option === 'permission message') type = SkriptCommandOptionType.PERMISSION_MESSAGE;
+                else if (groups.option === 'executable by') type = SkriptCommandOptionType.EXECUTABLE_BY;
+                else if (groups.option === 'cooldown') type = SkriptCommandOptionType.COOLDOWN;
+                else if (groups.option === 'cooldown message') type = SkriptCommandOptionType.COOLDOWN_MESSAGE;
+                else if (groups.option === 'cooldown bypass') type = SkriptCommandOptionType.COOLDOWN_BYPASS;
+                else if (groups.option === 'cooldown storage') type = SkriptCommandOptionType.COOLDOWN_STORAGE;
+                else if (groups.option === 'trigger') triggerPos = i;
+                if (type) {
+                    let range = new Range(
+                        new Position(position.line + i, groups.space.length ),
+                        new Position(position.line + i, line.length )
+                        ); 
+                    cmdOptions.setOption(type, groups.value, range)
+                }
+            } else if (i === triggerPos + 1) {
+                trigger.push(line);
+                triggerPos++;
             }
         }
-        let skCommandOptions = new SkriptCommandOptions(optionConfig);
-        console.log(skCommandOptions);
 
         /* 
          * 명령어 구체적으로 나누기
@@ -59,62 +90,70 @@ export class SkriptCommandBuilder extends SkriptComponentBuilder<SkriptCommand> 
          * [command option]
          * [trigger]
          */
-
-        return new SkriptCommand(this._skFile, this._range, this._docs, header, this._body);
+        console.log(cmdOptions);
+        return new SkriptCommand(this._skFile, this._range, this._docs, header, cmdOptions, trigger);
     }
 }
 
-interface SkriptCommandOptionConfig {
-    aliases?: string;
-    description?: string;
-    usage?: string;
-    permission?: string;
-    permissionMessage?: string;
-    executableBy?: string;
-    cooldown?: string;
-    cooldownMessage?: string;
-    cooldownBypass?: string;
-    cooldownStorage?: string;
+enum SkriptCommandOptionType {
+    ALIASES = 'aliases',
+    DESCRIPTION = 'description',
+    USAGE = 'usage',
+    PERMISSION = 'permission',
+    PERMISSION_MESSAGE = 'permission message',
+    EXECUTABLE_BY = 'executable by',
+    COOLDOWN = 'cooldown',
+    COOLDOWN_MESSAGE = 'cooldown message',
+    COOLDOWN_BYPASS = 'cooldown bypass',
+    COOLDOWN_STORAGE = 'cooldown storage'
+}
+export const SkriptCommandOptionTypes = {
+    ALIASES: SkriptCommandOptionType.ALIASES,
+    DESCRIPTION: SkriptCommandOptionType.DESCRIPTION,
+    USAGE: SkriptCommandOptionType.USAGE,
+    PERMISSION: SkriptCommandOptionType.PERMISSION,
+    PERMISSION_MESSAGE: SkriptCommandOptionType.PERMISSION_MESSAGE,
+    EXECUTABLE_BY: SkriptCommandOptionType.EXECUTABLE_BY,
+    COOLDOWN: SkriptCommandOptionType.COOLDOWN,
+    COOLDOWN_MESSAGE: SkriptCommandOptionType.COOLDOWN_MESSAGE,
+    COOLDOWN_BYPASS: SkriptCommandOptionType.COOLDOWN_BYPASS,
+    COOLDOWN_STORAGE: SkriptCommandOptionType.COOLDOWN_STORAGE,
+    values: () => {
+        return [
+            SkriptCommandOptionType.ALIASES,
+            SkriptCommandOptionType.DESCRIPTION,
+            SkriptCommandOptionType.USAGE,
+            SkriptCommandOptionType.PERMISSION,
+            SkriptCommandOptionType.PERMISSION_MESSAGE,
+            SkriptCommandOptionType.EXECUTABLE_BY,
+            SkriptCommandOptionType.COOLDOWN,
+            SkriptCommandOptionType.COOLDOWN_MESSAGE,
+            SkriptCommandOptionType.COOLDOWN_BYPASS,
+            SkriptCommandOptionType.COOLDOWN_STORAGE
+        ]
+    }
+}
+
+
+interface SkriptCommandOptionContext {
+    type: SkriptCommandOptionType;
+    value?: string;
+    range: Range;
 }
 
 class SkriptCommandOptions {
-    
-    constructor(
-        private readonly _config: SkriptCommandOptionConfig) {
+
+    private _options = new Map<SkriptCommandOptionType, {value:string, range:Range}>();
+
+    constructor() {
     }
 
-    public get aliases() {
-        return this._config.aliases;
+    public setOption(type:SkriptCommandOptionType, value:string, range:Range) {
+        this._options.set(type, {value:value, range:range});
     }
-    /*
-    public get description() {
-        return this._options.get('description')
+    public getOption(type:SkriptCommandOptionType) {
+        return this._options.get(type);
     }
-    public get usage() {
-        return this._options.get('usage')
-    }
-    public get permission() {
-        return this._options.get('permission')
-    }
-    public get permissionMessage() {
-        return this._options.get('permission message')
-    }
-    public get executableBy() {
-        return this._options.get('executable by')
-    }
-    public get cooldown() {
-        return this._options.get('cooldown')
-    }
-    public get cooldownMessage() {
-        return this._options.get('cooldown message')
-    }
-    public get cooldownBypass() {
-        return this._options.get('cooldown bypass')
-    }
-    public get cooldownStorage() {
-        return this._options.get('cooldown storage')
-    }
-    */
 
 }
 

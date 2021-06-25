@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkriptDocumentSymbolProvider = void 0;
 const vscode_1 = require("vscode");
 const Skript = require("../Skript");
+const Component_1 = require("../skript/Component");
+const SkriptCommand_1 = require("../skript/component/SkriptCommand");
 const SYMBOLS_MAP = new Map();
 /**
  * ```Ctrl + Shift + O``` 단축키로 바로 갈 수 있는 기능
@@ -19,10 +21,18 @@ class SkriptDocumentSymbolProvider {
             let symbols = new Array();
             SYMBOLS_MAP.set(fsPath, symbols);
             let skFile = Skript.findFile(fsPath);
-            if (!skFile)
+            if (!skFile) {
                 return symbols;
-            for (const comp of skFile.components)
-                symbols.push(new vscode_1.DocumentSymbol(comp.name, '', comp.symbol, comp.range, comp.range));
+            }
+            for (const comp of skFile.components) {
+                let docSymbol = new vscode_1.DocumentSymbol(comp.name, '', comp.symbol, comp.range, comp.range);
+                if (comp instanceof Component_1.SkriptCommand) {
+                    for (const type of SkriptCommand_1.SkriptCommandOptionTypes.values()) {
+                    }
+                    comp.options.getOption();
+                }
+                symbols.push(docSymbol);
+            }
             return symbols;
         }
         else {
