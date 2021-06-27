@@ -154,9 +154,9 @@
 
 
 		"function": {
-			"match": "^(function)\\s(\\w+\\((.*)\\))(\\:|\\s\\:\\:\\s([^:]+)\\:)",
+			"match": "^(function)\\s(\\w+)\\((.*)\\)(\\:|\\s\\:\\:\\s([^:]+)\\:)",
 			"captures": {
-				"1": { "name": "vskript.function" },
+				"1": { "name": "vskript.function.keyword" },
 				"2": { "name": "vskript.function.name" },
 				"3": { "patterns": [ { "include": "#function.parameter" } ] },
 				"4": { "name": "vskript.function.type" },
@@ -173,7 +173,7 @@
 		"function.parameter": {
 			"match": "([^():,]+):([^():,]+)",
 			"captures": {
-				"1": { },
+				"1": { "name": "vskript.function.parameter" },
 				"2": { "patterns": [ { "include": "#type" } ] }
 			},
 			"_comment": {
@@ -530,6 +530,8 @@
 			"name": "vskript.variable.local",
 			"begin": "\\{\\_",
 			"end": "\\}",
+			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
+			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"patterns": [
 				{	"include": "#variable.option"	},
 				{	"include": "#variable.runtime"	},
@@ -540,6 +542,8 @@
 			"name": "vskript.variable.runtime",
 			"begin": "\\{\\-",
 			"end": "\\}",
+			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
+			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"patterns": [
 				{	"include": "#variable.option"	},
 				{	"include": "#variable.local"	},
@@ -550,6 +554,8 @@
 			"name": "vskript.variable.normal",
 			"begin": "\\{",
 			"end": "\\}",
+			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
+			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"patterns": [
 				{	"include": "#variable.option"	},
 				{	"include": "#variable.local"	},
