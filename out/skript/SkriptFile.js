@@ -110,10 +110,10 @@ class SkriptFile {
         for (let i = 0; i < this._components.length; i++) {
             let comp = this._components[i];
             if (comp.range.contains(pos)) {
-                return;
+                return comp;
             }
             else if (pos.isBeforeOrEqual(comp.range.start)) {
-                return this._components[i];
+                return;
             }
         }
         return;

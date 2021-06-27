@@ -54,6 +54,9 @@ class SkriptFunction extends SkriptComponent_1.SkriptComponent {
         }
         return this._markdown;
     }
+    contextOf(_position) {
+        return 'function';
+    }
     /** 함수 선언부 */
     toDeclaration() {
         let parms = this._parameters.join();

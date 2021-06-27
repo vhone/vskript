@@ -12,6 +12,7 @@ function TextDocumentChangeEvent(event) {
     let changes = event.contentChanges;
     if (changes.length < 0)
         return;
+    // 입려 후 파일 업데이트
     let skFile = Skript.findFile(document.uri.fsPath);
     skFile.update(document.getText());
     for (const context of changes) {

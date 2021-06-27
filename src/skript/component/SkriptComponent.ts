@@ -1,4 +1,5 @@
-import { MarkdownString, Range, SymbolKind } from "vscode";
+import { MarkdownString, Position, Range, SymbolKind } from "vscode";
+import { SkriptContext } from "../Context";
 import { SkriptCodeContainer } from "../SkriptCodeCOntainer";
 import SkriptFile from "../SkriptFile";
 
@@ -6,6 +7,8 @@ import SkriptFile from "../SkriptFile";
 export abstract class SkriptComponent {
     
     protected _markdown!: MarkdownString;
+    public detail: string | undefined;
+
     constructor(
         protected readonly _skFile: SkriptFile,
         protected readonly _range: Range,
@@ -13,15 +16,16 @@ export abstract class SkriptComponent {
         protected readonly _name: string
     ) {}
 
-    public get range(): Range {
+    public get range() {
         return this._range;
     }
-    public get docs(): string[] {
+    public get docs() {
         return Object.assign(this._docs, {});
     }
-    public get name(): string {
+    public get name() {
         return this._name;
     }
+    abstract contextOf(position:Position): string | SkriptContext;
     abstract get symbol(): SymbolKind;
 
 }

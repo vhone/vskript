@@ -1,13 +1,13 @@
-import { Range, SymbolKind } from "vscode";
+import { Position, Range, SymbolKind } from "vscode";
 import SkriptFile from "../SkriptFile";
 import { SkriptComponent, SkriptComponentBuilder } from "./SkriptComponent";
 
 export class SkriptAliases extends SkriptComponent {
 
-    constructor(_skFile: SkriptFile, _range: Range, _docs: string[], _name: string,
+    constructor(skFile: SkriptFile, range: Range, docs: string[], name: string,
         protected readonly _aliases: Map<string,string[]>
     ) {
-        super(_skFile, _range, _docs, _name);
+        super(skFile, range, docs, name);
     }
 
     public get aliases(): Map<string,string[]> {
@@ -15,6 +15,9 @@ export class SkriptAliases extends SkriptComponent {
     }
     public get symbol(): SymbolKind {
         return SymbolKind.Constant;
+    }
+    public contextOf(_position: Position): string {
+        return 'aliases'
     }
     
 }

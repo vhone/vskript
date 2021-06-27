@@ -133,7 +133,7 @@
 			}
 		},
 		"command.options": {
-			"match": "^(\\t|\\s{4})(aliases|permission|trigger|description|usage)\\:",
+			"match": "^(\\t|\\s{4})(aliases|description|usage|permission message|executable by|permission|cooldown|cooldown message|cooldown bypass|cooldown storage|trigger)\\:",
 			"captures": {
 				"2": {	"name": "vskript.command.options"},
 				"3": {	

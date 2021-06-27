@@ -1,6 +1,7 @@
 import { CancellationToken, DocumentSemanticTokensProvider, Position, ProviderResult, Range, SemanticTokens, SemanticTokensBuilder, SemanticTokensLegend, TextDocument } from "vscode";
 import * as Skript from '../Skript';
 import { SkriptAliases } from "../skript/Component";
+import { SkriptExprText } from "../skript/Context";
 
 export const LEGEND = new SemanticTokensLegend(['aliases']);
 
@@ -18,7 +19,11 @@ export class SkriptDocumentSemanticTokensProvider implements DocumentSemanticTok
             let position = comp.range.end;
             for (const key of comp.aliases.keys()) {
                 for (const range of skFile.getRanges(key)) if (range.start.isAfterOrEqual(position)) {
-                    builder.push(range, 'aliases');
+                    let thisComp = skFile.componentOf(range.start);
+                    let context = thisComp?.contextOf(range.start);
+                    if (!(thisComp?.contextOf(range.start) instanceof SkriptExprText)) {
+                        builder.push(range, 'aliases');
+                    }
                 }
             }
         }

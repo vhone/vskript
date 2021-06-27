@@ -1,4 +1,4 @@
-import { MarkdownString, Range, SymbolKind } from "vscode";
+import { MarkdownString, Position, Range, SymbolKind } from "vscode";
 import SkriptFile from "../SkriptFile";
 import { SkriptComponent, SkriptComponentBuilder } from "./SkriptComponent";
 
@@ -59,6 +59,9 @@ import { SkriptComponent, SkriptComponentBuilder } from "./SkriptComponent";
 		}
 		return this._markdown;
 	}
+    public contextOf(_position: Position): string {
+        return 'function'
+    }
 
 	/** 함수 선언부 */
 	public toDeclaration(): string {

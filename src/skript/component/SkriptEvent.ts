@@ -1,4 +1,4 @@
-import { Range, SymbolKind } from "vscode";
+import { Position, Range, SymbolKind } from "vscode";
 import SkriptFile from "../SkriptFile";
 import { SkriptComponent, SkriptComponentBuilder } from "./SkriptComponent";
 
@@ -15,6 +15,9 @@ export class SkriptEvent extends SkriptComponent {
     }
     public get symbol(): SymbolKind {
         return SymbolKind.Event;
+    }
+    public contextOf(_position: Position): string {
+        return 'event'
     }
 
 }

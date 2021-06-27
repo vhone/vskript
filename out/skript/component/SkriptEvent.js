@@ -14,6 +14,9 @@ class SkriptEvent extends SkriptComponent_1.SkriptComponent {
     get symbol() {
         return vscode_1.SymbolKind.Event;
     }
+    contextOf(_position) {
+        return 'event';
+    }
 }
 exports.SkriptEvent = SkriptEvent;
 class SkriptEventBuilder extends SkriptComponent_1.SkriptComponentBuilder {
