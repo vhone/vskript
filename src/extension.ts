@@ -1,9 +1,6 @@
-import { CancellationToken, EvaluatableExpression, ExtensionContext, IndentAction, languages, Position, QuickInputButtons, Range, TextDocument, workspace } from 'vscode';
+import { ExtensionContext, IndentAction, languages, Position, Range } from 'vscode';
 import { onSkriptEnable } from './Skript';
-import * as Provider from './provider';
-import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
-import { LEGEND } from './provider/SkriptDocumentSemanticTokensProvider';
-import { SkriptExpression, SkriptExprFunction, SkriptExprText, SkriptExprVariable } from './skript/Context';
+import { SkriptExpression, SkriptExprVariable } from './skript/Context';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -18,7 +15,8 @@ languages.setLanguageConfiguration('vskript', {
 export function activate(_context:ExtensionContext) {
 
 	onSkriptEnable();
-
+	
+	/*
 	// Provider
 	languages.registerCompletionItemProvider('vskript', new Provider.SkriptCompletionItemProvider());
 	languages.registerColorProvider('vskript', new Provider.SkriptDocumentColorProvider());
@@ -37,12 +35,13 @@ export function activate(_context:ExtensionContext) {
 			return new EvaluatableExpression(new Range(new Position(1,0), new Position(1,10)));
 		}
 	})
+	*/
 
 
 
 	
-	let expressionMap = createExpressionMap(1, `set {_a} to func( a, "b", {_c::%{_d}%}, "func3() = %% 퍼센트 %func2( player, {_b}, func4() )%" )`);
-	console.log(expressionMap);
+	// let expressionMap = createExpressionMap(1, `set {_a} to func( a, "b", {_c::%{_d}%}, "func3() = %% 퍼센트 %func2( player, {_b}, func4() )%" )`);
+	// console.log(expressionMap);
 }
 
 export function deactivate() {}
