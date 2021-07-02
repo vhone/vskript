@@ -1,4 +1,4 @@
-import { workspace, window, EndOfLine, TextEditorDecorationType, DocumentSymbol, Range } from 'vscode'
+import { workspace, window, EndOfLine, TextEditorDecorationType, DocumentSymbol, Range, Uri, CommentThreadCollapsibleState } from 'vscode'
 import { readdirSync, readFileSync } from 'fs'
 import { extname, join } from 'path'
 import SkriptFile from "./skript/SkriptFile";
@@ -19,9 +19,11 @@ export function onSkriptEnable() {
 	if (folders) {
 		for (const iter of folders) {
 			let skPath = iter.uri.fsPath;
-			for (let fsPath of getSkriptPathArray(skPath)) {
+			for (let fsPath of _getSkriptPathArray(skPath)) {
 				let skName = fsPath.replace(skPath+'\\', '');
 				let skFile = new SkriptFile(readFileSync(fsPath,'UTF-8'), skPath, skName, EndOfLine.CRLF);
+				let uri = Uri.parse(fsPath);
+				console.log(uri);
 				FILE_LIST.push(skFile);
 				amtFunc += skFile.components.filter(comp => comp instanceof SkriptFunction).length;
 			}
@@ -50,16 +52,14 @@ export function findFile(fsPath:string): SkriptFile | undefined {
 
 
 /** path의 하위경로를 포함한 모든 skript path 받아오기 */
-function getSkriptPathArray(path:string): Array<string> {
+function _getSkriptPathArray(path:string): Array<string> {
 	let skPathArray:Array<string> = new Array<string>();
 	readdirSync(path,{withFileTypes:true}).forEach((file) => {
 		if (file.name.charAt(0) == '-')
 			return
 		let dir = join(path,file.name);
 		if (file.isDirectory()) {
-			for (const iter of getSkriptPathArray(dir)) {
-				skPathArray.push(iter);
-			}
+			skPathArray.push(..._getSkriptPathArray(dir));
 		} else if (extname(file.name) == '.sk') {
 			skPathArray.push(dir);
 		}
