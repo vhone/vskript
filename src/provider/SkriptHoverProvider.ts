@@ -23,7 +23,7 @@ export class SkriptHoverProvider implements HoverProvider {
 
         let lineText = document.lineAt(position.line).text;
         
-        for(const skFile of Skript.getFileList()) {
+        for(const skFile of Skript.getSkriptDocuments()) {
 
             let docThis = skFile.fsPath === document.uri.fsPath;
             for (const comp of skFile.components) {

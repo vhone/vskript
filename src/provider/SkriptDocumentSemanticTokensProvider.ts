@@ -9,7 +9,7 @@ export class SkriptDocumentSemanticTokensProvider implements DocumentSemanticTok
     provideDocumentSemanticTokens(document: TextDocument, _token: CancellationToken): ProviderResult<SemanticTokens> {
         console.log('SkriptDocumentSemanticTokensProvider');
 
-        let skFile = Skript.findFile(document.uri.fsPath);
+        let skFile = Skript.findDocument(document.uri.fsPath);
         if (!skFile) {
             return;
         }

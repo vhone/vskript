@@ -1,7 +1,7 @@
 import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
 import * as Skript from '../Skript';
-import { SkriptCommand } from '../skript/Component';
 import { SkriptExpression, SkriptExprFunction, SkriptExprText, SkriptExprVariable } from '../skript/Context';
+import { SkriptAliases, SkriptOptions, SkriptCommand } from '../skript_fork/SkriptParagraph';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
 
@@ -20,74 +20,40 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
             let symbols = new Array<DocumentSymbol>();
             SYMBOLS_MAP.set(fsPath, symbols);
         
-            let skFile = Skript.findFile(fsPath);
-            if (!skFile) {
+            let skDocument = Skript.find(fsPath);
+            if (!skDocument) {
                 return symbols;
             }
         
-            for (const comp of skFile.components) {
+            for (const paragraph of skDocument.paragraphs) {
 
                 // Component 심볼
-                let compSymbol = new DocumentSymbol(comp.name, comp.detail!, comp.symbol, comp.range, comp.range);
+                let paragraphSymbol = new DocumentSymbol(paragraph.title, '', paragraph.symbolKind, paragraph.range, paragraph.range);
                 
-                if (comp instanceof SkriptCommand) {
-
-                    // Option 심볼
-                    for (const option of comp.options) {
-                        let optionSymbol = new DocumentSymbol(option.name, option.value, option.symbol, option.range, option.range);
-                        compSymbol.children.push(optionSymbol);
+                if (paragraph instanceof SkriptAliases) {
+                    for (const phrase of paragraph.phrases) {
+                        let value = Object.assign(phrase.value, {}).map(v => v.replace('minecraft:', '')).join(', ');
+                        let phraseSymbol = new DocumentSymbol(phrase.key, value, SymbolKind.Enum, phrase.range, phrase.range);
+                        paragraphSymbol.children.push(phraseSymbol);
                     }
 
-                    // Trigger 심볼
-                    let trigger = comp.trigger;
-                    let triggerSymbol = new DocumentSymbol(trigger.name, '', trigger.symbol, trigger.range, trigger.range);
-                    compSymbol.children.push(triggerSymbol);
+                } else if (paragraph instanceof SkriptOptions) {
+                    for (const phrase of paragraph.phrases) {
+                        let phraseSymbol = new DocumentSymbol(phrase.key, phrase.value, SymbolKind.Enum, phrase.range, phrase.range);
+                        paragraphSymbol.children.push(phraseSymbol);
+                        
+                    }
 
-                    // 중복등록 방지
-                    let variableChecker = new Set<SkriptExprVariable>();
-                    let textChecker = new Set<SkriptExprText>();
-                    let functionChecker = new Set<SkriptExprFunction>();
-
-                    // Text 심볼
-                    for (const text of trigger.texts) {
-                        textChecker.add(text);
-                        let textSymbol = this._createSymbol(text);
-                        triggerSymbol.children.push(textSymbol);
-
-                        for (const child of text.getChildren()) {
-                            if (child instanceof SkriptExprVariable) {
-                                variableChecker.add(child);
-                                let variableSymbol = this._createSymbol(child);
-                                textSymbol.children.push(variableSymbol);
-                            } else if (child instanceof SkriptExprFunction) {
-                                functionChecker.add(child);
-                                let functionSymbol = this._createSymbol(child);
-                                textSymbol.children.push(functionSymbol);
-                            }
+                } else if (paragraph instanceof SkriptCommand) {
+                    if (paragraph.options) {
+                        for (const option of paragraph.options) {
+                            let optionSymbol = new DocumentSymbol(option.key, option.value, SymbolKind.Property, option.range, option.range);
+                            paragraphSymbol.children.push(optionSymbol);
                         }
                     }
-
-                    // // function 심볼
-                    // for (const func of trigger.functions) if (!functionChecker.has(func) {
-                    //     functionChecker.add(func);
-                    //     let functionSymbol = new DocumentSymbol(func.name, '', SymbolKind.Function, func.range, func.range);
-                    //     triggerSymbol.children.push(functionSymbol);
-                    //     for (const child of func.getChildren()) {
-                    //         if (child instanceof SkriptExprText) {
-
-                    //         }
-                    //     }
-                    // }
-
-                    // Variable 심볼
-                    for (const variable of trigger.variables) if (!variableChecker.has(variable)) {
-                        let variableSymbol = new DocumentSymbol(variable.code, '', SymbolKind.Variable, variable.range, variable.range);
-                        triggerSymbol.children.push(variableSymbol);
-                    }
-
                 }
 
-                symbols.push(compSymbol);
+                symbols.push(paragraphSymbol);
                     
             }
             

@@ -1,6 +1,8 @@
-import { ExtensionContext, IndentAction, languages, Position, Range } from 'vscode';
+import { ExtensionContext, IndentAction, languages, Position, Range, workspace } from 'vscode';
 import { onSkriptEnable } from './Skript';
 import { SkriptExpression, SkriptExprVariable } from './skript/Context';
+import * as Provider from './provider';
+import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -15,19 +17,21 @@ languages.setLanguageConfiguration('vskript', {
 export function activate(_context:ExtensionContext) {
 
 	onSkriptEnable();
-	
-	/*
+
 	// Provider
-	languages.registerCompletionItemProvider('vskript', new Provider.SkriptCompletionItemProvider());
-	languages.registerColorProvider('vskript', new Provider.SkriptDocumentColorProvider());
 	languages.registerDocumentSymbolProvider('vskript', new Provider.SkriptDocumentSymbolProvider());
 	languages.registerWorkspaceSymbolProvider(new Provider.SkriptWorkspaceSymbolProvider());
+	
+	// Event;
+	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
+	
+	/*
+	languages.registerCompletionItemProvider('vskript', new Provider.SkriptCompletionItemProvider());
+	languages.registerColorProvider('vskript', new Provider.SkriptDocumentColorProvider());
 	languages.registerHoverProvider('vskript', new Provider.SkriptHoverProvider());
 	languages.registerDefinitionProvider('vskript', new Provider.SkriptDefinitionProvider());
 	languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), LEGEND);
 
-	// Event;
-	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
 
 	languages.registerEvaluatableExpressionProvider('vskript', {
 		provideEvaluatableExpression(_document: TextDocument, _position: Position, _token: CancellationToken): EvaluatableExpression {

@@ -14,21 +14,22 @@ export default function TextDocumentChangeEvent(event:TextDocumentChangeEvent) {
         return;
 
     // 입려 후 파일 업데이트
-    let skFile = Skript.findFile(document.uri.fsPath)!;
-    skFile.update(document.getText());
+    let skDocument = Skript.find(document.uri.fsPath)!;
+    skDocument.update(document.getText());
     
-    for (const context of changes) {
-        let text = context.text;
+    // for (const context of changes) {
+    //     let text = context.text;
 
-        // 개행 입력
-        if (text.match(/^(\r\n|\r|\n)(\t|\s)*$/i)) {
-            inputEnter(context, document);
+    //     // 개행 입력
+    //     if (text.match(/^(\r\n|\r|\n)(\t|\s)*$/i)) {
+    //         inputEnter(context, document);
 
-        }
-    }
+    //     }
+    // }
 }
 
 function inputEnter(context: TextDocumentContentChangeEvent, document: TextDocument) {
+
     // docs 기호 선입력 확인
     let i = context.range.start.line;
     let line = document.lineAt(i).text;
@@ -49,18 +50,18 @@ function inputEnter(context: TextDocumentContentChangeEvent, document: TextDocum
                 builder.delete(new Range(document.lineAt(i).range.start, document.lineAt(i+1).range.end));
             });
 
-            let skFile = Skript.findFile(document.uri.fsPath);
-            if (!skFile)
+            let skDocument = Skript.find(document.uri.fsPath);
+            if (!skDocument)
                 return;
-            let skComp = skFile.componentOf(context.range.start);
-            if (!skComp || !(skComp instanceof SkriptFunction))
+            let skParagraph = skDocument.paragraphOf(context.range.start);
+            if (!skParagraph || !(skParagraph instanceof SkriptFunction))
                 return;
 
             let docs = new Array<string>();
             let j = 1;
-            for (const param of skComp.parameters)
+            for (const param of skParagraph.parameters)
                 docs.push(`#> @parm ${param.name} \${${j++}}`)
-            if (skComp.type)
+            if (skParagraph.type)
                 docs.push(`#> @return \${${j++}}`);
             docs.unshift(`#> \${${j}}`)
             editor.insertSnippet(new SnippetString(docs.join('\r\n')), context.range);

@@ -16,11 +16,11 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
     provideCompletionItems(document: TextDocument /*position: Position, token: CancellationToken, context: CompletionContext*/ ) {
         let fsPath = document.uri.fsPath;
         if (ITEMS_MAP.size === 0){
-            for (let skFile of Skript.getFileList()){
+            for (let skFile of Skript.getSkriptDocuments()){
                 this.updateFunctionCompletionItem(skFile);
             }
         } else if (!ITEMS_MAP.has(fsPath) || document.isDirty) {
-            this.updateFunctionCompletionItem(Skript.findFile(fsPath)!);
+            this.updateFunctionCompletionItem(Skript.findDocument(fsPath)!);
         }
 
         let response = new Array<CompletionItem>();

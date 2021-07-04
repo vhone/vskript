@@ -9,7 +9,7 @@ export class SkriptDefinitionProvider implements DefinitionProvider {
         let range = document.getWordRangeAtPosition(position);
         if (range) {
             let funcName = document.getText(range);
-            for(const skFile of Skript.getFileList()) {
+            for(const skFile of Skript.getSkriptDocuments()) {
                 for (const comp of skFile.components) if (comp instanceof SkriptFunction && comp.name === funcName) {
 					let uri = Uri.file(skFile.fsPath);
 					let location = new Location(uri, comp.range);

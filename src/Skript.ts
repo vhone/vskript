@@ -1,70 +1,77 @@
-import { workspace, window, EndOfLine, TextEditorDecorationType, DocumentSymbol, Range, Uri, CommentThreadCollapsibleState } from 'vscode'
-import { readdirSync, readFileSync } from 'fs'
-import { extname, join } from 'path'
-import SkriptFile from "./skript/SkriptFile";
-import { SkriptFunction } from './skript/Component';
+import { workspace, window } from 'vscode'
+import * as FileSystem from 'fs'
+import * as Path from 'path'
+import { SkriptDocument } from './skript_fork/SkriptDocument';
+import { SkriptPath } from './skript_fork/SkriptPath';
+import { SkriptAliases, SkriptParagraph } from './skript_fork/SkriptParagraph';
 
 export * as Component from './skript/Component';
 
 
 
-const FILE_LIST = new Array<SkriptFile>();
+const WORKSAPCE_FATH = workspace.workspaceFolders;
+
+export const DOCUMENTS = new Array<SkriptDocument>();
 
 
 
 /** 스크립트 실행 */
-export function onSkriptEnable() {
-	let amtFunc: number = 0;
-	let folders = workspace.workspaceFolders;
-	if (folders) {
-		for (const iter of folders) {
-			let skPath = iter.uri.fsPath;
-			for (let fsPath of _getSkriptPathArray(skPath)) {
-				let skName = fsPath.replace(skPath+'\\', '');
-				let skFile = new SkriptFile(readFileSync(fsPath,'UTF-8'), skPath, skName, EndOfLine.CRLF);
-				let uri = Uri.parse(fsPath);
-				console.log(uri);
-				FILE_LIST.push(skFile);
-				amtFunc += skFile.components.filter(comp => comp instanceof SkriptFunction).length;
-			}
+export async function onSkriptEnable() {
+	if (WORKSAPCE_FATH) {
+		// let amtFunc: number = 0;
+		for (const path of WORKSAPCE_FATH) {
+			let rootPath = new SkriptPath(path.uri.fsPath, '');
+			for (let skPath of await _getSkriptPaths(rootPath)) {
+				let document = FileSystem.readFileSync(skPath.fsPath, {encoding: 'UTF-8'});
+				let skDocument = new SkriptDocument(skPath, document);
+				DOCUMENTS.push(skDocument);
+			};
+
+			// for (let fsPath of _getSkriptPathArray(skPath)) {
+			// 	let skName = fsPath.replace(skPath+'\\', '');
+			// 	let skFile = new SkriptFile(readFileSync(fsPath,'UTF-8'), skPath, skName, EndOfLine.CRLF);
+			// 	FILE_LIST.push(skFile);
+			// 	amtFunc += skFile.components.filter(comp => comp instanceof SkriptFunction).length;
+			// }
 		}
+		console.log(DOCUMENTS);
+		// window.showInformationMessage(`Loaded ${amtFunc} functions.`);
+		// window.showInformationMessage(`Loaded ${FILE_LIST.length} skript files.`);
+		window.showInformationMessage(`Loaded ${DOCUMENTS.length} skript files.`);
 	}
-	if (amtFunc > 0) window.showInformationMessage(`Loaded ${amtFunc} functions.`);
-	if (FILE_LIST.length > 0) window.showInformationMessage(`Loaded ${FILE_LIST.length} skript files.`);
 	
 }
 
 
 
-/** 모든 SkriptFile 반환 */
-export function getFileList(): Array<SkriptFile> {
-	return FILE_LIST;
-}
-
 /** 경로와 같은 SkriptFile이 있으면 반환 */
-export function findFile(fsPath:string): SkriptFile | undefined {
-	for (const file of FILE_LIST)
-		if (file.fsPath === fsPath) return file;
+export function find(fsPath:string): SkriptDocument | undefined {
+	for (const document of DOCUMENTS) if (document.skPath.fsPath === fsPath) {
+		return document;
+	}
 	return;
 }
 
 
 
-
-/** path의 하위경로를 포함한 모든 skript path 받아오기 */
-function _getSkriptPathArray(path:string): Array<string> {
-	let skPathArray:Array<string> = new Array<string>();
-	readdirSync(path,{withFileTypes:true}).forEach((file) => {
-		if (file.name.charAt(0) == '-')
-			return
-		let dir = join(path,file.name);
-		if (file.isDirectory()) {
-			skPathArray.push(..._getSkriptPathArray(dir));
-		} else if (extname(file.name) == '.sk') {
-			skPathArray.push(dir);
+/** 하위경로 받아오기 */
+async function _getSkriptPaths(loopPath: SkriptPath): Promise<SkriptPath[]> {
+	let skPathArray = new Array<SkriptPath>();
+	for (const file of FileSystem.readdirSync(loopPath.fsPath, {encoding:'UTF-8', withFileTypes:true})) {
+		let skPath = new SkriptPath(loopPath.root, Path.join(loopPath.name, file.name));
+		if (file.name.charAt(0) === '-') {
+			continue;
 		}
-	});
-	return skPathArray;
+		if (file.isDirectory()) {
+			skPathArray.push(...await _getSkriptPaths(skPath))
+		} else if (Path.extname(file.name) === '.sk') {
+			skPathArray.push(skPath);
+		}
+	};
+	return new Promise((resolve) => {
+		resolve(skPathArray);
+	})
 }
+
 
 
