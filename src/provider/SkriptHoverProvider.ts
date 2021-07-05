@@ -1,7 +1,7 @@
 import { create } from 'node:domain';
 import { Hover, HoverProvider, MarkdownString, Position, Range, TextDocument, Uri } from 'vscode'
 import * as Skript from "../Skript"
-import { SkriptAliases, SkriptFunction, SkriptOptions } from '../skript/Component';
+import { SkriptFunction } from '../skript_fork/SkriptParagraph';
 
 export class SkriptHoverProvider implements HoverProvider {
 
@@ -23,22 +23,22 @@ export class SkriptHoverProvider implements HoverProvider {
 
         let lineText = document.lineAt(position.line).text;
         
-        for(const skFile of Skript.getSkriptDocuments()) {
+        for(const skDocument of Skript.DOCUMENTS) {
 
-            let docThis = skFile.fsPath === document.uri.fsPath;
-            for (const comp of skFile.components) {
+            let docThis = skDocument.skPath.fsPath === document.uri.fsPath;
+            for (const paragraph of skDocument.paragraphs) {
 
                 let hover = null;
 
-                if (comp instanceof SkriptFunction) {
-                    hover = this.createHover(lineText, position, comp.name, comp.markdown);
+                if (paragraph instanceof SkriptFunction) {
+                    hover = this.createHover(lineText, position, paragraph.title, paragraph.tooltip);
                     if (hover) 
                         return hover;
                 }
 
                 if (docThis) {
-                    if (comp instanceof SkriptOptions) {
-                        for (const variable of comp.options) {
+                    if (paragraph instanceof SkriptOptions) {
+                        for (const variable of paragraph.options) {
                             hover = this.createHover(lineText, position,
                                 `{@${variable[0]}}`,
                                 new MarkdownString().appendCodeblock(variable[1], 'vskript'));
@@ -46,8 +46,8 @@ export class SkriptHoverProvider implements HoverProvider {
                                 return hover;
                             }
                         }
-                    } else if (comp instanceof SkriptAliases)  {
-                        for (const itemtype of comp.aliases) {
+                    } else if (paragraph instanceof SkriptAliases)  {
+                        for (const itemtype of paragraph.aliases) {
                             let hover = this.createHover(lineText, position,
                                 itemtype[0],
                                 new MarkdownString().appendCodeblock(itemtype[1].join('\r\n')));

@@ -1,7 +1,6 @@
-import { CommentThreadCollapsibleState, Range, SymbolKind } from "vscode";
+import { Range, SymbolKind } from "vscode";
 import { SkriptDocument } from "./SkriptDocument";
 import { SkriptLine } from "./SkriptLine";
-import { SkriptPath } from "./SkriptPath";
 import { SkriptToolTip } from "./SkriptToolTip";
 
 
@@ -42,7 +41,7 @@ export class SkriptParagraphBuilder {
     private _paragraph: string;
 
     private _skDocument: SkriptDocument;
-    private _skToolTip: SkriptToolTip | undefined;
+    private _skToolTip?: SkriptToolTip;
 
     constructor (skDocument: SkriptDocument, paragraph:string) {
         this._skDocument = skDocument;
