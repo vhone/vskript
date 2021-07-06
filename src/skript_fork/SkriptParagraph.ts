@@ -9,13 +9,12 @@ export abstract class SkriptParagraph {
     private readonly _skDocument: SkriptDocument;
     private readonly _range: Range;
     private readonly _title: string;
-    private readonly _skToolTip: SkriptToolTip | undefined;
+    private _skToolTip?: SkriptToolTip;
 
-    constructor (skDocument:SkriptDocument, range:Range, title:string, skToolTip?:SkriptToolTip) {
+    constructor (skDocument:SkriptDocument, range:Range, title:string) {
         this._skDocument = skDocument;
         this._range = range;
         this._title = title;
-        this._skToolTip = skToolTip;
     }
 
     public get document(): SkriptDocument {
@@ -30,6 +29,11 @@ export abstract class SkriptParagraph {
     public get tooltip(): SkriptToolTip | undefined {
         return this._skToolTip;
     }
+    public setToolTip(skTooltip:SkriptToolTip) {
+        this._skToolTip = skTooltip;
+    }
+    
+    
     
     abstract get symbolKind(): SymbolKind;
 }
@@ -130,7 +134,7 @@ export class SkriptParagraphBuilder {
     }
 
     private _createEvent(range:Range, paragraph:string, head:string, body:string): SkriptEvent {
-        return new SkriptEvent(this._skDocument, range, head, this._skToolTip);
+        return new SkriptEvent(this._skDocument, range, head);
     }
 
     private _createCommand(range:Range, paragraph:string, head:string, body:string): SkriptCommand {

@@ -6,14 +6,15 @@ import { SkriptParagraph } from "./SkriptParagraph";
 export class SkriptToolTip {
     
 
-
-    private readonly _comment: string;
+	private readonly _skParagraph: SkriptParagraph;
+    private readonly _tooltip: string[];
     private _markdown: MarkdownString | undefined;
     
 
 
-    constructor(skParagraph:SkriptParagraph, comment:string) {
-        this._comment = comment;
+    constructor(skParagraph:SkriptParagraph, tooltip:string[]) {
+		this._skParagraph = skParagraph;
+        this._tooltip = tooltip;
     }
 
 
@@ -23,23 +24,23 @@ export class SkriptToolTip {
 			let docs = new Array<string>();
 			let regex_parm = /(\@parm)\s(\w*)\s(.*)/g;
 			let regex_return = /(\@return)\s(.*)/g;
-			for (const line of SkriptLine.split(this._comment)) {
-				docs.push(line.text
+			for (const line of this._tooltip) {
+				docs.push(line
 					.replace(regex_parm, '_$1_ ```$2``` ─ $3')
 					.replace(regex_return, '_$1_ ─ $2')
 				);
 			}
-			console.log(docs)
+			console.log('[docs]', docs);
 			this._markdown = new MarkdownString('', true)
-				.appendCodeblock('function ' + this.toDeclaration(), 'vskript')
+				.appendCodeblock(this._skParagraph.title)
 			
-			// if (docs.length > 0) {
-			// 	docs.unshift('***');
-			// 	docs.push('');
-			// 	this._markdown.appendMarkdown(docs.join('  \r\n'));
-			// }
-			
-			// this._markdown.appendMarkdown(['***', 'from ```' + this._skFile.skName + '```'].join('  \r\n'))
+			if (docs.length > 0) {
+				docs.unshift('***');
+				docs.push('');
+				this._markdown.appendMarkdown(docs.join('  \r\n'));
+			}
+			console.log(this._markdown);
+			this._markdown.appendMarkdown(['***', 'from ```' + this._skParagraph.document.skPath.name + '```'].join('  \r\n'))
 		}
 		return this._markdown;
 	}

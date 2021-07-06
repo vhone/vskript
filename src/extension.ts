@@ -21,6 +21,7 @@ export function activate(_context:ExtensionContext) {
 	// Provider
 	languages.registerDocumentSymbolProvider('vskript', new Provider.SkriptDocumentSymbolProvider());
 	languages.registerWorkspaceSymbolProvider(new Provider.SkriptWorkspaceSymbolProvider());
+	languages.registerHoverProvider('vskript', new Provider.SkriptHoverProvider());
 	
 	// Event;
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
@@ -28,7 +29,6 @@ export function activate(_context:ExtensionContext) {
 	/*
 	languages.registerCompletionItemProvider('vskript', new Provider.SkriptCompletionItemProvider());
 	languages.registerColorProvider('vskript', new Provider.SkriptDocumentColorProvider());
-	languages.registerHoverProvider('vskript', new Provider.SkriptHoverProvider());
 	languages.registerDefinitionProvider('vskript', new Provider.SkriptDefinitionProvider());
 	languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), LEGEND);
 

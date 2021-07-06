@@ -141,16 +141,16 @@ export class SkriptDocument {
                 let paragraph = this._trimParagraph(groups.paragraph);
                 let skParagraphBuilder = new SkriptParagraphBuilder(this, paragraph);
 
-                // docs 주석
-                if (groups.comment) {
-                    let comment = this._trimComment(groups.comment);
-                    if (comment)
-                        skParagraphBuilder.setToolTip(new SkriptToolTip(comment));
-                }
-
                 // 생성
                 let skParagraph = skParagraphBuilder.build()!;
                 this._paragraphs.push(skParagraph);
+
+                // docs 주석
+                if (groups.comment) {
+                    let tooltip = this._trimToolTip(groups.comment);
+                    if (tooltip)
+                        skParagraph.setToolTip(new SkriptToolTip(skParagraph, tooltip));
+                }
                 
                 console.log(skParagraph);
 
@@ -162,23 +162,24 @@ export class SkriptDocument {
         }
     }
 
-    private _trimComment(comment: string): string | undefined {
+    private _trimToolTip(comment: string): string[] | undefined {
         let lines = SkriptLine.split(comment);
-        let rest = new Array<SkriptLine>();
+        let tooltip = new Array<string>();
         for (let i=0; i<lines.length; i++) {
             let line = lines[i];
-            if (line.text.match(/^((\t|\s)*(\#[^>].*)?)?$/)) {
+            let search
+            if (search = line.text.match(/^(?:\t|\s)*(?:\#\>\s?(.*))$/)) {
+                tooltip.push(search[1].trim());
+            } else {
                 continue;
-            }else {
-                rest.push(line);
             }
         }
-        if (rest.length <= 0) {
+        if (tooltip.length <= 0) {
             return
         } else {
-            let start = rest[0];
-            let end = rest[rest.length - 1];
-            return comment.substring(start.offset, end.offset + end.text.length);
+            let start = tooltip[0];
+            let end = tooltip[tooltip.length - 1];
+            return tooltip;
         }
     }
 
