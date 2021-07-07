@@ -3,7 +3,6 @@ import * as FileSystem from 'fs'
 import * as Path from 'path'
 import { SkriptDocument } from './skript_fork/SkriptDocument';
 import { SkriptPath } from './skript_fork/SkriptPath';
-import { SkriptAliases, SkriptParagraph } from './skript_fork/SkriptParagraph';
 
 export * as Component from './skript/Component';
 
@@ -26,13 +25,6 @@ export async function onSkriptEnable() {
 				let skDocument = new SkriptDocument(skPath, document);
 				DOCUMENTS.push(skDocument);
 			};
-
-			// for (let fsPath of _getSkriptPathArray(skPath)) {
-			// 	let skName = fsPath.replace(skPath+'\\', '');
-			// 	let skFile = new SkriptFile(readFileSync(fsPath,'UTF-8'), skPath, skName, EndOfLine.CRLF);
-			// 	FILE_LIST.push(skFile);
-			// 	amtFunc += skFile.components.filter(comp => comp instanceof SkriptFunction).length;
-			// }
 		}
 		console.log(DOCUMENTS);
 		// window.showInformationMessage(`Loaded ${amtFunc} functions.`);
@@ -72,6 +64,3 @@ async function _getSkriptPaths(loopPath: SkriptPath): Promise<SkriptPath[]> {
 		resolve(skPathArray);
 	})
 }
-
-
-

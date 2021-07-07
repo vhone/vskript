@@ -1,6 +1,6 @@
 import { Position, Range, SnippetString, TextDocument, TextDocumentChangeEvent, TextDocumentContentChangeEvent, window } from 'vscode'
 import * as Skript from '../Skript';
-import { SkriptFunction } from '../skript/Component';
+import { SkriptFunction } from '../skript_fork/paragraph/SkriptFunction';
 
 let pass:boolean = false;
 

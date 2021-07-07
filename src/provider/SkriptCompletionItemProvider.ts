@@ -1,7 +1,6 @@
 import { CompletionItemProvider, CompletionItem, TextDocument, CompletionItemKind, MarkdownString, SnippetString } from 'vscode'
 import * as Skript from '../Skript'
-import { SkriptFunction } from '../skript/Component';
-import SkriptFile from '../skript/SkriptFile';
+import { SkriptFunction } from '../skript_fork/SkriptParagraph';
 
 
 const ITEMS_MAP = new Map<string,CompletionItem[]>();
@@ -17,10 +16,10 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
         let fsPath = document.uri.fsPath;
         if (ITEMS_MAP.size === 0){
             for (let skFile of Skript.getSkriptDocuments()){
-                this.updateFunctionCompletionItem(skFile);
+                this._updateFunctionCompletionItem(skFile);
             }
         } else if (!ITEMS_MAP.has(fsPath) || document.isDirty) {
-            this.updateFunctionCompletionItem(Skript.findDocument(fsPath)!);
+            this._updateFunctionCompletionItem(Skript.findDocument(fsPath)!);
         }
 
         let response = new Array<CompletionItem>();
@@ -32,13 +31,13 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
         return response;
     }
 
-    private updateFunctionCompletionItem(skFile:SkriptFile): CompletionItem[] {
-        let items = this.createCompletionItemsInFile(skFile);
+    private _updateFunctionCompletionItem(skFile:SkriptFile): CompletionItem[] {
+        let items = this._createCompletionItemsInFile(skFile);
         ITEMS_MAP.set(skFile.fsPath, items);
         return items;
     }
 
-    private createCompletionItemsInFile(skFile:SkriptFile): CompletionItem[] {
+    private _createCompletionItemsInFile(skFile:SkriptFile): CompletionItem[] {
         let items = new Array<CompletionItem>();
         for (let comp of skFile.components) if (comp instanceof SkriptFunction) {
             // item

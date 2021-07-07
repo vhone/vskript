@@ -31,14 +31,14 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
                 let paragraphSymbol = new DocumentSymbol(paragraph.title, '', paragraph.symbolKind, paragraph.range, paragraph.range);
                 
                 if (paragraph instanceof SkriptAliases) {
-                    for (const phrase of paragraph.phrases) {
+                    for (const phrase of paragraph.aliases) {
                         let value = Object.assign(phrase.value, {}).map(v => v.replace('minecraft:', '')).join(', ');
                         let phraseSymbol = new DocumentSymbol(phrase.key, value, SymbolKind.Enum, phrase.range, phrase.range);
                         paragraphSymbol.children.push(phraseSymbol);
                     }
 
                 } else if (paragraph instanceof SkriptOptions) {
-                    for (const phrase of paragraph.phrases) {
+                    for (const phrase of paragraph.options) {
                         let phraseSymbol = new DocumentSymbol(phrase.key, phrase.value, SymbolKind.Enum, phrase.range, phrase.range);
                         paragraphSymbol.children.push(phraseSymbol);
                         

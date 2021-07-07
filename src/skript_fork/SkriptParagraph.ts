@@ -1,8 +1,14 @@
 import { Range, SymbolKind } from "vscode";
 import { SkriptDocument } from "./SkriptDocument";
 import { SkriptLine } from "./SkriptLine";
+import { SkriptPhrases } from "./SkriptPhrase";
 import { SkriptToolTip } from "./SkriptToolTip";
 
+export interface SkriptKeyValue<T> {
+    range: Range,
+    key: string,
+    value: T
+}
 
 export abstract class SkriptParagraph {
 
@@ -10,7 +16,7 @@ export abstract class SkriptParagraph {
     private readonly _range: Range;
     private readonly _title: string;
     private _skToolTip?: SkriptToolTip;
-
+    
     constructor (skDocument:SkriptDocument, range:Range, title:string) {
         this._skDocument = skDocument;
         this._range = range;
@@ -32,52 +38,30 @@ export abstract class SkriptParagraph {
     public setToolTip(skTooltip:SkriptToolTip) {
         this._skToolTip = skTooltip;
     }
-    
-    
-    
     abstract get symbolKind(): SymbolKind;
-}
 
 
-
-export class SkriptParagraphBuilder {
-
-    private _paragraph: string;
-
-    private _skDocument: SkriptDocument;
-    private _skToolTip?: SkriptToolTip;
-
-    constructor (skDocument: SkriptDocument, paragraph:string) {
-        this._skDocument = skDocument;
-        this._paragraph = paragraph;
-    }
-
-    public setToolTip(skToolTip:SkriptToolTip): SkriptParagraphBuilder {
-        this._skToolTip = skToolTip;
-        return this;
-    }
-    
-    public build(): SkriptParagraph | undefined {
-
-        let range = this._skDocument.getRange(this._paragraph);
+    public static create(skDocument: SkriptDocument, paragraph:string): SkriptParagraph | undefined {
+        
+        let range = skDocument.getRange(paragraph);
         if (!range)
             return;
 
         let search
-        if (search = this._paragraph.match(/^(?<paragraph>(?<head>aliases)\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups){
-            return this._createAliases(range, search.paragraph, search.head, search.body);
+        if (search = paragraph.match(/^(?<paragraph>(?<head>aliases)\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups){
+            return this._createAliases(skDocument, range, search.paragraph, search.head, search.body);
 
-        } else if (search = this._paragraph.match(/^(?<paragraph>(?<head>options)\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
-            return this._createOptions(range, search.paragraph, search.head, search.body);
+        } else if (search = paragraph.match(/^(?<paragraph>(?<head>options)\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
+            return this._createOptions(skDocument, range, search.paragraph, search.head, search.body);
             
-        } else if (search = this._paragraph.match(/^(?<paragraph>(?<head>on\s([^\:]+))\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
-            return this._createEvent(range, search.paragraph, search.head, search.body);
+        } else if (search = paragraph.match(/^(?<paragraph>(?<head>on\s([^\:]+))\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
+            return this._createEvent(skDocument, range, search.paragraph, search.head, search.body);
             
-        } else if (search = this._paragraph.match(/^(?<paragraph>(?<head>command\s([^\:]*))\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
-            return this._createCommand(range, search.paragraph, search.head, search.body);
+        } else if (search = paragraph.match(/^(?<paragraph>(?<head>command\s([^\:]*))\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
+            return this._createCommand(skDocument, range, search.paragraph, search.head, search.body);
             
-        } else if (search = this._paragraph.match(/^(?<paragraph>(?<head>function\s(?:\w+)\((?:.*)\)(?:\s\:\:\s(?:[^:]+))?)\:(.*)(?<body>(?:(?:\r\n|\r|\n)(?:[^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
-            return this._createFunction(range, search.paragraph, search.head, search.body);
+        } else if (search = paragraph.match(/^(?<paragraph>(?<head>function\s(?:\w+)\((?:.*)\)(?:\s\:\:\s(?:[^:]+))?)\:(.*)(?<body>(?:(?:\r\n|\r|\n)(?:[^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
+            return this._createFunction(skDocument, range, search.paragraph, search.head, search.body);
             
         }
         
@@ -85,62 +69,63 @@ export class SkriptParagraphBuilder {
 
     }
 
-    private _createAliases(range:Range, paragraph:string, head:string, body:string): SkriptAliases {
-
-        let offset = this._skDocument.offsetAt(range.start);
+    private static _createAliases(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptAliases {
 
         let phrases = new Array<SkriptKeyValue<string[]>>();
-
-        for (const line of SkriptLine.split(paragraph)) {
+        for (const line of SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start))) {
             let groups = line.text.match(/(?:\t|\s{4})(?<aliase>(?<key>[^\=]+)\=(?<values>[^#]*))/)?.groups;
             if (!groups)
                 continue;
             let aliase = groups.aliase.trim();
-            let start = offset + line.offset + line.text.indexOf(aliase);
+            let start = line.offset + line.text.indexOf(aliase);
             let phrase: SkriptKeyValue<string[]> = {
                 range: (() => {
-                    return new Range(this._skDocument.positionAt(start)!, this._skDocument.positionAt(start + aliase.length)!)
+                    return new Range(_skDocument.positionAt(start)!, _skDocument.positionAt(start + aliase.length)!)
                 })(),
                 key: groups.key.trim(),
                 value : groups.values.split(',').map(value => value.trim())
             }
             phrases.push(phrase);
         }
-        return new SkriptAliases(this._skDocument, range, head, phrases, this._skToolTip);
+        return new SkriptAliases(_skDocument, _range, phrases);
         
     }
 
-    private _createOptions(range:Range, paragraph:string, head:string, body:string): SkriptOptions {
-
-        let offset = this._skDocument.offsetAt(range.start);
+    private static _createOptions(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptOptions {
 
         let phrases = new Array<SkriptKeyValue<string>>();
-        for (const line of SkriptLine.split(paragraph)) {
+        for (const line of SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start))) {
             let groups = line.text.match(/(?:\t|\s{4})(?<option>(?<key>[^\:]+)\:(?<value>[^#]*))/)?.groups;
             if (!groups)
                 continue;
             let option = groups.option.trim();
-            let start = offset + line.offset + line.text.indexOf(option);
+            let start = line.offset + line.text.indexOf(option);
             let phrase: SkriptKeyValue<string> = {
                 range: (() => {
-                    return new Range(this._skDocument.positionAt(start)!, this._skDocument.positionAt(start + option.length)!)
+                    return new Range(_skDocument.positionAt(start)!, _skDocument.positionAt(start + option.length)!)
                 })(),
                 key: groups.key.trim(),
                 value : groups.value.trim()
             }
             phrases.push(phrase);
         }
-        return new SkriptOptions(this._skDocument, range, head, phrases, this._skToolTip);
+        return new SkriptOptions(_skDocument, _range, phrases);
     }
 
-    private _createEvent(range:Range, paragraph:string, head:string, body:string): SkriptEvent {
-        return new SkriptEvent(this._skDocument, range, head);
+    private static _createEvent(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptEvent {
+
+        console.log(_head);
+        let skPhrases = SkriptPhrases.create();
+        for (const line of SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start))) {
+            console.log(line);
+        }
+
+        return new SkriptEvent(_skDocument, _range, _head, skPhrases);
     }
 
-    private _createCommand(range:Range, paragraph:string, head:string, body:string): SkriptCommand {
+    private static _createCommand(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptCommand {
 
-        let offset = this._skDocument.offsetAt(range.start);
-        let lines = SkriptLine.split(paragraph);
+        let lines = SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start));
 
         let info: SkriptCommandInfomation = { label: 'label' };
 
@@ -155,16 +140,16 @@ export class SkriptParagraphBuilder {
         for (let i=0; i<lines.length; i++ ) {
             let line = lines[i];
             let groups
-            if (groups = line.text.match(/(?:\t|\s{4})(?<option>(?<key>[^\:]+)\:(?<value>[^#]*))/)?.groups) {
+            if (groups = line.text.match(/(?:\t|\s{4})(?<option>(?<key>[^\t\s\:]+)\:(?<value>[^#]*))/)?.groups) {
                 let option = groups.option.trim();
-                let start = offset + line.offset + line.text.indexOf(option);
+                let start = line.offset + line.text.indexOf(option);
                 let key = groups.key.trim();
                 if (key === 'trigger') {
                     trigger = true;
                 } else {
                     options.push({
                         range: (() => {
-                            return new Range(this._skDocument.positionAt(start)!, this._skDocument.positionAt(start + option.length)!)
+                            return new Range(_skDocument.positionAt(start)!, _skDocument.positionAt(start + option.length)!)
                         })(),
                         key: key,
                         value: groups.value?.trim()
@@ -181,14 +166,14 @@ export class SkriptParagraphBuilder {
             info.options = options
         }
 
-        return new SkriptCommand(this._skDocument, range, info, this._skToolTip);
+        return new SkriptCommand(_skDocument, _range, info);
     }
 
-    private _createFunction(range:Range, paragraph:string, head:string, body:string): SkriptFunction | undefined {
+    private static _createFunction(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptFunction | undefined {
 
-        let offset = this._skDocument.offsetAt(range.start);
+        let offset = _skDocument.offsetAt(_range.start);
         
-        let headGroup = head.match(/^function\s(?<name>\w+)\((?<parameter>.*)\)(?:\s\:\:\s(?<type>[^:]+))?/i)?.groups;
+        let headGroup = _head.match(/^function\s(?<name>\w+)\((?<parameter>.*)\)(?:\s\:\:\s(?<type>[^:]+))?/i)?.groups;
         if (headGroup) {
             let parameters: SkriptFunctionParameter[] = [];
             let parameter = headGroup.parameter;
@@ -208,30 +193,23 @@ export class SkriptParagraphBuilder {
                 type: headGroup.type?.trim()
             };
 
-            return new SkriptFunction(this._skDocument, range, info, this._skToolTip);
+            return new SkriptFunction(_skDocument, _range, info);
         }
 
         return;
 
     }
-
 }
 
 
-
-interface SkriptKeyValue<T> {
-    range: Range,
-    key: string,
-    value: T
-}
 
 export class SkriptAliases extends SkriptParagraph {
 
-    private readonly _phrases = new Array<SkriptKeyValue<string[]>>();
+    private readonly _aliases = new Array<SkriptKeyValue<string[]>>();
 
-    constructor(skDocument:SkriptDocument, range:Range, title:string, phrases:SkriptKeyValue<string[]> [], skToolTip?:SkriptToolTip) {
-        super(skDocument, range, title, skToolTip)
-        this._phrases.push(...phrases);
+    constructor(skDocument:SkriptDocument, range:Range, aliases:SkriptKeyValue<string[]> []) {
+        super(skDocument, range, 'alaises')
+        this._aliases.push(...aliases);
     }
 
     /** ```
@@ -241,8 +219,8 @@ export class SkriptAliases extends SkriptParagraph {
         return SymbolKind.Constant;
     }
 
-    public get phrases(){
-        return this._phrases
+    public get aliases(){
+        return this._aliases
     }
     
 }
@@ -251,11 +229,11 @@ export class SkriptAliases extends SkriptParagraph {
 
 export class SkriptOptions extends SkriptParagraph {
 
-    private readonly _phrases = new Array<SkriptKeyValue<string>>();
+    private readonly _options = new Array<SkriptKeyValue<string>>();
 
-    constructor(skDocument:SkriptDocument, range:Range, title:string, phrases:SkriptKeyValue<string>[], skToolTip?:SkriptToolTip) {
-        super(skDocument, range, title, skToolTip)
-        this._phrases.push(...phrases);
+    constructor(skDocument:SkriptDocument, range:Range, options:SkriptKeyValue<string>[]) {
+        super(skDocument, range, 'options')
+        this._options.push(...options);
     }
 
     /** ```
@@ -265,8 +243,8 @@ export class SkriptOptions extends SkriptParagraph {
         return SymbolKind.Constant;
     }
 
-    public get phrases(){
-        return this._phrases
+    public get options(){
+        return this._options
     }
 
 }
@@ -275,18 +253,34 @@ export class SkriptOptions extends SkriptParagraph {
 
 export class SkriptEvent extends SkriptParagraph {
 
+    private readonly _skPhrases: SkriptPhrase[];
+
+    constructor(skDocument:SkriptDocument, range:Range, title:string) {
+        super(skDocument, range, title);
+    }
+
+
     /** ```
      * SymbolKind.Event
      * ``` */
     get symbolKind(): SymbolKind {
         return SymbolKind.Event;
     }
+
+    get phrase(): SkriptPhrases {
+        return this._skPhrases;
+    }
+
+    public setPhrases(...skPhrases:SkriptPhrase[]) {
+        
+    }
     
 }
 
 
 
-interface SkriptCommandInfomation {
+
+export interface SkriptCommandInfomation {
     label: string;
     arguments?: string;
     options?: SkriptKeyValue<string>[];
@@ -296,10 +290,10 @@ export class SkriptCommand extends SkriptParagraph {
 
     private readonly _info: SkriptCommandInfomation;
 
-    constructor(skDocument:SkriptDocument, range:Range, info:SkriptCommandInfomation, skToolTip?:SkriptToolTip) {
+    constructor(skDocument:SkriptDocument, range:Range, info:SkriptCommandInfomation) {
         let title = `/${info.label}`;
         if (info.arguments) title += ` ${info.arguments}`;
-        super(skDocument, range, title, skToolTip);
+        super(skDocument, range, title);
         this._info = info;
     }
 
@@ -326,13 +320,14 @@ export class SkriptCommand extends SkriptParagraph {
 
 
 
-interface SkriptFunctionInfomation {
+
+export interface SkriptFunctionInfomation {
     name: string,
     parameters: SkriptFunctionParameter[] | undefined,
     type: string | undefined
 }
 
-interface SkriptFunctionParameter {
+export interface SkriptFunctionParameter {
     name: string,
     type: string,
     default: string | undefined
@@ -342,7 +337,7 @@ export class SkriptFunction extends SkriptParagraph {
 
     private readonly _info: SkriptFunctionInfomation;
 
-    constructor(skDocument:SkriptDocument, range:Range, info:SkriptFunctionInfomation, skToolTip?:SkriptToolTip) {
+    constructor(skDocument:SkriptDocument, range:Range, info:SkriptFunctionInfomation) {
         let parameters = new Array<string>();
         for (const parameter of info.parameters!) {
             let text = `${parameter.name}:${parameter.type}`;
@@ -351,7 +346,7 @@ export class SkriptFunction extends SkriptParagraph {
             parameters.push(text);
         }
         let title = `${info.name}(${parameters.join(', ')})${(info.type) ? ` :: ${info.type}` : `:`}`
-        super(skDocument, range, title, skToolTip)
+        super(skDocument, range, title);
         this._info = info;
 
     }

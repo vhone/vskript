@@ -1,6 +1,6 @@
 import { Position, Range } from "vscode";
 import { SkriptLine } from "./SkriptLine";
-import { SkriptParagraph, SkriptParagraphBuilder } from "./SkriptParagraph";
+import { SkriptParagraph } from "./SkriptParagraph";
 import { SkriptPath } from "./SkriptPath";
 import { SkriptToolTip } from "./SkriptToolTip";
 
@@ -9,15 +9,11 @@ import { SkriptToolTip } from "./SkriptToolTip";
 
 export class SkriptDocument {
 
-
-
     private _skPath: SkriptPath;
     private _document: string;
 
     private _skLines: SkriptLine[] = [];
     private _paragraphs: SkriptParagraph[] = [];
-
-
 
     constructor (skPath: SkriptPath, document: string) {
         this._skPath = skPath;
@@ -137,28 +133,27 @@ export class SkriptDocument {
             let groups = search.groups;
             if (groups) {
 
-                // 빌더
-                let paragraph = this._trimParagraph(groups.paragraph);
-                let skParagraphBuilder = new SkriptParagraphBuilder(this, paragraph);
-
                 // 생성
-                let skParagraph = skParagraphBuilder.build()!;
-                this._paragraphs.push(skParagraph);
+                let paragraph = this._trimParagraph(groups.paragraph);
+                let skParagraph = SkriptParagraph.create(this, paragraph);
 
-                // docs 주석
-                if (groups.comment) {
-                    let tooltip = this._trimToolTip(groups.comment);
-                    if (tooltip)
-                        skParagraph.setToolTip(new SkriptToolTip(skParagraph, tooltip));
+                if (skParagraph) {
+                    this._paragraphs.push(skParagraph);
+
+                    // docs 주석
+                    if (groups.comment) {
+                        let tooltip = this._trimToolTip(groups.comment);
+                        if (tooltip)
+                            skParagraph.setToolTip(new SkriptToolTip(skParagraph, tooltip));
+                    }
                 }
-                
-                console.log(skParagraph);
-
+    
                 document = document.substring(document.indexOf(paragraph) + paragraph.length);
 
             } else {
                 break;
             }
+
         }
     }
 

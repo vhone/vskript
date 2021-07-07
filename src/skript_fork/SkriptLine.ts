@@ -1,3 +1,4 @@
+import { Position } from "vscode";
 
 
 export class SkriptLine {
@@ -8,17 +9,17 @@ export class SkriptLine {
         public readonly feed: string
     ) {}
 
-    public static split(paragraph:string): SkriptLine[] {
+    public static split(paragraph:string, offset?:number): SkriptLine[] {
         let lines = new Array<SkriptLine>();
         let copy = paragraph;
-        let offset = 0;
+        let index = (offset) ? offset : 0;
         let search
         while (search = copy.match(/\r\n|\r|\n|$/)) {
-            let line = new SkriptLine(offset, copy.substring(0, search.index!), search[0]);
+            let line = new SkriptLine(index, copy.substring(0, search.index!), search[0]);
 
             lines.push(line);
 
-            offset += line.text.length + line.feed.length;
+            index += line.text.length + line.feed.length;
             copy = copy.substring(search.index! + line.feed.length);
             if (copy.length <= 0) break;
             

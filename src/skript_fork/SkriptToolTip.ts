@@ -30,16 +30,14 @@ export class SkriptToolTip {
 					.replace(regex_return, '_$1_ ─ $2')
 				);
 			}
-			console.log('[docs]', docs);
-			this._markdown = new MarkdownString('', true)
-				.appendCodeblock(this._skParagraph.title)
+			this._markdown = new MarkdownString()
+				.appendCodeblock(this._skParagraph.title);
 			
 			if (docs.length > 0) {
 				docs.unshift('***');
 				docs.push('');
 				this._markdown.appendMarkdown(docs.join('  \r\n'));
 			}
-			console.log(this._markdown);
 			this._markdown.appendMarkdown(['***', 'from ```' + this._skParagraph.document.skPath.name + '```'].join('  \r\n'))
 		}
 		return this._markdown;
