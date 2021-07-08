@@ -1,27 +1,21 @@
 import { SkriptLine } from "./SkriptLine";
 import { SkriptParagraph } from "./SkriptParagraph";
 
-interface SkriptPhrase{
+export class SkriptPhrase {
 
-}
+    private readonly _skParagraph: SkriptParagraph;
+    private readonly _skLine: SkriptLine;
 
-export class SkriptPhrases {
-
-    private readonly _skParagraph;
-    private readonly _skPhrase;
-
-    constructor(skParagraph:SkriptParagraph, skPhrase:SkriptPhrase[]) {
+    constructor(skParagraph:SkriptParagraph, skLine:SkriptLine) {
         this._skParagraph = skParagraph;
-        this._skPhrase = skPhrase;
+        this._skLine = skLine;
+        // console.log(skLine.text)
     }
-    
-    public static create(skParagraph:SkriptParagraph, skLines:SkriptLine[]): SkriptPhrases {
 
-        console.log(skLines);
-        let phrases = new Array<SkriptPhrase>();
-
-        return new SkriptPhrases(skParagraph, phrases);
-    }
+    // 글자 = "%익스프레션%, %변수%, %함수%"
+    // 변수 = {%익스프레션%::%변수%}
+    // 함수 = func( 익스프레션, 변수, 함수 )
+    // 익스프레션 = 패턴 + 익스프레션, 변수, 함수
 
 }       
     

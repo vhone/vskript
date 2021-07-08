@@ -535,7 +535,8 @@
 			"patterns": [
 				{	"include": "#variable.option"	},
 				{	"include": "#variable.runtime"	},
-				{	"include": "#variable.local"	}
+				{	"include": "#variable.local"	},
+				{	"include": "#variable.normal"	}
 			]
 		},
 		"variable.runtime": {
@@ -547,7 +548,8 @@
 			"patterns": [
 				{	"include": "#variable.option"	},
 				{	"include": "#variable.local"	},
-				{	"include": "#variable.runtime"	}
+				{	"include": "#variable.runtime"	},
+				{	"include": "#variable.normal"	}
 			]
 		},
 		"variable.normal": {

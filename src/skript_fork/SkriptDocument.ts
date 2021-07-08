@@ -4,6 +4,11 @@ import { SkriptParagraph } from "./SkriptParagraph";
 import { SkriptPath } from "./SkriptPath";
 import { SkriptToolTip } from "./SkriptToolTip";
 
+
+
+type Class<T> = { new (...args: any[]): T };
+
+
 // phrase 구절 : 두개 단어 이상으로 문장의 역할을 하는 것
 // sentence 문장
 
@@ -82,6 +87,14 @@ export class SkriptDocument {
 		}
 		return;
 	}
+
+    public getParagraphs<T extends SkriptParagraph>(clazz:Class<T>): T[] {
+        let array = new Array<T>();
+        for (const value of this._paragraphs) if (value instanceof clazz) {
+            array.push(value);
+        }
+        return array;
+    }
     
     /*
     public getWordRangeAtPosition(position: Position, regex?: RegExp): Range | undefined {

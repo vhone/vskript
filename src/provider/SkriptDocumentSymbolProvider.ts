@@ -1,6 +1,5 @@
 import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
 import * as Skript from '../Skript';
-import { SkriptExpression, SkriptExprFunction, SkriptExprText, SkriptExprVariable } from '../skript/Context';
 import { SkriptAliases, SkriptOptions, SkriptCommand } from '../skript_fork/SkriptParagraph';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
@@ -15,47 +14,55 @@ const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
  */
 export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
     provideDocumentSymbols(document: TextDocument /*token: CancellationToken*/) {
+
         let fsPath = document.uri.fsPath;
         if (!SYMBOLS_MAP.has(fsPath) || document.isDirty) {
-            let symbols = new Array<DocumentSymbol>();
+
+            let symbols: DocumentSymbol[] = [];
             SYMBOLS_MAP.set(fsPath, symbols);
         
             let skDocument = Skript.find(fsPath);
-            if (!skDocument) {
-                return symbols;
-            }
+            if (!skDocument)
+                return
         
-            for (const paragraph of skDocument.paragraphs) {
+            // Aliases
+            for (const skAliases of skDocument.getParagraphs(SkriptAliases)) {
+                let aliasesSymbol = new DocumentSymbol(skAliases.title, '', skAliases.symbolKind, skAliases.range, skAliases.range);
+                symbols.push(aliasesSymbol);
 
-                // Component 심볼
-                let paragraphSymbol = new DocumentSymbol(paragraph.title, '', paragraph.symbolKind, paragraph.range, paragraph.range);
-                
-                if (paragraph instanceof SkriptAliases) {
-                    for (const phrase of paragraph.aliases) {
-                        let value = Object.assign(phrase.value, {}).map(v => v.replace('minecraft:', '')).join(', ');
-                        let phraseSymbol = new DocumentSymbol(phrase.key, value, SymbolKind.Enum, phrase.range, phrase.range);
-                        paragraphSymbol.children.push(phraseSymbol);
-                    }
-
-                } else if (paragraph instanceof SkriptOptions) {
-                    for (const phrase of paragraph.options) {
-                        let phraseSymbol = new DocumentSymbol(phrase.key, phrase.value, SymbolKind.Enum, phrase.range, phrase.range);
-                        paragraphSymbol.children.push(phraseSymbol);
-                        
-                    }
-
-                } else if (paragraph instanceof SkriptCommand) {
-                    if (paragraph.options) {
-                        for (const option of paragraph.options) {
-                            let optionSymbol = new DocumentSymbol(option.key, option.value, SymbolKind.Property, option.range, option.range);
-                            paragraphSymbol.children.push(optionSymbol);
-                        }
-                    }
+                for (const aliases of skAliases.aliases) {
+                    let value = Object.assign(aliases.value, {}).map(v => v.replace('minecraft:', '')).join(', ');
+                    let optionSymbol = new DocumentSymbol(aliases.key, value, SymbolKind.Enum, aliases.range, aliases.range);
+                    aliasesSymbol.children.push(optionSymbol);
                 }
 
-                symbols.push(paragraphSymbol);
-                    
             }
+
+            // Options
+            for (const skOptions of skDocument.getParagraphs(SkriptOptions)) {
+                let optionsSymbol = new DocumentSymbol(skOptions.title, '', skOptions.symbolKind, skOptions.range, skOptions.range);
+                symbols.push(optionsSymbol);
+
+                for (const option of skOptions.options) {
+                    let optionSymbol = new DocumentSymbol(option.key, option.value, SymbolKind.Enum, option.range, option.range);
+                    optionsSymbol.children.push(optionSymbol);
+                }
+
+            }
+
+            // Command
+            for (const skCommand of skDocument.getParagraphs(SkriptCommand)) {
+                let commandSymbol = new DocumentSymbol(skCommand.title, '', skCommand.symbolKind, skCommand.range, skCommand.range);
+                symbols.push(commandSymbol);
+
+                if (skCommand.options) for (const option of skCommand.options) {
+                    let optionSymbol = new DocumentSymbol(option.key, option.value, SymbolKind.Enum, option.range, option.range);
+                    commandSymbol.children.push(optionSymbol);
+                }
+
+            }
+
+            console.log(symbols);
             
             return symbols;
 
@@ -65,15 +72,16 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
         }
     }
 
-    private _createSymbol(expr:SkriptExpression): DocumentSymbol {
-        let symbol = SymbolKind.Null;
-        if (expr instanceof SkriptExprText) {
-            symbol = SymbolKind.String;
-        } else if (expr instanceof SkriptExprVariable) {
-            symbol = SymbolKind.Variable;
-        } else if (expr instanceof SkriptExprFunction) {
-            symbol = SymbolKind.Function;
-        }
-        return new DocumentSymbol(expr.code, '', symbol, expr.range, expr.range);
-    }
+    // private _createSymbol(expr:SkriptExpression): DocumentSymbol {
+    //     let symbol = SymbolKind.Null;
+    //     if (expr instanceof SkriptExprText) {
+    //         symbol = SymbolKind.String;
+    //     } else if (expr instanceof SkriptExprVariable) {
+    //         symbol = SymbolKind.Variable;
+    //     } else if (expr instanceof SkriptExprFunction) {
+    //         symbol = SymbolKind.Function;
+    //     }
+    //     return new DocumentSymbol(expr.code, '', symbol, expr.range, expr.range);
+    // }
+
 }

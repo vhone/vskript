@@ -1,7 +1,8 @@
+import { EventEmitter } from "node:stream";
 import { Range, SymbolKind } from "vscode";
 import { SkriptDocument } from "./SkriptDocument";
 import { SkriptLine } from "./SkriptLine";
-import { SkriptPhrases } from "./SkriptPhrase";
+import { SkriptPhrase } from "./SkriptPhrase";
 import { SkriptToolTip } from "./SkriptToolTip";
 
 export interface SkriptKeyValue<T> {
@@ -9,7 +10,6 @@ export interface SkriptKeyValue<T> {
     key: string,
     value: T
 }
-
 export abstract class SkriptParagraph {
 
     private readonly _skDocument: SkriptDocument;
@@ -114,13 +114,14 @@ export abstract class SkriptParagraph {
 
     private static _createEvent(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptEvent {
 
-        console.log(_head);
-        let skPhrases = SkriptPhrases.create();
-        for (const line of SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start))) {
-            console.log(line);
+        let skEvent = new SkriptEvent(_skDocument, _range, _head);
+
+        let lines = SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start))
+        for (let i=1; i < lines.length; i++) {
+            skEvent.phrase.push(new SkriptPhrase(skEvent, lines[i]))
         }
 
-        return new SkriptEvent(_skDocument, _range, _head, skPhrases);
+        return skEvent;
     }
 
     private static _createCommand(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptCommand {
@@ -253,7 +254,7 @@ export class SkriptOptions extends SkriptParagraph {
 
 export class SkriptEvent extends SkriptParagraph {
 
-    private readonly _skPhrases: SkriptPhrase[];
+    private readonly _skPhrase = new Array<SkriptPhrase>();
 
     constructor(skDocument:SkriptDocument, range:Range, title:string) {
         super(skDocument, range, title);
@@ -267,12 +268,12 @@ export class SkriptEvent extends SkriptParagraph {
         return SymbolKind.Event;
     }
 
-    get phrase(): SkriptPhrases {
-        return this._skPhrases;
+    get phrase(): SkriptPhrase[] {
+        return this._skPhrase;
     }
 
     public setPhrases(...skPhrases:SkriptPhrase[]) {
-        
+        this._skPhrase.push(...skPhrases)
     }
     
 }

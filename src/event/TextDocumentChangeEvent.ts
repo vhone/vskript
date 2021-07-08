@@ -1,6 +1,5 @@
 import { Position, Range, SnippetString, TextDocument, TextDocumentChangeEvent, TextDocumentContentChangeEvent, window } from 'vscode'
 import * as Skript from '../Skript';
-import { SkriptFunction } from '../skript_fork/paragraph/SkriptFunction';
 
 let pass:boolean = false;
 
@@ -28,71 +27,71 @@ export default function TextDocumentChangeEvent(event:TextDocumentChangeEvent) {
     // }
 }
 
-function inputEnter(context: TextDocumentContentChangeEvent, document: TextDocument) {
+// function inputEnter(context: TextDocumentContentChangeEvent, document: TextDocument) {
 
-    // docs 기호 선입력 확인
-    let i = context.range.start.line;
-    let line = document.lineAt(i).text;
-    let groups = line.match(/^(?<space>(\t|\s)*)(?<prefix>\#\>\>?)(\s)?(.*)?$/i)?.groups;
-    if (groups) {
+//     // docs 기호 선입력 확인
+//     let i = context.range.start.line;
+//     let line = document.lineAt(i).text;
+//     let groups = line.match(/^(?<space>(\t|\s)*)(?<prefix>\#\>\>?)(\s)?(.*)?$/i)?.groups;
+//     if (groups) {
 
-        let editor = window.activeTextEditor;
-        if (!editor)
-            return;
+//         let editor = window.activeTextEditor;
+//         if (!editor)
+//             return;
 
-        let prefix = groups.prefix;
+//         let prefix = groups.prefix;
             
-        // '#>>'
-        if (prefix === '#>>') {
-            console.log('[docs create]');
+//         // '#>>'
+//         if (prefix === '#>>') {
+//             console.log('[docs create]');
 
-            editor.edit(builder => {
-                builder.delete(new Range(document.lineAt(i).range.start, document.lineAt(i+1).range.end));
-            });
+//             editor.edit(builder => {
+//                 builder.delete(new Range(document.lineAt(i).range.start, document.lineAt(i+1).range.end));
+//             });
 
-            let skDocument = Skript.find(document.uri.fsPath);
-            if (!skDocument)
-                return;
-            let skParagraph = skDocument.paragraphOf(context.range.start);
-            if (!skParagraph || !(skParagraph instanceof SkriptFunction))
-                return;
+//             let skDocument = Skript.find(document.uri.fsPath);
+//             if (!skDocument)
+//                 return;
+//             let skParagraph = skDocument.paragraphOf(context.range.start);
+//             if (!skParagraph || !(skParagraph instanceof SkriptFunction))
+//                 return;
 
-            let docs = new Array<string>();
-            let j = 1;
-            for (const param of skParagraph.parameters)
-                docs.push(`#> @parm ${param.name} \${${j++}}`)
-            if (skParagraph.type)
-                docs.push(`#> @return \${${j++}}`);
-            docs.unshift(`#> \${${j}}`)
-            editor.insertSnippet(new SnippetString(docs.join('\r\n')), context.range);
+//             let docs = new Array<string>();
+//             let j = 1;
+//             for (const param of skParagraph.parameters)
+//                 docs.push(`#> @parm ${param.name} \${${j++}}`)
+//             if (skParagraph.type)
+//                 docs.push(`#> @return \${${j++}}`);
+//             docs.unshift(`#> \${${j}}`)
+//             editor.insertSnippet(new SnippetString(docs.join('\r\n')), context.range);
 
-        // '#>'
-        } else if (prefix === '#>') {
-            console.log('[docs newline]');
-            editor.edit(builder => {
-                builder.insert(new Position(i+1, groups!.space.length), '#> ')
-            });
+//         // '#>'
+//         } else if (prefix === '#>') {
+//             console.log('[docs newline]');
+//             editor.edit(builder => {
+//                 builder.insert(new Position(i+1, groups!.space.length), '#> ')
+//             });
             
-        }
+//         }
 
-        // ==========================================
+//         // ==========================================
 
-        /* 컴포넌트에 따른 DOCS 샘플 및 어노테이션
-         *
-         * DOCS
-         * @param - docs 파라메터
-         * @return - docs 리턴
-         * 
-         * 어노테이션
-         * @Search(false) 서칭 제외 - WorkspaceSymbolProvider
-         * @Complete(false) 자동완성 제외 - CompletionItemProvider
-         * @options(search=false,complete=false)
-         * 
-         * 시매틱 구문강조 프로바이더 검색해볼것.
-         */
+//         /* 컴포넌트에 따른 DOCS 샘플 및 어노테이션
+//          *
+//          * DOCS
+//          * @param - docs 파라메터
+//          * @return - docs 리턴
+//          * 
+//          * 어노테이션
+//          * @Search(false) 서칭 제외 - WorkspaceSymbolProvider
+//          * @Complete(false) 자동완성 제외 - CompletionItemProvider
+//          * @options(search=false,complete=false)
+//          * 
+//          * 시매틱 구문강조 프로바이더 검색해볼것.
+//          */
 
-        // ==========================================
+//         // ==========================================
             
-    }
+//     }
 
-}
+// }
