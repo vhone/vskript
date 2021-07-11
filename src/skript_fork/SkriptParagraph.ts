@@ -1,373 +1,82 @@
-import { EventEmitter } from "node:stream";
-import { Range, SymbolKind } from "vscode";
-import { SkriptDocument } from "./SkriptDocument";
 import { SkriptLine } from "./SkriptLine";
-import { SkriptPhrase } from "./SkriptPhrase";
-import { SkriptToolTip } from "./SkriptToolTip";
+import { SkriptComponent, SkriptKeyValue, SkriptOptions } from "./SkriptComponent";
+import { Position, Range } from "vscode";
+import { SkriptVariable } from "./SkriptExpression";
 
-export interface SkriptKeyValue<T> {
-    range: Range,
-    key: string,
-    value: T
-}
-export abstract class SkriptParagraph {
+export class SkriptParagraph {
 
-    private readonly _skDocument: SkriptDocument;
+    private readonly _skComponent: SkriptComponent;
     private readonly _range: Range;
-    private readonly _title: string;
-    private _skToolTip?: SkriptToolTip;
-    
-    constructor (skDocument:SkriptDocument, range:Range, title:string) {
-        this._skDocument = skDocument;
+    private readonly _paragraph: string;
+
+    private readonly _variables: SkriptVariable[] = [];
+
+    constructor(skComponent:SkriptComponent, range:Range, paragraph:string) {
+        this._skComponent = skComponent;
         this._range = range;
-        this._title = title;
+        this._paragraph = paragraph;
+
+        this._setVariables();
     }
 
-    public get document(): SkriptDocument {
-        return this._skDocument;
+    public get variables() {
+        return this._variables;
     }
-    public get range(): Range {
-        return this._range;
-    }
-    public get title(): string {
-        return this._title;
-    }
-    public get tooltip(): SkriptToolTip | undefined {
-        return this._skToolTip;
-    }
-    public setToolTip(skTooltip:SkriptToolTip) {
-        this._skToolTip = skTooltip;
-    }
-    abstract get symbolKind(): SymbolKind;
 
+    private _setVariables() {
 
-    public static create(skDocument: SkriptDocument, paragraph:string): SkriptParagraph | undefined {
-        
-        let range = skDocument.getRange(paragraph);
-        if (!range)
-            return;
+        let list = new Array<{index:number,value:boolean}>();
+        let regex_start = new RegExp(/\{/, 'g');
+        let regex_end = new RegExp(/\}/, 'g');
 
+        // 괄호 위치 탐색
         let search
-        if (search = paragraph.match(/^(?<paragraph>(?<head>aliases)\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups){
-            return this._createAliases(skDocument, range, search.paragraph, search.head, search.body);
-
-        } else if (search = paragraph.match(/^(?<paragraph>(?<head>options)\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
-            return this._createOptions(skDocument, range, search.paragraph, search.head, search.body);
-            
-        } else if (search = paragraph.match(/^(?<paragraph>(?<head>on\s([^\:]+))\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
-            return this._createEvent(skDocument, range, search.paragraph, search.head, search.body);
-            
-        } else if (search = paragraph.match(/^(?<paragraph>(?<head>command\s([^\:]*))\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
-            return this._createCommand(skDocument, range, search.paragraph, search.head, search.body);
-            
-        } else if (search = paragraph.match(/^(?<paragraph>(?<head>function\s(?:\w+)\((?:.*)\)(?:\s\:\:\s(?:[^:]+))?)\:(.*)(?<body>(?:(?:\r\n|\r|\n)(?:[^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
-            return this._createFunction(skDocument, range, search.paragraph, search.head, search.body);
-            
+        while (search = regex_start.exec(this._paragraph)) {
+            list.push({index: search.index, value: true});
+        }
+        while (search = regex_end.exec(this._paragraph)) {
+            list.push({index: search.index, value: false});
         }
         
-        return;
+        let document = this._skComponent.document;
+        let offset = document.offsetAt(this._range.start);
 
-    }
-
-    private static _createAliases(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptAliases {
-
-        let phrases = new Array<SkriptKeyValue<string[]>>();
-        for (const line of SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start))) {
-            let groups = line.text.match(/(?:\t|\s{4})(?<aliase>(?<key>[^\=]+)\=(?<values>[^#]*))/)?.groups;
-            if (!groups)
-                continue;
-            let aliase = groups.aliase.trim();
-            let start = line.offset + line.text.indexOf(aliase);
-            let phrase: SkriptKeyValue<string[]> = {
-                range: (() => {
-                    return new Range(_skDocument.positionAt(start)!, _skDocument.positionAt(start + aliase.length)!)
-                })(),
-                key: groups.key.trim(),
-                value : groups.values.split(',').map(value => value.trim())
+        let bracket = 0
+        let position = {start:-1, end:-1};
+        for (const v of list.sort((a,b)=>{ return a.index - b.index})) {
+    
+            if (v.value) {
+                if (bracket === 0) position.start = v.index;
+                bracket++;
+            } else {
+                bracket--;
+                if (bracket === 0) position.end = v.index + 1;
             }
-            phrases.push(phrase);
-        }
-        return new SkriptAliases(_skDocument, _range, phrases);
-        
-    }
-
-    private static _createOptions(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptOptions {
-
-        let phrases = new Array<SkriptKeyValue<string>>();
-        for (const line of SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start))) {
-            let groups = line.text.match(/(?:\t|\s{4})(?<option>(?<key>[^\:]+)\:(?<value>[^#]*))/)?.groups;
-            if (!groups)
-                continue;
-            let option = groups.option.trim();
-            let start = line.offset + line.text.indexOf(option);
-            let phrase: SkriptKeyValue<string> = {
-                range: (() => {
-                    return new Range(_skDocument.positionAt(start)!, _skDocument.positionAt(start + option.length)!)
-                })(),
-                key: groups.key.trim(),
-                value : groups.value.trim()
-            }
-            phrases.push(phrase);
-        }
-        return new SkriptOptions(_skDocument, _range, phrases);
-    }
-
-    private static _createEvent(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptEvent {
-
-        let skEvent = new SkriptEvent(_skDocument, _range, _head);
-
-        let lines = SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start))
-        for (let i=1; i < lines.length; i++) {
-            skEvent.phrase.push(new SkriptPhrase(skEvent, lines[i]))
-        }
-
-        return skEvent;
-    }
-
-    private static _createCommand(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptCommand {
-
-        let lines = SkriptLine.split(_paragraph, _skDocument.offsetAt(_range.start));
-
-        let info: SkriptCommandInfomation = { label: 'label' };
-
-        let search = lines[0].text.match(/\/(?<label>[^\s]+)(?:\s(?<arguments>[^:]*))?\:/)?.groups;
-        if (search) {
-            info.label = search.label;
-            info.arguments = search.arguments
-        }
-
-        let options = new Array<SkriptKeyValue<string>>();
-        let trigger = false;
-        for (let i=0; i<lines.length; i++ ) {
-            let line = lines[i];
-            let groups
-            if (groups = line.text.match(/(?:\t|\s{4})(?<option>(?<key>[^\t\s\:]+)\:(?<value>[^#]*))/)?.groups) {
-                let option = groups.option.trim();
-                let start = line.offset + line.text.indexOf(option);
-                let key = groups.key.trim();
-                if (key === 'trigger') {
-                    trigger = true;
-                } else {
-                    options.push({
-                        range: (() => {
-                            return new Range(_skDocument.positionAt(start)!, _skDocument.positionAt(start + option.length)!)
-                        })(),
-                        key: key,
-                        value: groups.value?.trim()
-                    })
+    
+            if (position.start > -1 && position.end > -1) {
+                let range = new Range(document.positionAt(offset + position.start)!, document.positionAt(offset + position.end)!)
+                let variable = this._paragraph.substring(position.start, position.end);
+                let raw_variable = variable.replace(/\%[^%]+%/, '*').replace(/\:\:\d+\}/, '::*}')
+                for (const options of document.getParagraphs(SkriptOptions)) {
+                    for (const option of options.options) {
+                        raw_variable = raw_variable.replace(`{@${option.key}}`, option.value);
+                    }
                 }
-            } else if (trigger) {
-                if (groups = line.text.match(/(?:\t|\s{4}){2}(?<code>.*)/)?.groups) {
-                } else {
-                    trigger = false;
-                }
-            }
-        }
-        if (options.length > 0 ) {
-            info.options = options
-        }
-
-        return new SkriptCommand(_skDocument, _range, info);
-    }
-
-    private static _createFunction(_skDocument:SkriptDocument, _range:Range, _paragraph:string, _head:string, _body:string): SkriptFunction | undefined {
-
-        let offset = _skDocument.offsetAt(_range.start);
-        
-        let headGroup = _head.match(/^function\s(?<name>\w+)\((?<parameter>.*)\)(?:\s\:\:\s(?<type>[^:]+))?/i)?.groups;
-        if (headGroup) {
-            let parameters: SkriptFunctionParameter[] = [];
-            let parameter = headGroup.parameter;
-            let search
-            while (search = parameter.match(/(?<parameter>(?<name>[^\,\:]*)\:(?<type>[^\,\=]*)(?:\=(?<default>[^\,]*))?\,?)/)?.groups) {
-                parameters.push({
-                    name: search.name.trim(),
-                    type: search.type.trim(),
-                    default: search.default?.trim()
-                })
-                parameter = parameter.replace(search.parameter, '');
+                this._variables.push(new SkriptVariable(range, variable, raw_variable));
+                position = {start:-1, end:-1};
             }
     
-            let info: SkriptFunctionInfomation = {
-                name: headGroup.name.trim(),
-                parameters: parameters,
-                type: headGroup.type?.trim()
-            };
-
-            return new SkriptFunction(_skDocument, _range, info);
         }
 
-        return;
-
-    }
-}
-
-
-
-export class SkriptAliases extends SkriptParagraph {
-
-    private readonly _aliases = new Array<SkriptKeyValue<string[]>>();
-
-    constructor(skDocument:SkriptDocument, range:Range, aliases:SkriptKeyValue<string[]> []) {
-        super(skDocument, range, 'alaises')
-        this._aliases.push(...aliases);
+        // console.log(this._variables);
     }
 
-    /** ```
-     * SymbolKind.Constant
-     * ``` */
-    get symbolKind(): SymbolKind {
-        return SymbolKind.Constant;
-    }
+    // 글자 = "%익스프레션%, %변수%, %함수%"
+    // 변수 = {%익스프레션%::%변수%}
+    // 함수 = func( 익스프레션, 변수, 함수 )
+    // 익스프레션 = 패턴 + 익스프레션, 변수, 함수
 
-    public get aliases(){
-        return this._aliases
-    }
+}       
     
-}
 
 
-
-export class SkriptOptions extends SkriptParagraph {
-
-    private readonly _options = new Array<SkriptKeyValue<string>>();
-
-    constructor(skDocument:SkriptDocument, range:Range, options:SkriptKeyValue<string>[]) {
-        super(skDocument, range, 'options')
-        this._options.push(...options);
-    }
-
-    /** ```
-     * SymbolKind.Constant
-     * ``` */
-    get symbolKind(): SymbolKind {
-        return SymbolKind.Constant;
-    }
-
-    public get options(){
-        return this._options
-    }
-
-}
-
-
-
-export class SkriptEvent extends SkriptParagraph {
-
-    private readonly _skPhrase = new Array<SkriptPhrase>();
-
-    constructor(skDocument:SkriptDocument, range:Range, title:string) {
-        super(skDocument, range, title);
-    }
-
-
-    /** ```
-     * SymbolKind.Event
-     * ``` */
-    get symbolKind(): SymbolKind {
-        return SymbolKind.Event;
-    }
-
-    get phrase(): SkriptPhrase[] {
-        return this._skPhrase;
-    }
-
-    public setPhrases(...skPhrases:SkriptPhrase[]) {
-        this._skPhrase.push(...skPhrases)
-    }
-    
-}
-
-
-
-
-export interface SkriptCommandInfomation {
-    label: string;
-    arguments?: string;
-    options?: SkriptKeyValue<string>[];
-}
-
-export class SkriptCommand extends SkriptParagraph {
-
-    private readonly _info: SkriptCommandInfomation;
-
-    constructor(skDocument:SkriptDocument, range:Range, info:SkriptCommandInfomation) {
-        let title = `/${info.label}`;
-        if (info.arguments) title += ` ${info.arguments}`;
-        super(skDocument, range, title);
-        this._info = info;
-    }
-
-    get label() {
-        return this._info.label
-    }
-
-    get arguments() {
-        return this._info.arguments
-    }
-
-    get options() {
-        return this._info.options
-    }
-
-    /** ```
-     * SymbolKind.Class
-     * ``` */
-    get symbolKind(): SymbolKind {
-        return SymbolKind.Class;
-    }
-
-}
-
-
-
-
-export interface SkriptFunctionInfomation {
-    name: string,
-    parameters: SkriptFunctionParameter[] | undefined,
-    type: string | undefined
-}
-
-export interface SkriptFunctionParameter {
-    name: string,
-    type: string,
-    default: string | undefined
-}
-
-export class SkriptFunction extends SkriptParagraph {
-
-    private readonly _info: SkriptFunctionInfomation;
-
-    constructor(skDocument:SkriptDocument, range:Range, info:SkriptFunctionInfomation) {
-        let parameters = new Array<string>();
-        for (const parameter of info.parameters!) {
-            let text = `${parameter.name}:${parameter.type}`;
-            if (parameter.default)
-                text += `=${parameter.default}`
-            parameters.push(text);
-        }
-        let title = `${info.name}(${parameters.join(', ')})${(info.type) ? ` :: ${info.type}` : `:`}`
-        super(skDocument, range, title);
-        this._info = info;
-
-    }
-
-    get name(): string {
-        return this._info.name;
-    }
-
-    get parameters(): SkriptFunctionParameter[] | undefined {
-        return this._info.parameters;
-    }
-
-    get returnType(): string | undefined {
-        return this._info.type;
-    }
-    /** ```
-     * SymbolKind.Function
-     * ``` */
-    get symbolKind(): SymbolKind {
-        return SymbolKind.Function;
-    }
-    
-}

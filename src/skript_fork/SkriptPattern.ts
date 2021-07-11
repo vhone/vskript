@@ -1,3 +1,4 @@
+import { stringify } from "node:querystring";
 
 
 
@@ -8,11 +9,31 @@ interface SkriptPatternInfo {
 
 export abstract class SkriptPattern {
 
-    protected constructor() {
+    protected _index = 0;
+
+    abstract search(text:string, position?:number): SkriptPatternInfo | undefined;
+
+    /**
+     * set search index to 0
+     */
+    public reset() {
+        this._index = 0;
     }
+
+    public static create(regexp:RegExp): SkriptPattern;
+    public static create(opener:string, closer:string): SkriptPattern;
+    public static create(a:any, b?:any): SkriptPattern | undefined {
+        if (a instanceof RegExp) {
+            return new SkriptRegexpPattern(a);
+        } else if (b && typeof a === 'string' && typeof b === 'string') {
+            return new SkriptBracketPattern(a, b);
+        }
+        return;
+    }
+
 }
 
-export class SkriptRegexPattern extends SkriptPattern {
+class SkriptRegexpPattern extends SkriptPattern {
 
 	private readonly _regexp: RegExp;
 
@@ -21,26 +42,41 @@ export class SkriptRegexPattern extends SkriptPattern {
 		this._regexp = regexp;
 	}
 
+    public search(text: string, position?: number): SkriptPatternInfo | undefined {
+
+        if (!position)
+            position = this._index;
+
+        let search = text.substring(position).match(this._regexp);
+        if (search) {
+            let index = search.index!;
+            if(index > -1) {
+                this._index = position + index + search[0].length;
+                return {
+                    index: position + index,
+                    text: search[0]
+                }
+            }
+        }
+
+        return;
+
+    }
+    
+    
+
 }
 
-export class SkriptBracketPattern extends SkriptPattern {
+class SkriptBracketPattern extends SkriptPattern {
 
 	private readonly _opener: string;
 	private readonly _closer: string;
-    private _index = 0;
 
 	constructor(opener:string,closer:string) {
         super();
 		this._opener = opener;
 		this._closer = closer;
 	}
-
-    /**
-     * set search index to 0
-     */
-    public reset() {
-        this._index = 0;
-    }
 
     /**
      * @param text 찾을 글자 
@@ -52,21 +88,24 @@ export class SkriptBracketPattern extends SkriptPattern {
         if (!position)
             position = this._index;
         
-        // opener
+        // opener - fix
         let start = text.indexOf(this._opener, position);
         if (start < 0)
             return
 
-        // closer
+        // closer - extend
         let end = text.indexOf(this._closer, position);
         if (end < 0)
             return
 
-        // sub string
-        let subStr = text.substring(start + 1,end);
-        let index = subStr.indexOf(this._opener,0);
+        // sub string - move
+        let subStart = start + 1;
+        let subText = text.substring(subStart, end);
+        let index = subText.indexOf(this._opener,0);
         while (index >= 0) {
-            index = subStr.indexOf(this._opener,index + 1);
+
+            //move
+            subStart += index + 1;
 
             // extend
             end = text.indexOf(this._closer, end + 1);
@@ -74,6 +113,9 @@ export class SkriptBracketPattern extends SkriptPattern {
                 end = text.length - 1;
                 break;
             }
+
+            subText = text.substring(subStart , end);
+            index = subText.indexOf(this._opener,0);
 
         }
 

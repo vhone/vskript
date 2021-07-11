@@ -3,7 +3,7 @@ import { onSkriptEnable } from './Skript';
 import { SkriptExpression, SkriptExprVariable } from './skript/Context';
 import * as Provider from './provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
-import { SkriptBracketPattern } from './skript_fork/SkriptPattern';
+import { SkriptPattern } from './skript_fork/SkriptPattern';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -20,19 +20,23 @@ languages.setLanguageConfiguration('vskript', {
 
 export function activate(_context:ExtensionContext) {
 
-	// let code = '{list::%{_value}%} and {liest2::%{_value2}%}, {list3::%{_value3}%}';
-	// let pattern = new SkriptBracketPattern('{', '}');
-	// let search
+	let search
+
+	let code = '{list::%{_value}%} and {liest2%{_value5}%::%{_value2}%}, {list4::%{list3::%{_value3}%}%}, {_a::%{_b}%.%{_c::%{_d}%}%}';
+
+
+
+	// let pattern = SkriptPattern.create('{', '}');
 	// while (search = pattern.search(code)) {
 	// 	console.log(search);
 	// }
 
-	let code = '"글자를 찾아 떠나는 여행" and "입니다", "더블 작성 "" 어떻게"';
-	let pattern = new SkriptBracketPattern('"', '"');
-	let search
-	while (search = pattern.search(code)) {
-		console.log(search);
-	}
+	// let code2 = '"글자를 찾아 떠나는 여행" and "입니다", "더블 작성 "" 어떻게"';
+	// let pattern2 = SkriptPattern.create(/\"[^\"]*(\"\"[^\"]*)*\"/);
+	// while (search = pattern2.search(code2)) {
+	// 	console.log(search);
+	// }
+
 
 	onSkriptEnable();
 

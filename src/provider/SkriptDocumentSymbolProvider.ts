@@ -1,6 +1,8 @@
-import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
+import { DocumentSymbol, DocumentSymbolProvider, Location, SymbolInformation, SymbolKind, TextDocument } from 'vscode';
 import * as Skript from '../Skript';
-import { SkriptAliases, SkriptOptions, SkriptCommand } from '../skript_fork/SkriptParagraph';
+import { SkriptAliases, SkriptOptions, SkriptCommand, SkriptEvent, SkriptFunction } from '../skript_fork/SkriptComponent';
+import { SkriptVariable, SkriptVariableType } from '../skript_fork/SkriptExpression';
+import { SkriptDocumentSemanticTokensProvider } from './SkriptDocumentSemanticTokensProvider';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
 
@@ -58,8 +60,26 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
                 if (skCommand.options) for (const option of skCommand.options) {
                     let optionSymbol = new DocumentSymbol(option.key, option.value, SymbolKind.Enum, option.range, option.range);
                     commandSymbol.children.push(optionSymbol);
+
+                    if (option.key === 'trigger') {
+                        optionSymbol.children.push(...this._createVariableSymbols(skCommand.paragraph.variables));
+                    }
                 }
 
+            }
+
+            // Event
+            for (const skEvent of skDocument.getParagraphs(SkriptEvent)) {
+                let eventSymbol = new DocumentSymbol(skEvent.title, '', skEvent.symbolKind, skEvent.range, skEvent.range);
+                eventSymbol.children.push(...this._createVariableSymbols(skEvent.paragraph.variables));
+                symbols.push(eventSymbol);
+            }
+
+            // Function
+            for (const skFunction of skDocument.getParagraphs(SkriptFunction)) {
+                let functionSymbol = new DocumentSymbol(skFunction.title, '', skFunction.symbolKind, skFunction.range, skFunction.range);
+                functionSymbol.children.push(...this._createVariableSymbols(skFunction.paragraph.variables));
+                symbols.push(functionSymbol);
             }
 
             console.log(symbols);
@@ -72,16 +92,29 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
         }
     }
 
-    // private _createSymbol(expr:SkriptExpression): DocumentSymbol {
-    //     let symbol = SymbolKind.Null;
-    //     if (expr instanceof SkriptExprText) {
-    //         symbol = SymbolKind.String;
-    //     } else if (expr instanceof SkriptExprVariable) {
-    //         symbol = SymbolKind.Variable;
-    //     } else if (expr instanceof SkriptExprFunction) {
-    //         symbol = SymbolKind.Function;
-    //     }
-    //     return new DocumentSymbol(expr.code, '', symbol, expr.range, expr.range);
-    // }
+    private _createVariableSymbols(variables:SkriptVariable[]): DocumentSymbol[] {
+        let result: DocumentSymbol[] = [];
+        let maps = new Map<string, {variable:SkriptVariable, amount: number}>();
+        for (const skVariable of variables) if (skVariable.type === SkriptVariableType.LOCAL) {
+
+            let value
+            if (value = maps.get(skVariable.raw)) {
+                value.amount += 1;
+            } else {
+                maps.set(skVariable.raw, {variable:skVariable, amount:1});
+            }
+
+        }
+
+        for (const key of maps.keys()) {
+            let value = maps.get(key)!
+            let variable = value.variable;
+            let amount = value.amount;
+            let variableSymbol = new DocumentSymbol(key, `used ${amount} times`, SymbolKind.Variable, variable.range, variable.range);
+            result.push(variableSymbol);
+        }
+
+        return result;
+    }
 
 }

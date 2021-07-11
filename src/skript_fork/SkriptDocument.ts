@@ -1,6 +1,6 @@
 import { Position, Range } from "vscode";
 import { SkriptLine } from "./SkriptLine";
-import { SkriptParagraph } from "./SkriptParagraph";
+import { SkriptComponent } from "./SkriptComponent";
 import { SkriptPath } from "./SkriptPath";
 import { SkriptToolTip } from "./SkriptToolTip";
 
@@ -18,7 +18,7 @@ export class SkriptDocument {
     private _document: string;
 
     private _skLines: SkriptLine[] = [];
-    private _paragraphs: SkriptParagraph[] = [];
+    private _paragraphs: SkriptComponent[] = [];
 
     constructor (skPath: SkriptPath, document: string) {
         this._skPath = skPath;
@@ -76,7 +76,7 @@ export class SkriptDocument {
     }
 
 	/** Positon에 맞는 요소를 반환 */
-	public paragraphOf(position:Position): SkriptParagraph | undefined {
+	public paragraphOf(position:Position): SkriptComponent | undefined {
 		for (let i=0; i < this._paragraphs.length; i++) {
 			let comp = this._paragraphs[i];
 			if (comp.range.contains(position)) {
@@ -88,7 +88,7 @@ export class SkriptDocument {
 		return;
 	}
 
-    public getParagraphs<T extends SkriptParagraph>(clazz:Class<T>): T[] {
+    public getParagraphs<T extends SkriptComponent>(clazz:Class<T>): T[] {
         let array = new Array<T>();
         for (const value of this._paragraphs) if (value instanceof clazz) {
             array.push(value);
@@ -148,7 +148,7 @@ export class SkriptDocument {
 
                 // 생성
                 let paragraph = this._trimParagraph(groups.paragraph);
-                let skParagraph = SkriptParagraph.create(this, paragraph);
+                let skParagraph = SkriptComponent.create(this, paragraph);
 
                 if (skParagraph) {
                     this._paragraphs.push(skParagraph);

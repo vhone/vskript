@@ -1,18 +1,18 @@
 import { MarkdownString } from "vscode";
 import { SkriptLine } from "./SkriptLine";
-import { SkriptParagraph } from "./SkriptParagraph";
+import { SkriptComponent } from "./SkriptComponent";
 
 
 export class SkriptToolTip {
     
 
-	private readonly _skParagraph: SkriptParagraph;
+	private readonly _skParagraph: SkriptComponent;
     private readonly _tooltip: string[];
     private _markdown: MarkdownString | undefined;
     
 
 
-    constructor(skParagraph:SkriptParagraph, tooltip:string[]) {
+    constructor(skParagraph:SkriptComponent, tooltip:string[]) {
 		this._skParagraph = skParagraph;
         this._tooltip = tooltip;
     }
