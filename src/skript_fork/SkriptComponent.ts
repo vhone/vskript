@@ -1,7 +1,5 @@
-import { EventEmitter } from "node:stream";
 import { Position, Range, SymbolKind } from "vscode";
-import { SkriptDocument } from "./SkriptDocument";
-import { SkriptLine } from "./SkriptLine";
+import { SkriptDocument, SkriptLine } from "./SkriptDocument";
 import { SkriptParagraph } from "./SkriptParagraph";
 import { SkriptToolTip } from "./SkriptToolTip";
 
