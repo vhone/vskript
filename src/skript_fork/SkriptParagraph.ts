@@ -18,7 +18,10 @@ export class SkriptParagraph {
         this._setVariables();
     }
 
-    public get variables() {
+    public get range(): Range {
+        return this._range;
+    }
+    public get variables(): SkriptVariable[] {
         return this._variables;
     }
 

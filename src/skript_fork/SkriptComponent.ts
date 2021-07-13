@@ -1,3 +1,5 @@
+import { Test } from "mocha";
+import { TextDecoder } from "node:util";
 import { Position, Range, SymbolKind } from "vscode";
 import { SkriptDocument, SkriptLine } from "./SkriptDocument";
 import { SkriptParagraph } from "./SkriptParagraph";

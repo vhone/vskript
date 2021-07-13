@@ -1,5 +1,5 @@
 import { Position, Range } from "vscode";
-import { SkriptComponent } from "./SkriptComponent";
+import { SkriptComponent, SkriptMapComponent, SkriptParagraphComponent } from "./SkriptComponent";
 import { SkriptPath } from "./SkriptPath";
 import { SkriptToolTip } from "./SkriptToolTip";
 
@@ -17,7 +17,7 @@ export class SkriptDocument {
     private _document: string;
 
     private _skLines: SkriptLine[] = [];
-    private _paragraphs: SkriptComponent[] = [];
+    private _skComponents: SkriptComponent[] = [];
 
     constructor (skPath: SkriptPath, document: string) {
         this._skPath = skPath;
@@ -26,7 +26,7 @@ export class SkriptDocument {
     }
     
     public get paragraphs() {
-        return this._paragraphs;
+        return this._skComponents;
     }
 
     public get skPath() {
@@ -76,8 +76,8 @@ export class SkriptDocument {
 
 	/** Positon에 맞는 요소를 반환 */
 	public paragraphOf(position:Position): SkriptComponent | undefined {
-		for (let i=0; i < this._paragraphs.length; i++) {
-			let comp = this._paragraphs[i];
+		for (let i=0; i < this._skComponents.length; i++) {
+			let comp = this._skComponents[i];
 			if (comp.range.contains(position)) {
 				return comp;
 			} else if (position.isBeforeOrEqual(comp.range.start)){
@@ -89,16 +89,13 @@ export class SkriptDocument {
 
     public getParagraphs<T extends SkriptComponent>(clazz:Class<T>): T[] {
         let array = new Array<T>();
-        for (const value of this._paragraphs) if (value instanceof clazz) {
+        for (const value of this._skComponents) if (value instanceof clazz) {
             array.push(value);
         }
         return array;
     }
     
     /*
-    public getWordRangeAtPosition(position: Position, regex?: RegExp): Range | undefined {
-        throw new Error("Method not implemented.");
-    }
     public validateRange(range: Range): Range {
         throw new Error("Method not implemented.");
     }
@@ -136,7 +133,7 @@ export class SkriptDocument {
     }
 
     private _updateSkriptParagraph() {
-        this._paragraphs.length = 0;
+        this._skComponents.length = 0;
         
         let document = this._document;
         let search
@@ -150,7 +147,7 @@ export class SkriptDocument {
                 let skParagraph = SkriptComponent.create(this, paragraph);
 
                 if (skParagraph) {
-                    this._paragraphs.push(skParagraph);
+                    this._skComponents.push(skParagraph);
 
                     // docs 주석
                     if (groups.comment) {
