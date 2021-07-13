@@ -1,4 +1,3 @@
-import { SkriptLine } from "./SkriptLine";
 import { SkriptComponent, SkriptKeyValue, SkriptOptions } from "./SkriptComponent";
 import { Position, Range } from "vscode";
 import { SkriptVariable } from "./SkriptExpression";

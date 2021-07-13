@@ -1,5 +1,4 @@
 import { MarkdownString } from "vscode";
-import { SkriptLine } from "./SkriptLine";
 import { SkriptComponent } from "./SkriptComponent";
 
 
