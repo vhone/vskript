@@ -1,7 +1,7 @@
 import { DocumentSymbol, DocumentSymbolProvider, Location, SymbolInformation, SymbolKind, TextDocument } from 'vscode';
 import * as Skript from '../Skript';
 import { SkriptAliases, SkriptOptions, SkriptCommand, SkriptEvent, SkriptFunction } from '../skript_fork/SkriptComponent';
-import { SkriptVariable, SkriptVariableType } from '../skript_fork/SkriptExpression';
+import { SkriptVariable, SkriptVariableKind } from '../skript_fork/SkriptExpression';
 import { SkriptDocumentSemanticTokensProvider } from './SkriptDocumentSemanticTokensProvider';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
@@ -28,7 +28,7 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
                 return
         
             // Aliases
-            for (const skAliases of skDocument.getParagraphs(SkriptAliases)) {
+            for (const skAliases of skDocument.getComponents(SkriptAliases)) {
                 let aliasesSymbol = new DocumentSymbol(skAliases.title, '', skAliases.symbolKind, skAliases.range, skAliases.range);
                 symbols.push(aliasesSymbol);
 
@@ -41,7 +41,7 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
             }
 
             // Options
-            for (const skOptions of skDocument.getParagraphs(SkriptOptions)) {
+            for (const skOptions of skDocument.getComponents(SkriptOptions)) {
                 let optionsSymbol = new DocumentSymbol(skOptions.title, '', skOptions.symbolKind, skOptions.range, skOptions.range);
                 symbols.push(optionsSymbol);
 
@@ -53,7 +53,7 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
             }
 
             // Command
-            for (const skCommand of skDocument.getParagraphs(SkriptCommand)) {
+            for (const skCommand of skDocument.getComponents(SkriptCommand)) {
                 let commandSymbol = new DocumentSymbol(skCommand.title, '', skCommand.symbolKind, skCommand.range, skCommand.range);
                 symbols.push(commandSymbol);
 
@@ -69,20 +69,20 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
             }
 
             // Event
-            for (const skEvent of skDocument.getParagraphs(SkriptEvent)) {
+            for (const skEvent of skDocument.getComponents(SkriptEvent)) {
                 let eventSymbol = new DocumentSymbol(skEvent.title, '', skEvent.symbolKind, skEvent.range, skEvent.range);
                 eventSymbol.children.push(...this._createVariableSymbols(skEvent.paragraph.variables));
                 symbols.push(eventSymbol);
             }
 
             // Function
-            for (const skFunction of skDocument.getParagraphs(SkriptFunction)) {
+            for (const skFunction of skDocument.getComponents(SkriptFunction)) {
                 let functionSymbol = new DocumentSymbol(skFunction.title, '', skFunction.symbolKind, skFunction.range, skFunction.range);
                 functionSymbol.children.push(...this._createVariableSymbols(skFunction.paragraph.variables));
                 symbols.push(functionSymbol);
             }
 
-            console.log(symbols);
+            // console.log(symbols);
             
             return symbols;
 
@@ -95,7 +95,7 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
     private _createVariableSymbols(variables:SkriptVariable[]): DocumentSymbol[] {
         let result: DocumentSymbol[] = [];
         let maps = new Map<string, {variable:SkriptVariable, amount: number}>();
-        for (const skVariable of variables) if (skVariable.type === SkriptVariableType.LOCAL) {
+        for (const skVariable of variables) if (skVariable.kind === SkriptVariableKind.LOCAL) {
 
             let value
             if (value = maps.get(skVariable.raw)) {

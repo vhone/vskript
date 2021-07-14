@@ -12,7 +12,7 @@ export class SkriptHoverProvider implements HoverProvider {
         for(const skDocument of Skript.DOCUMENTS) {
 
             let docThis = skDocument.skPath.fsPath === document.uri.fsPath;
-            for (const paragraph of skDocument.paragraphs) {
+            for (const paragraph of skDocument.compnents) {
 
                 let hover = null;
 

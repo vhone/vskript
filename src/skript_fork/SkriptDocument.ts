@@ -17,7 +17,7 @@ export class SkriptDocument {
     private _document: string;
 
     private _skLines: SkriptLine[] = [];
-    private _paragraphs: SkriptComponent[] = [];
+    private _components: SkriptComponent[] = [];
 
     constructor (skPath: SkriptPath, document: string) {
         this._skPath = skPath;
@@ -25,8 +25,8 @@ export class SkriptDocument {
         this._update();
     }
     
-    public get paragraphs() {
-        return this._paragraphs;
+    public get compnents() {
+        return this._components;
     }
 
     public get skPath() {
@@ -75,9 +75,9 @@ export class SkriptDocument {
     }
 
 	/** Positon에 맞는 요소를 반환 */
-	public paragraphOf(position:Position): SkriptComponent | undefined {
-		for (let i=0; i < this._paragraphs.length; i++) {
-			let comp = this._paragraphs[i];
+	public componentOf(position:Position): SkriptComponent | undefined {
+		for (let i=0; i < this._components.length; i++) {
+			let comp = this._components[i];
 			if (comp.range.contains(position)) {
 				return comp;
 			} else if (position.isBeforeOrEqual(comp.range.start)){
@@ -87,9 +87,9 @@ export class SkriptDocument {
 		return;
 	}
 
-    public getParagraphs<T extends SkriptComponent>(clazz:Class<T>): T[] {
+    public getComponents<T extends SkriptComponent>(clazz:Class<T>): T[] {
         let array = new Array<T>();
-        for (const value of this._paragraphs) if (value instanceof clazz) {
+        for (const value of this._components) if (value instanceof clazz) {
             array.push(value);
         }
         return array;
@@ -136,7 +136,7 @@ export class SkriptDocument {
     }
 
     private _updateSkriptParagraph() {
-        this._paragraphs.length = 0;
+        this._components.length = 0;
         
         let document = this._document;
         let search
@@ -150,7 +150,7 @@ export class SkriptDocument {
                 let skParagraph = SkriptComponent.create(this, paragraph);
 
                 if (skParagraph) {
-                    this._paragraphs.push(skParagraph);
+                    this._components.push(skParagraph);
 
                     // docs 주석
                     if (groups.comment) {
