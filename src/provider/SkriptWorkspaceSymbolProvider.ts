@@ -9,7 +9,7 @@ export class SkriptWorkspaceSymbolProvider implements WorkspaceSymbolProvider {
     provideWorkspaceSymbols(query: string, _token: CancellationToken) {
         let results = new Array<SymbolInformation>();
         for (const skDocument of Skript.DOCUMENTS) {
-            for (const paragraph of skDocument.paragraphs) if (paragraph.title.includes(query)) {
+            for (const paragraph of skDocument.compnents) if (paragraph.title.includes(query)) {
                 let uri = Uri.file(skDocument.skPath.fsPath);
                 let location = new Location(uri, paragraph.range);
                 results.push(new SymbolInformation(paragraph.title, paragraph.symbolKind, skDocument.skPath.name, location));

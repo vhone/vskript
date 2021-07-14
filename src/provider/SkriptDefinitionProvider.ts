@@ -10,7 +10,7 @@ export class SkriptDefinitionProvider implements DefinitionProvider {
         if (range) {
             let funcName = document.getText(range);
             for(const skDocument of Skript.DOCUMENTS) {
-                for (const comp of skDocument.paragraphs) if (comp instanceof SkriptFunction && comp.name === funcName) {
+                for (const comp of skDocument.compnents) if (comp instanceof SkriptFunction && comp.name === funcName) {
 					let uri = Uri.file(skDocument.skPath.fsPath);
 					let location = new Location(uri, comp.range);
                     return location;

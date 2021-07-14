@@ -57,7 +57,8 @@ export abstract class SkriptComponent {
         } else if (search = component.match(/^(?<component>(?<head>on\s([^\:]+))\:(.*)((\r\n|\r|\n)(?<body>((\W[^\r\n]*)?(\r\n|\r|\n)?)+))?)/i)?.groups) {
             return this._createEvent(skDocument, range, search.component, search.head, search.body);
             
-        } else if (search = component.match(/^(?<component>(?<head>command\s([^\:]*))\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
+        } else if (search = component.match(/^(?<component>(command\s?(?<head>[^\:]*))\:?(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)*))/i)?.groups) {
+            // console.log(search)
             return this._createCommand(skDocument, range, search.component, search.head, search.body);
             
         } else if (search = component.match(/^(?<component>(?<head>function\s(?:\w+)\((?:.*)\)(?:\s\:\:\s(?:[^:]+))?)\:(.*)(?<body>(?:(?:\r\n|\r|\n)(?:[^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
@@ -134,24 +135,25 @@ export abstract class SkriptComponent {
 
 
 
-    private static _createCommand(_skDocument:SkriptDocument, _range:Range, _component:string, _head:string, _body:string): SkriptCommand {
-
-        // let lines = SkriptLine.split(_component, _skDocument.offsetAt(_range.start));
+    private static _createCommand(_skDocument:SkriptDocument, _range:Range, _component:string, _head?:string, _body?:string): SkriptCommand {
 
         let offset = _skDocument.offsetAt(_range.start);
 
-        let info: SkriptCommandInfomation = { label: 'label' };
+        let info: SkriptCommandInfomation = {};
 
-        let search = _head.match(/\/(?<label>[^\s]+)(?:\s(?<arguments>[^:]*))?/)?.groups;
+        let search = _head?.match(/\/?(?<label>[^\s]*)(?:\s(?<arguments>[^:]*))?/)?.groups;
         if (search) {
             info.label = search.label;
             info.arguments = search.arguments
-        }
+        };
+
+        // console.log(search)
 
         let paragraph: {range:Range, text:string} | undefined;
         let options = new Array<SkriptKeyValue<string>>();
-        for (const match of _component.match(/(?!\r\n|\r|\n)(\t|\s{4})([^:]*)\:(.*)((\r\n|\r|\n)((\t|\s)*\#.*|(\t|\s{4}){2}.*))*/g)!) {
-            let groups = match.match(/(\t|\s)*(?<option>(?<key>[^\t\s][^:]*)\:(?<value>.*)((\r\n|\r|\n)(?<paragraph>((\W[^\r\n]*)?(\r\n|\r|\n)?)+))?)/)?.groups;
+        let match =_component.match(/(?!\r\n|\r|\n)(\t|\s{4})([^:]*)\:(.*)((\r\n|\r|\n)((\t|\s)*\#.*|(\t|\s{4}){2}.*))*/g);
+        if (match) for (const m of match) {
+            let groups = m.match(/(\t|\s)*(?<option>(?<key>[^\t\s][^:]*)\:(?<value>.*)((\r\n|\r|\n)(?<paragraph>((\W[^\r\n]*)?(\r\n|\r|\n)?)+))?)/)?.groups;
             if (groups) {
                 let index = offset + _component.indexOf(groups.option);
                 if (!groups.paragraph) {
@@ -178,49 +180,15 @@ export abstract class SkriptComponent {
             }
         }
         if (options.length > 0 ) info.options = options;
+        // console.log('a', _range);
 
         let skCommand = new SkriptCommand(_skDocument, _range, info);
+
+        // console.log(skCommand);
 
         if (paragraph) {
             skCommand.paragraph = new SkriptParagraph(skCommand, paragraph.range, paragraph.text);
         }
-
-        // console.log(skCommand)
-
-        // let options = new Array<SkriptKeyValue<string>>();
-        // let trigger = false;
-        // for (let i=0; i<lines.length; i++ ) {
-        //     let line = lines[i];
-        //     let groups
-        //     if (groups = line.text.match(/(?:\t|\s{4})(?<option>(?<key>[^\t\s\:]+)\:(?<value>[^#]*))/)?.groups) {
-        //         let option = groups.option.trim();
-        //         let start = line.offset + line.text.indexOf(option);
-        //         let key = groups.key.trim();
-        //         if (key === 'trigger') {
-        //             trigger = true;
-        //         } else {
-        //             options.push({
-        //                 range: (() => {
-        //                     return new Range(_skDocument.positionAt(start)!, _skDocument.positionAt(start + option.length)!)
-        //                 })(),
-        //                 key: key,
-        //                 value: groups.value?.trim()
-        //             })
-        //         }
-        //     } else if (trigger) {
-        //         if (groups = line.text.match(/(?:\t|\s{4}){2}(?<code>.*)/)?.groups) {
-        //         } else {
-        //             trigger = false;
-        //         }
-        //     }
-        // }
-        // if (options.length > 0 ) {
-        //     info.options = options
-        // }
-        
-        // let offset = _skDocument.offsetAt(_range.start) + _component.indexOf(_body);
-        // let range = new Range(_skDocument.positionAt(offset)!, _skDocument.positionAt(offset + _body.length)!);
-        // let skParagraph = new SkriptParagraph(skCommand, range, _body);
 
         return skCommand;
 
@@ -364,32 +332,35 @@ export class SkriptEvent extends SkriptParagraphComponent {
 
 
 export interface SkriptCommandInfomation {
-    label: string;
+    label?: string;
     arguments?: string;
     options?: SkriptKeyValue<string>[];
 }
 
 export class SkriptCommand extends SkriptParagraphComponent {
 
-    private readonly _info: SkriptCommandInfomation;
+    private readonly _info?: SkriptCommandInfomation;
 
-    constructor(skDocument:SkriptDocument, range:Range, info:SkriptCommandInfomation) {
-        let title = `/${info.label}`;
-        if (info.arguments) title += ` ${info.arguments}`;
+    constructor(skDocument:SkriptDocument, range:Range, info?:SkriptCommandInfomation) {
+        let title = 'command'
+        if (info) {
+            if (info.label) title +=  ` /${info.label}`;
+            if (info.arguments) title += ` ${info.arguments}`;
+        }
         super(skDocument, range, title);
         this._info = info;
     }
 
     get label() {
-        return this._info.label
+        return this._info?.label
     }
 
     get arguments() {
-        return this._info.arguments
+        return this._info?.arguments
     }
 
     get options() {
-        return this._info.options
+        return this._info?.options
     }
 
     /** ```

@@ -3,7 +3,6 @@ import { onSkriptEnable } from './Skript';
 import { SkriptExpression, SkriptExprVariable } from './skript/Context';
 import * as Provider from './provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
-import { SkriptPattern } from './skript_fork/SkriptPattern';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -33,6 +32,10 @@ export function activate(_context:ExtensionContext) {
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
 	
 	/*
+<<<<<<< HEAD
+=======
+	
+>>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
 	languages.registerColorProvider('vskript', new Provider.SkriptDocumentColorProvider());
 	languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), LEGEND);
 

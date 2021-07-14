@@ -26,7 +26,7 @@ export async function onSkriptEnable() {
 				DOCUMENTS.push(skDocument);
 			};
 		}
-		console.log(DOCUMENTS);
+		// console.log(DOCUMENTS);
 		// window.showInformationMessage(`Loaded ${amtFunc} functions.`);
 		// window.showInformationMessage(`Loaded ${FILE_LIST.length} skript files.`);
 		window.showInformationMessage(`Loaded ${DOCUMENTS.length} skript files.`);

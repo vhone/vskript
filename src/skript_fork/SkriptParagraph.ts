@@ -59,7 +59,7 @@ export class SkriptParagraph {
                 let range = new Range(document.positionAt(offset + position.start)!, document.positionAt(offset + position.end)!)
                 let variable = this._paragraph.substring(position.start, position.end);
                 let raw_variable = variable.replace(/\%[^%]+%/, '*').replace(/\:\:\d+\}/, '::*}')
-                for (const options of document.getParagraphs(SkriptOptions)) {
+                for (const options of document.getComponents(SkriptOptions)) {
                     for (const option of options.options) {
                         raw_variable = raw_variable.replace(`{@${option.key}}`, option.value);
                     }
