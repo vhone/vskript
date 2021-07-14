@@ -17,11 +17,7 @@ export class SkriptDocument {
     private _document: string;
 
     private _skLines: SkriptLine[] = [];
-<<<<<<< HEAD
-    private _skComponents: SkriptComponent[] = [];
-=======
     private _components: SkriptComponent[] = [];
->>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
 
     constructor (skPath: SkriptPath, document: string) {
         this._skPath = skPath;
@@ -29,13 +25,8 @@ export class SkriptDocument {
         this._update();
     }
     
-<<<<<<< HEAD
-    public get paragraphs() {
-        return this._skComponents;
-=======
     public get compnents() {
         return this._components;
->>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
     }
 
     public get skPath() {
@@ -84,15 +75,9 @@ export class SkriptDocument {
     }
 
 	/** Positon에 맞는 요소를 반환 */
-<<<<<<< HEAD
-	public paragraphOf(position:Position): SkriptComponent | undefined {
-		for (let i=0; i < this._skComponents.length; i++) {
-			let comp = this._skComponents[i];
-=======
 	public componentOf(position:Position): SkriptComponent | undefined {
 		for (let i=0; i < this._components.length; i++) {
 			let comp = this._components[i];
->>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
 			if (comp.range.contains(position)) {
 				return comp;
 			} else if (position.isBeforeOrEqual(comp.range.start)){
@@ -104,11 +89,7 @@ export class SkriptDocument {
 
     public getComponents<T extends SkriptComponent>(clazz:Class<T>): T[] {
         let array = new Array<T>();
-<<<<<<< HEAD
-        for (const value of this._skComponents) if (value instanceof clazz) {
-=======
         for (const value of this._components) if (value instanceof clazz) {
->>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
             array.push(value);
         }
         return array;
@@ -152,11 +133,7 @@ export class SkriptDocument {
     }
 
     private _updateSkriptParagraph() {
-<<<<<<< HEAD
-        this._skComponents.length = 0;
-=======
         this._components.length = 0;
->>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
         
         let document = this._document;
         let search
@@ -170,11 +147,7 @@ export class SkriptDocument {
                 let skParagraph = SkriptComponent.create(this, paragraph);
 
                 if (skParagraph) {
-<<<<<<< HEAD
-                    this._skComponents.push(skParagraph);
-=======
                     this._components.push(skParagraph);
->>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
 
                     // docs 주석
                     if (groups.comment) {

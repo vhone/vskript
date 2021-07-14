@@ -1,13 +1,7 @@
-<<<<<<< HEAD
-import { CompletionItemProvider, CompletionItem, TextDocument, CancellationToken, CompletionContext, Position } from 'vscode'
-import * as Skript from '../Skript'
-
-=======
 import { CompletionItemProvider, CompletionItem, TextDocument, CompletionItemKind, MarkdownString, SnippetString, DocumentHighlight, CancellationToken, CompletionContext, Position } from 'vscode'
 import * as Skript from '../Skript'
 import { SkriptCommand, SkriptFunction, SkriptOptions, SkriptParagraphComponent } from '../skript_fork/SkriptComponent';
 import { SkriptMaterial as SkriptMaterials } from '../skript_fork/SkriptMaterial';
->>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
 
 const ITEMS_MAP = new Map<string,CompletionItem[]>();
 
@@ -19,27 +13,6 @@ const kaywords = [ 'aliases', 'options', 'on', 'command', 'function' ];
  * resolveCompletionItem는 목록을 스크롤할 때 동작한다.  
  */
 export class SkriptCompletionItemProvider implements CompletionItemProvider<CompletionItem> {
-<<<<<<< HEAD
-    provideCompletionItems(document: TextDocument, position: Position, _token: CancellationToken, _context: CompletionContext ) {
-
-        let fsPath = document.uri.fsPath;
-
-        let skDocument = Skript.find(fsPath);
-        let range = document.getWordRangeAtPosition(position, /\".*\"/);
-        let word = document.getText(range);
-        console.log(range);
-        console.log(word);
-
-        // if (ITEMS_MAP.size === 0){
-        //     for (let skFile of Skript.getSkriptDocuments()){
-        //         this._updateFunctionCompletionItem(skFile);
-        //     }
-        // } else if (!ITEMS_MAP.has(fsPath) || document.isDirty) {
-        //     this._updateFunctionCompletionItem(Skript.findDocument(fsPath)!);
-        // }
-
-        let response = new Array<CompletionItem>();
-=======
     provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext ): CompletionItem[] | undefined {
 
         let result = new Array<CompletionItem>();
@@ -178,16 +151,11 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
         //     this._updateFunctionCompletionItem(Skript.findDocument(fsPath)!);
         // }
 
->>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
         // for (let key of ITEMS_MAP.keys()) {
         //     for (let items of ITEMS_MAP.get(key)!) {
         //         response.push(items);
         //     }
         // }
-<<<<<<< HEAD
-        return response;
-    }
-=======
         return result;
     }/*,
 
@@ -196,7 +164,6 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
     }*/
 
 
->>>>>>> a2b2298247eaf3dab035b65b4cb99579908ad818
 
     // private _updateFunctionCompletionItem(skFile:SkriptFile): CompletionItem[] {
     //     let items = this._createCompletionItemsInFile(skFile);
