@@ -1,7 +1,7 @@
 import { CompletionItemProvider, CompletionItem, TextDocument, CompletionItemKind, MarkdownString, SnippetString, DocumentHighlight, CancellationToken, CompletionContext, Position } from 'vscode'
 import * as Skript from '../Skript'
 import { SkriptCommand, SkriptFunction, SkriptOptions, SkriptParagraphComponent } from '../skript_fork/SkriptComponent';
-import { SkriptMaterial as SkriptMaterials } from '../skript_fork/SkriptMaterial';
+import { Materials as SkriptMaterials } from '../skript_fork/resource/Materials';
 
 const ITEMS_MAP = new Map<string,CompletionItem[]>();
 

@@ -16,6 +16,7 @@ export const DOCUMENTS = new Array<SkriptDocument>();
 
 /** 스크립트 실행 */
 export async function onSkriptEnable() {
+
 	if (WORKSAPCE_FATH) {
 		// let amtFunc: number = 0;
 		for (const path of WORKSAPCE_FATH) {
