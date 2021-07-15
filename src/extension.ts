@@ -3,6 +3,7 @@ import { onSkriptEnable } from './Skript';
 import { SkriptExpression, SkriptExprVariable } from './skript/Context';
 import * as Provider from './provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
+import { EFFECTS } from './skript_fork/resource/Effects';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -16,8 +17,63 @@ languages.setLanguageConfiguration('vskript', {
 
 
 
+function findText(text:string, opener:string, closer:string, inner?:string): string[] {
+	inner = (inner) ? `\%${inner}\%` : '';
+	let regexp = new RegExp(`${opener}[^${opener}${closer}]*${inner}[^${opener}${closer}]*${closer}`, 'g');
+	console.log(regexp)
+	let array: string[] = [];
+	let search
+	while (search = regexp.exec(text)) {
+		array.push(search[0]);
+	}
+	
+	// array.push(...findText(text, opener, closer, search[0]));
+
+	return array;
+}
 
 export function activate(_context:ExtensionContext) {
+
+	// let variable = 'set {asdf::%{bacde::%{_asd}%::asd}%} to {123::%{1252::%{_232}%::151 123}%}';
+	let variable = 'set {asdf::%{bacde::%{_asd}%::%{_wnm}%}%} to {123::%{1252::%player%::151 123}%}'
+
+	// let brackets: string[][] = [['{', '}'], ['%', '%']];
+	let brackets: string[] = ['{', '}'];
+
+	
+	let find = findText(variable, '\\{', '\\}');
+	console.log(find)
+	/*
+	// let text = 'set {_a} to "b"';
+	let text = 'set ';
+
+	for (const eff of EFFECTS) {
+		eff.next(text);
+	}
+	*/
+
+	/*
+	let map = new Map<number,string>();
+	// let pattern = 'send [the] action bar [with text] %text% to %players%';
+	let pattern = 'break %blocks% [naturally] [using %item type%]';
+	let i = 0;
+	let pos = 0;
+	let regexp = /\%[^\%]+\%/g;
+	let search
+	while(search = regexp.exec(pattern)) {
+		let index = search.index!;
+		if (index === pos) {
+			map.set(i++, search[0]);
+		} else {
+			let sub = pattern.substring(pos, index);
+			map.set(i++, sub.trim());
+			map.set(i++, search[0]);
+		}
+		pos = index + search[0].length;
+		console.log(pos, search);
+	}
+	console.log(map);
+	*/
 
 	onSkriptEnable();
 
