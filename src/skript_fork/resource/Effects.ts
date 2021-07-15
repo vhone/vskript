@@ -57,11 +57,11 @@ class SkriptLanguageEffect {
         return this._patterns;
     }
 
-    public next(code:string): string {
+    public next(_code:string): string {
         for (const pattern of this._patterns) {
             
         }
-        return 'a'
+        return 'a';
     }
 
 }

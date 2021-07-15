@@ -17,31 +17,40 @@ languages.setLanguageConfiguration('vskript', {
 
 
 
-function findText(text:string, opener:string, closer:string, inner?:string): string[] {
-	inner = (inner) ? `\%${inner}\%` : '';
+function findText(text:string, opener:string, closer:string, inner?:string): string[] | undefined {
+	inner = (inner) ? `%${inner}%` : '';
 	let regexp = new RegExp(`${opener}[^${opener}${closer}]*${inner}[^${opener}${closer}]*${closer}`, 'g');
-	console.log(regexp)
+	console.log(regexp + ' → ' + text)
 	let array: string[] = [];
 	let search
+	let range = [-1, -1];
 	while (search = regexp.exec(text)) {
-		array.push(search[0]);
+		let inner = findText(text, opener, closer, search[0]);
+		if (!inner) {
+			array.push(search[0]);
+		} else {
+			array.push(...inner);
+		}
 	}
+
+	// console.log(range)
+	// console.log(text.substring(range[0], range[1]));
 	
 	// array.push(...findText(text, opener, closer, search[0]));
 
-	return array;
+	return (array.length > 0) ? array : undefined;
 }
 
 export function activate(_context:ExtensionContext) {
 
 	// let variable = 'set {asdf::%{bacde::%{_asd}%::asd}%} to {123::%{1252::%{_232}%::151 123}%}';
-	let variable = 'set {asdf::%{bacde::%{_asd}%::%{_wnm}%}%} to {123::%{1252::%player%::151 123}%}'
+	let variable = 'set {asdf.{abcd}::%{bacde::%{_asd}%::%{_wnm}%}%} to {123::%{1252::%player%::151 123}%}'
 
 	// let brackets: string[][] = [['{', '}'], ['%', '%']];
 	let brackets: string[] = ['{', '}'];
 
 	
-	let find = findText(variable, '\\{', '\\}');
+	let find = findText(variable, '{', '}');
 	console.log(find)
 	/*
 	// let text = 'set {_a} to "b"';
