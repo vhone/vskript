@@ -16,20 +16,24 @@ languages.setLanguageConfiguration('vskript', {
 });
 
 
+/*
+function findText(text:string, opener:string, closer:string, inner?:string): String[] | undefined {
 
-function findText(text:string, opener:string, closer:string, inner?:string): string[] | undefined {
-	inner = (inner) ? `%${inner}%` : '';
-	let regexp = new RegExp(`${opener}[^${opener}${closer}]*${inner}[^${opener}${closer}]*${closer}`, 'g');
+	let any = `[^${opener}${closer}]*`
+	let expr = `%[^%]*%`
+	inner = (inner) ? `%${any}${inner}${any}%` : '';
+	let regexp = new RegExp(`${opener}${any}(${expr}${any})?${inner}${any}(${expr}${any})?${closer}`, 'g');
+
 	console.log(regexp + ' → ' + text)
-	let array: string[] = [];
+	let set = new Set<string>();
 	let search
 	let range = [-1, -1];
 	while (search = regexp.exec(text)) {
 		let inner = findText(text, opener, closer, search[0]);
 		if (!inner) {
-			array.push(search[0]);
+			set.add(search[0]);
 		} else {
-			array.push(...inner);
+			inner.forEach(e => set.add(e));
 		}
 	}
 
@@ -37,21 +41,97 @@ function findText(text:string, opener:string, closer:string, inner?:string): str
 	// console.log(text.substring(range[0], range[1]));
 	
 	// array.push(...findText(text, opener, closer, search[0]));
-
-	return (array.length > 0) ? array : undefined;
+	
+	return (set.size > 0) ? Array.from(set) : undefined;
 }
+*/
+
+
+
+
+
+
+
+
+
+
+
+// (c) 2007 Steven Levithan <stevenlevithan.com>
+// MIT License
+
+/*** matchRecursive
+	accepts a string to search and a format (start and end tokens separated by "...").
+	returns an array of matches, allowing nested instances of format.
+
+	examples:
+		matchRecursive("test",          "(...)")   -> []
+		matchRecursive("(t(e)s)()t",    "(...)")   -> ["t(e)s", ""]
+		matchRecursive("t<e>>st",       "<...>")   -> ["e"]
+		matchRecursive("t<<e>st",       "<...>")   -> ["e"]
+		matchRecursive("t<<e>>st",      "<...>")   -> ["<e>"]
+		matchRecursive("<|t<e<|s|>t|>", "<|...|>") -> ["t<e<|s|>t"]
+*/
+const matchRecursive = function () {
+	let	formatParts = /^([\S\s]+?)\.\.\.([\S\s]+)/,
+		metaChar = /[-[\]{}()*+?.\\^$|,]/g,
+		escape = function (str: string) {
+			return str.replace(metaChar, "\\$&");
+		};
+
+	return function (str: string, format: string) {
+		let p = formatParts.exec(format);
+		if (!p) throw new Error("format must include start and end tokens separated by '...'");
+		if (p[1] == p[2]) throw new Error("start and end format tokens cannot be identical");
+
+		let	opener = p[1],
+			closer = p[2],
+			iterator = new RegExp(format.length === 5 ? "["+escape(opener+closer)+"]" : escape(opener)+"|"+escape(closer), "g"),
+			results = [],
+			openTokens,
+			matchStartIndex = -1,
+			match;
+
+		do {
+			openTokens = 0;
+			while (match = iterator.exec(str)) {
+				if (match[0] === opener) {
+					if (openTokens === 0)
+						matchStartIndex = iterator.lastIndex;
+					openTokens++;
+				} else if (openTokens > 0) {
+					openTokens--;
+					if (openTokens > 0)
+						results.push(str.slice(matchStartIndex, match.index));
+				}
+			}
+		} while (openTokens && (iterator.lastIndex = matchStartIndex));
+
+		return results;
+	};
+}();
+
+
+
+
+
+
+
+
+
+
 
 export function activate(_context:ExtensionContext) {
 
 	// let variable = 'set {asdf::%{bacde::%{_asd}%::asd}%} to {123::%{1252::%{_232}%::151 123}%}';
-	let variable = 'set {asdf.{abcd}::%{bacde::%{_asd}%::%{_wnm}%}%} to {123::%{1252::%player%::151 123}%}'
+	let variable = 'set {asdf.{abcd}::%{bacde::%{_asd}%::%{_wnm}%}%} to {123::% {1252::%player%::151 123}%}'
 
 	// let brackets: string[][] = [['{', '}'], ['%', '%']];
 	let brackets: string[] = ['{', '}'];
 
-	
-	let find = findText(variable, '{', '}');
-	console.log(find)
+	console.log(matchRecursive(variable, '{...}'))
+	// let find = findText(variable, '{', '}');
+	// console.log(find)
+
 	/*
 	// let text = 'set {_a} to "b"';
 	let text = 'set ';
