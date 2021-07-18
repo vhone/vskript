@@ -36,23 +36,32 @@ export enum SkriptVariableType {
 
 export class SkriptVariable extends SkriptExpression {
 
-    private readonly _rawExpr: string;
+    private readonly _raw: string;
     private readonly _kind: SkriptVariableKind;
     private readonly _type: SkriptVariableType;
+    
+    private _parent?: SkriptVariable;
+    private _child?: SkriptVariable[];
 
-    constructor(range: Range, expr: string, rawExpr: string) {
+    /**
+     * 
+     * @param range 범위
+     * @param expr 적혀 있는 그대로
+     * @param raw 실제 사용되는
+     */
+    constructor(range: Range, expr: string, raw: string) {
         super(range, expr);
-        this._rawExpr = rawExpr
-        if (rawExpr.match(/^\{\_/)) {
+        this._raw = raw
+        if (raw.match(/^\{\_/)) {
             this._kind = SkriptVariableKind.LOCAL;
-        } else if (rawExpr.match(/^\{\@/)) {
+        } else if (raw.match(/^\{\@/)) {
             this._kind = SkriptVariableKind.OPTION;
-        } else if (rawExpr.match(/^\{\-/)) {
+        } else if (raw.match(/^\{\-/)) {
             this._kind = SkriptVariableKind.RUNTIME;
         } else {
             this._kind = SkriptVariableKind.GLOVAL;
         }
-        if (rawExpr.match(/\*\}$/)) {
+        if (raw.match(/\*\}$/)) {
             this._type = SkriptVariableType.LIST;
         } else {
             this._type = SkriptVariableType.NORMAL;
@@ -60,13 +69,21 @@ export class SkriptVariable extends SkriptExpression {
     }
 
     public get raw(): string {
-        return this._rawExpr;
+        return this._raw;
     }
     public get kind(): SkriptVariableKind {
         return this._kind;
     }
     public get type(): SkriptVariableType {
         return this._type;
+    }
+    public get parent(): SkriptVariable | undefined {
+        return this._parent;
+    }
+    public get child(): SkriptVariable[] {
+        if (!this._child)
+            this._child = new Array<SkriptVariable>();
+        return this._child;
     }
 
 }

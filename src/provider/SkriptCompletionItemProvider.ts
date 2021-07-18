@@ -100,14 +100,11 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
                         let trg = new CompletionItem('trigger', CompletionItemKind.Property);
                         trg.insertText = new SnippetString('trigger:\r\n\t\t')
                         
-                        let items = [ as, desc, usage, perm, perm_msg, exec, cool, cool_msg, cool_byp, cool_str, trg];
+                        let items = [ as, desc, usage, perm, perm_msg, exec, cool, cool_msg, cool_byp, cool_str, trg ];
 
                         for (const option of skComponent.options!) {
                             items = items.filter(v => v.label !== option.key);
-                        }
-
-                        for (const item of items) {
-                            result.push(item);
+                            result.push(...items);
                         }
                     }
                 }

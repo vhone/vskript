@@ -3,7 +3,9 @@ import { onSkriptEnable } from './Skript';
 import { SkriptExpression, SkriptExprVariable } from './skript/Context';
 import * as Provider from './provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
-import { EFFECTS } from './skript_fork/resource/Effects';
+import { EFFECTS } from './skript_fork/resource/SkriptEffects';
+import { TextDecoder } from 'node:util';
+import { SkriptVariable, SkriptVariableType } from './skript_fork/SkriptExpression';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -16,103 +18,58 @@ languages.setLanguageConfiguration('vskript', {
 });
 
 
-/*
-function findText(text:string, opener:string, closer:string, inner?:string): String[] | undefined {
 
-	let any = `[^${opener}${closer}]*`
-	let expr = `%[^%]*%`
-	inner = (inner) ? `%${any}${inner}${any}%` : '';
-	let regexp = new RegExp(`${opener}${any}(${expr}${any})?${inner}${any}(${expr}${any})?${closer}`, 'g');
 
-	console.log(regexp + ' → ' + text)
-	let set = new Set<string>();
-	let search
-	let range = [-1, -1];
+function findVariable(text:string, index?:number): SkriptVariable | undefined {
+
+	if (!index)
+		index = 0;
+
+	let opener = '{',
+		closer = '}',
+		escape = '%',
+		stack = 0,
+		start = -1,
+		isNested = false,
+		regexp = new RegExp(`${opener}|${escape}|${closer}`, 'g'),
+		child: SkriptVariable[] = [];
+
+	let search;
 	while (search = regexp.exec(text)) {
-		let inner = findText(text, opener, closer, search[0]);
-		if (!inner) {
-			set.add(search[0]);
-		} else {
-			inner.forEach(e => set.add(e));
+		console.log(search);
+		if (search[0] === opener) {
+			if (start < 0)
+				start = search.index;
+			stack ++;
+		
+		} else if (start < 0) {
+			continue;
+
+		} else if (search[0] === escape) {
+			if (isNested) {
+				isNested = false;
+			} else {
+				isNested = true;
+				let v = findVariable(text.substr(search.index + 1), index + search.index + 1);
+				if (v) {
+					regexp.lastIndex = search.index + v.expr.length + 1;
+					child.push(v);
+				}
+			}
+
+		} else if (search[0] === closer) {
+			stack--;
+			if (stack === 0) {
+				let ragne = new Range(0, 0, 0, 0);
+				let variable = new SkriptVariable(ragne, text.substring(start, search.index + 1), text.substring(start, search.index + 1));
+				variable.child.push(...child);
+				return variable;
+			}
 		}
 	}
 
-	// console.log(range)
-	// console.log(text.substring(range[0], range[1]));
-	
-	// array.push(...findText(text, opener, closer, search[0]));
-	
-	return (set.size > 0) ? Array.from(set) : undefined;
+	return;
 }
-*/
-
-
-
-
-
-
-
-
-
-
-
-// (c) 2007 Steven Levithan <stevenlevithan.com>
-// MIT License
-
-/*** matchRecursive
-	accepts a string to search and a format (start and end tokens separated by "...").
-	returns an array of matches, allowing nested instances of format.
-
-	examples:
-		matchRecursive("test",          "(...)")   -> []
-		matchRecursive("(t(e)s)()t",    "(...)")   -> ["t(e)s", ""]
-		matchRecursive("t<e>>st",       "<...>")   -> ["e"]
-		matchRecursive("t<<e>st",       "<...>")   -> ["e"]
-		matchRecursive("t<<e>>st",      "<...>")   -> ["<e>"]
-		matchRecursive("<|t<e<|s|>t|>", "<|...|>") -> ["t<e<|s|>t"]
-*/
-const matchRecursive = function () {
-	let	formatParts = /^([\S\s]+?)\.\.\.([\S\s]+)/,
-		metaChar = /[-[\]{}()*+?.\\^$|,]/g,
-		escape = function (str: string) {
-			return str.replace(metaChar, "\\$&");
-		};
-
-	return function (str: string, format: string) {
-		let p = formatParts.exec(format);
-		if (!p) throw new Error("format must include start and end tokens separated by '...'");
-		if (p[1] == p[2]) throw new Error("start and end format tokens cannot be identical");
-
-		let	opener = p[1],
-			closer = p[2],
-			iterator = new RegExp(format.length === 5 ? "["+escape(opener+closer)+"]" : escape(opener)+"|"+escape(closer), "g"),
-			results = [],
-			openTokens,
-			matchStartIndex = -1,
-			match;
-
-		do {
-			openTokens = 0;
-			while (match = iterator.exec(str)) {
-				if (match[0] === opener) {
-					if (openTokens === 0)
-						matchStartIndex = iterator.lastIndex;
-					openTokens++;
-				} else if (openTokens > 0) {
-					openTokens--;
-					if (openTokens > 0)
-						results.push(str.slice(matchStartIndex, match.index));
-				}
-			}
-		} while (openTokens && (iterator.lastIndex = matchStartIndex));
-
-		return results;
-	};
-}();
-
-
-
-
 
 
 
@@ -123,46 +80,13 @@ const matchRecursive = function () {
 export function activate(_context:ExtensionContext) {
 
 	// let variable = 'set {asdf::%{bacde::%{_asd}%::asd}%} to {123::%{1252::%{_232}%::151 123}%}';
-	let variable = 'set {asdf.{abcd}::%{bacde::%{_asd}%::%{_wnm}%}%} to {123::% {1252::%player%::151 123}%}'
+	// let variable = 'set {asdf.{abcd}::%{bacde::%{_asd}%::%{_wnm}%}%} to {123::% {1252::%player%::151 123}%}'
 
-	// let brackets: string[][] = [['{', '}'], ['%', '%']];
-	let brackets: string[] = ['{', '}'];
+	// console.log(findVariable(variable));
 
-	console.log(matchRecursive(variable, '{...}'))
-	// let find = findText(variable, '{', '}');
-	// console.log(find)
+	let effect = 'send [the] action bar [with text] %text% to %players%';
 
-	/*
-	// let text = 'set {_a} to "b"';
-	let text = 'set ';
-
-	for (const eff of EFFECTS) {
-		eff.next(text);
-	}
-	*/
-
-	/*
-	let map = new Map<number,string>();
-	// let pattern = 'send [the] action bar [with text] %text% to %players%';
-	let pattern = 'break %blocks% [naturally] [using %item type%]';
-	let i = 0;
-	let pos = 0;
-	let regexp = /\%[^\%]+\%/g;
-	let search
-	while(search = regexp.exec(pattern)) {
-		let index = search.index!;
-		if (index === pos) {
-			map.set(i++, search[0]);
-		} else {
-			let sub = pattern.substring(pos, index);
-			map.set(i++, sub.trim());
-			map.set(i++, search[0]);
-		}
-		pos = index + search[0].length;
-		console.log(pos, search);
-	}
-	console.log(map);
-	*/
+	
 
 	onSkriptEnable();
 

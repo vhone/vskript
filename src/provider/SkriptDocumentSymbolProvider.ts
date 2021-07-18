@@ -92,18 +92,19 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
         }
     }
 
-    private _createVariableSymbols(variables:SkriptVariable[]): DocumentSymbol[] {
+    private _createVariableSymbols(skVariables:SkriptVariable[]): DocumentSymbol[] {
         let result: DocumentSymbol[] = [];
         let maps = new Map<string, {variable:SkriptVariable, amount: number}>();
-        for (const skVariable of variables) if (skVariable.kind === SkriptVariableKind.LOCAL) {
 
+        for (const variables of skVariables)
+            for (const skVariable of this._getAllVariable(variables))
+                if (skVariable.kind === SkriptVariableKind.LOCAL) {
             let value
             if (value = maps.get(skVariable.raw)) {
                 value.amount += 1;
             } else {
                 maps.set(skVariable.raw, {variable:skVariable, amount:1});
             }
-
         }
 
         for (const key of maps.keys()) {
@@ -115,6 +116,19 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
         }
 
         return result;
+    }
+
+    private _getAllVariable(skVariable:SkriptVariable): SkriptVariable[] {
+        // console.log(skVariable)
+        if (skVariable.child.length === 0) {
+            return [skVariable]
+        } else {
+            let array: SkriptVariable[] = [];
+            for (const child of skVariable.child) {
+                array.push(skVariable, ...this._getAllVariable(child));
+            }
+            return array;
+        }
     }
 
 }
