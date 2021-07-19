@@ -3,7 +3,7 @@ import { CancellationToken, DocumentSemanticTokensProvider, ProviderResult, Sema
 export const LEGEND = new SemanticTokensLegend(['aliases']);
 
 export class SkriptDocumentSemanticTokensProvider implements DocumentSemanticTokensProvider {
-    provideDocumentSemanticTokens(document: TextDocument, _token: CancellationToken): ProviderResult<SemanticTokens> {
+    provideDocumentSemanticTokens(_document: TextDocument, _token: CancellationToken): ProviderResult<SemanticTokens> {
         console.log('SkriptDocumentSemanticTokensProvider');
 
         // let skFile = Skript.findDocument(document.uri.fsPath);

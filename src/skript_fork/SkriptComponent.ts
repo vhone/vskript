@@ -58,7 +58,6 @@ export abstract class SkriptComponent {
             return this._createEvent(skDocument, range, search.component, search.head, search.body);
             
         } else if (search = component.match(/^(?<component>(command\s?(?<head>[^\:]*))\:?(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)*))/i)?.groups) {
-            // console.log(search)
             return this._createCommand(skDocument, range, search.component, search.head, search.body);
             
         } else if (search = component.match(/^(?<component>(?<head>function\s(?:\w+)\((?:.*)\)(?:\s\:\:\s(?:[^:]+))?)\:(.*)(?<body>(?:(?:\r\n|\r|\n)(?:[^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
@@ -122,7 +121,6 @@ export abstract class SkriptComponent {
     private static _createEvent(_skDocument:SkriptDocument, _range:Range, _component:string, _head:string, _body:string): SkriptEvent {
 
         let skEvent = new SkriptEvent(_skDocument, _range, _head);
-
         let offset = _skDocument.offsetAt(_range.start) + _component.indexOf(_body);
         let range = new Range(_skDocument.positionAt(offset)!, _skDocument.positionAt(offset + _body.length)!);
         let skParagraph = new SkriptParagraph(skEvent, range, _body);
@@ -146,8 +144,6 @@ export abstract class SkriptComponent {
             info.label = search.label;
             info.arguments = search.arguments
         };
-
-        // console.log(search)
 
         let paragraph: {range:Range, text:string} | undefined;
         let options = new Array<SkriptKeyValue<string>>();
@@ -180,11 +176,8 @@ export abstract class SkriptComponent {
             }
         }
         if (options.length > 0 ) info.options = options;
-        // console.log('a', _range);
 
         let skCommand = new SkriptCommand(_skDocument, _range, info);
-
-        // console.log(skCommand);
 
         if (paragraph) {
             skCommand.paragraph = new SkriptParagraph(skCommand, paragraph.range, paragraph.text);

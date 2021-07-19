@@ -1,4 +1,4 @@
-import { DocumentSymbol, DocumentSymbolProvider, Location, SymbolInformation, SymbolKind, TextDocument } from 'vscode';
+import { DocumentSymbol, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument } from 'vscode';
 import * as Skript from '../Skript';
 import { SkriptAliases, SkriptOptions, SkriptCommand, SkriptEvent, SkriptFunction } from '../skript_fork/SkriptComponent';
 import { SkriptVariable, SkriptVariableKind } from '../skript_fork/SkriptExpression';
@@ -26,7 +26,7 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
             let skDocument = Skript.find(fsPath);
             if (!skDocument)
                 return
-        
+            
             // Aliases
             for (const skAliases of skDocument.getComponents(SkriptAliases)) {
                 let aliasesSymbol = new DocumentSymbol(skAliases.title, '', skAliases.symbolKind, skAliases.range, skAliases.range);
@@ -81,8 +81,6 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
                 functionSymbol.children.push(...this._createVariableSymbols(skFunction.paragraph.variables));
                 symbols.push(functionSymbol);
             }
-
-            // console.log(symbols);
             
             return symbols;
 
@@ -119,7 +117,6 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
     }
 
     private _getAllVariable(skVariable:SkriptVariable): SkriptVariable[] {
-        // console.log(skVariable)
         if (skVariable.child.length === 0) {
             return [skVariable]
         } else {

@@ -1,11 +1,12 @@
-import { CompletionItemProvider, CompletionItem, TextDocument, CompletionItemKind, MarkdownString, SnippetString, DocumentHighlight, CancellationToken, CompletionContext, Position } from 'vscode'
+import { CompletionItemProvider, CompletionItem, TextDocument, CompletionItemKind, SnippetString, CancellationToken, CompletionContext, Position } from 'vscode'
 import * as Skript from '../Skript'
-import { SkriptCommand, SkriptFunction, SkriptOptions, SkriptParagraphComponent } from '../skript_fork/SkriptComponent';
+import { SkriptCommand } from '../skript_fork/SkriptComponent';
 import { Materials as SkriptMaterials } from '../skript_fork/resource/Materials';
 
 const ITEMS_MAP = new Map<string,CompletionItem[]>();
 
 const kaywords = [ 'aliases', 'options', 'on', 'command', 'function' ];
+
 /**
  * ```Ctrl + space``` 단축키로 completion을 연다.
  * ***
@@ -13,7 +14,7 @@ const kaywords = [ 'aliases', 'options', 'on', 'command', 'function' ];
  * resolveCompletionItem는 목록을 스크롤할 때 동작한다.  
  */
 export class SkriptCompletionItemProvider implements CompletionItemProvider<CompletionItem> {
-    provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext ): CompletionItem[] | undefined {
+    provideCompletionItems(document: TextDocument, position: Position, _token: CancellationToken, _context: CompletionContext ): CompletionItem[] | undefined {
 
         let result = new Array<CompletionItem>();
 
@@ -56,13 +57,12 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
         let skDocument = Skript.find(document.uri.fsPath);
         if (skDocument) {
 
-            let skComponent = skDocument.componentOf(position);
+            // let skComponent = skDocument.componentOf(position);
+            let skComponent = skDocument.lastComponentOf(position);
+            console.log(skComponent)
+            console.log([subText]);
             if (skComponent) {
-
                 if (skComponent instanceof SkriptCommand) {
-                    // console.log(skComponent);
-                    // console.log(line.text);
-                    // console.log(word);
                     if (subText.match(/^(\t|\s{4})($|[^\t\s\:]*$)/)) {
 
                         let as = new CompletionItem('aliases', CompletionItemKind.Property);
@@ -102,10 +102,10 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
                         
                         let items = [ as, desc, usage, perm, perm_msg, exec, cool, cool_msg, cool_byp, cool_str, trg ];
 
-                        for (const option of skComponent.options!) {
-                            items = items.filter(v => v.label !== option.key);
-                            result.push(...items);
+                        if (skComponent.options) for (const option of skComponent.options) {
+                            items = items.filter(v => v.label !== option.key);  
                         }
+                        result.push(...items);
                     }
                 }
 
@@ -113,46 +113,6 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
 
         }
 
-
-
-        // let skDocument = Skript.find(document.uri.fsPath);
-        // let skComponent = skDocument?.componentOf(position);
-        // if ((skComponent) && skComponent instanceof SkriptParagraphComponent) {
-
-        //     let set = new Set<string>();
-
-        //     // 옵션 세팅
-        //     let skOptions = skDocument?.getComponents(SkriptOptions)
-        //     if (skOptions) for (const skOption of skOptions) {
-        //         for (const option of skOption.options) {
-        //             set.add(`{@${option.key}}`);
-        //         }
-        //     }
-
-        //     // 변수 리스트 세팅
-        //     for (const variable of skComponent.paragraph.variables) {
-        //         set.add(variable.expr);
-        //     }
-        //     for (const expr of set) {
-        //         let item = new CompletionItem(expr, CompletionItemKind.Variable);
-        //         result.push(item);
-        //     }
-        // }
-
-        // let fsPath = document.uri.fsPath;
-        // if (ITEMS_MAP.size === 0){
-        //     for (let skFile of Skript.getSkriptDocuments()){
-        //         this._updateFunctionCompletionItem(skFile);
-        //     }
-        // } else if (!ITEMS_MAP.has(fsPath) || document.isDirty) {
-        //     this._updateFunctionCompletionItem(Skript.findDocument(fsPath)!);
-        // }
-
-        // for (let key of ITEMS_MAP.keys()) {
-        //     for (let items of ITEMS_MAP.get(key)!) {
-        //         response.push(items);
-        //     }
-        // }
         return result;
     }/*,
 

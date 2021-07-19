@@ -87,6 +87,19 @@ export class SkriptDocument {
 		return;
 	}
 
+	/** Positon이 속하거나 가장 가까운 요소를 반환 */
+	public lastComponentOf(position:Position): SkriptComponent | undefined {
+		for (let i=0; i < this._components.length; i++) {
+			let comp = this._components[i];
+			if (comp.range.contains(position)) {
+				return comp;
+			} else if (position.isBeforeOrEqual(comp.range.start)){
+				return this._components[i-1];
+			}
+		}
+		return;
+	}
+
     public getComponents<T extends SkriptComponent>(clazz:Class<T>): T[] {
         let array = new Array<T>();
         for (const value of this._components) if (value instanceof clazz) {
@@ -158,7 +171,6 @@ export class SkriptDocument {
                 }
     
                 document = document.substring(document.indexOf(paragraph) + paragraph.length);
-
             } else {
                 break;
             }

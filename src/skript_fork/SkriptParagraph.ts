@@ -28,54 +28,6 @@ export class SkriptParagraph {
         return this._variables;
     }
 
-    // private _setVariables() {
-
-    //     let list = new Array<{index:number,value:boolean}>();
-    //     let regex_start = new RegExp(/\{/, 'g');
-    //     let regex_end = new RegExp(/\}/, 'g');
-
-    //     // 괄호 위치 탐색
-    //     let search
-    //     while (search = regex_start.exec(this._paragraph)) {
-    //         list.push({index: search.index, value: true});
-    //     }
-    //     while (search = regex_end.exec(this._paragraph)) {
-    //         list.push({index: search.index, value: false});
-    //     }
-        
-    //     let document = this._skComponent.document;
-    //     let offset = document.offsetAt(this._range.start);
-
-    //     let bracket = 0
-    //     let position = {start:-1, end:-1};
-    //     for (const v of list.sort((a,b)=>{ return a.index - b.index})) {
-    
-    //         if (v.value) {
-    //             if (bracket === 0) position.start = v.index;
-    //             bracket++;
-    //         } else {
-    //             bracket--;
-    //             if (bracket === 0) position.end = v.index + 1;
-    //         }
-    
-    //         if (position.start > -1 && position.end > -1) {
-    //             let range = new Range(document.positionAt(offset + position.start)!, document.positionAt(offset + position.end)!)
-    //             let variable = this._paragraph.substring(position.start, position.end);
-    //             let raw_variable = variable.replace(/\%[^%]+%/, '*').replace(/\:\:\d+\}/, '::*}')
-    //             for (const options of document.getComponents(SkriptOptions)) {
-    //                 for (const option of options.options) {
-    //                     raw_variable = raw_variable.replace(`{@${option.key}}`, option.value);
-    //                 }
-    //             }
-    //             this._variables.push(new SkriptVariable(range, variable, raw_variable));
-    //             position = {start:-1, end:-1};
-    //         }
-    
-    //     }
-
-    //     // console.log(this._variables);
-    // }
-
     // 글자 = "%익스프레션%, %변수%, %함수%"
     // 변수 = {%익스프레션%::%변수%}
     // 함수 = func( 익스프레션, 변수, 함수 )
@@ -84,16 +36,15 @@ export class SkriptParagraph {
     private _setVariables() {
 
         let local_index = this._skDocument.offsetAt(this._range.start);
-        let paragraph = this._paragraph;
 
         let position = 0;
         let index;
         do {
-            index = paragraph.indexOf('{', position);
+            index = this._paragraph.indexOf('{', position);
             if (index > 0) {
-                let variable = this._findVariable(paragraph, index, local_index);
+                let variable = this._findVariable(this._paragraph, index, local_index);
                 if (!variable)
-                    continue;
+                    break;
                 this._variables.push(variable);
     
                 position = index + variable.expr.length + 1;
@@ -109,11 +60,11 @@ export class SkriptParagraph {
     
         let opener = '{',
             closer = '}',
-            escape = '%',
+            nest = '%',
             stack = 0,
             start = -1,
             isNested = false,
-            regexp = new RegExp(`${opener}|${escape}|${closer}`, 'g'),
+            regexp = new RegExp(`${opener}|${nest}|${closer}`, 'g'),
             child: SkriptVariable[] = [];
     
         let search;
@@ -122,21 +73,24 @@ export class SkriptParagraph {
                 if (start < 0)
                     start = search.index;
                 stack ++;
-            
-            } else if (start < 0) {
-                continue;
-    
-            } else if (search[0] === escape) {
+
+            } else if (search[0] === nest) {
+                if (start < 0) {
+                    return;
+                }
                 if (isNested) {
                     isNested = false;
                 } else {
                     isNested = true;
-                    let v = this._findVariable(paragraph.substr(search.index + 1), index + search.index + 1, local_index);
+                    let v = this._findVariable(paragraph, search.index + 1, local_index + index);
                     if (v) {
                         regexp.lastIndex = search.index + v.expr.length + 1;
                         child.push(v);
                     }
                 }
+            
+            } else if (start < 0) {
+                continue;
     
             } else if (search[0] === closer) {
                 stack--;
@@ -149,6 +103,7 @@ export class SkriptParagraph {
                 }
             }
         }
+
     
         return;
     }
