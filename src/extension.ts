@@ -2,6 +2,7 @@ import { ExtensionContext, IndentAction, languages, workspace } from 'vscode';
 import { onSkriptEnable } from './Skript';
 import * as Provider from './provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
+import { LEGEND } from './provider/SkriptDocumentSemanticTokensProvider';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -23,6 +24,7 @@ export function activate(_context:ExtensionContext) {
 	languages.registerHoverProvider('vskript', new Provider.SkriptHoverProvider());
 	languages.registerDefinitionProvider('vskript', new Provider.SkriptDefinitionProvider());
 	languages.registerCompletionItemProvider('vskript', new Provider.SkriptCompletionItemProvider());
+	languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), LEGEND);
 	
 	// Event;
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
@@ -30,7 +32,6 @@ export function activate(_context:ExtensionContext) {
 	/*
 	
 	languages.registerColorProvider('vskript', new Provider.SkriptDocumentColorProvider());
-	languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), LEGEND);
 
 	languages.registerEvaluatableExpressionProvider('vskript', {
 		provideEvaluatableExpression(_document: TextDocument, _position: Position, _token: CancellationToken): EvaluatableExpression {

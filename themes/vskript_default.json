@@ -9,7 +9,8 @@
 	},
 	"semanticHighlighting": true,
 	"semanticTokenColors": {
-		"aliases": { "foreground": "#7fcceb" }
+		"aliases": { "foreground": "#7fcceb" },
+		"parameter": { "foreground": "#ff0000" }
 	},
 	"tokenColors": [
 		

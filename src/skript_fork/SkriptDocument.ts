@@ -25,7 +25,7 @@ export class SkriptDocument {
         this._update();
     }
     
-    public get compnents() {
+    public get components() {
         return this._components;
     }
 

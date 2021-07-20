@@ -1,6 +1,7 @@
 import { Test } from "mocha";
 import { TextDecoder } from "node:util";
 import { Position, Range, SymbolKind } from "vscode";
+import { SkriptType } from "./language/SkriptLanguageType";
 import { SkriptDocument, SkriptLine } from "./SkriptDocument";
 import { SkriptParagraph } from "./SkriptParagraph";
 import { SkriptToolTip } from "./SkriptToolTip";
@@ -201,7 +202,7 @@ export abstract class SkriptComponent {
             while (search = parameter.match(/(?<parameter>(?<name>[^\,\:]*)\:(?<type>[^\,\=]*)(?:\=(?<default>[^\,]*))?\,?)/)?.groups) {
                 parameters.push({
                     name: search.name.trim(),
-                    type: search.type.trim(),
+                    type: SkriptType.create(search.type.trim()),
                     default: search.default?.trim()
                 })
                 parameter = parameter.replace(search.parameter, '');
@@ -376,7 +377,7 @@ export interface SkriptFunctionInfomation {
 
 export interface SkriptFunctionParameter {
     name: string,
-    type: string,
+    type: SkriptType,
     default: string | undefined
 }
 

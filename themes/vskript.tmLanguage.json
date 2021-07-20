@@ -217,9 +217,11 @@
 				{ "include": "#type.blockdata" },
 				{ "include": "#type.boolean" },
 				{ "include": "#type.cat" },
+				{ "include": "#type.chunk" },
 				{ "include": "#type.click" },
 				{ "include": "#type.color" },
 				{ "include": "#type.sender" },
+				{ "include": "#type.damagecause" },
 				{ "include": "#type.date" },
 				{ "include": "#type.difficulty" },
 				{ "include": "#type.direction" },
@@ -274,7 +276,7 @@
 		},
 		"type.blockdata": {
 			"name": "vskript.type.blockdata",
-			"match": "\\bblockdatas?\\b"
+			"match": "\\bblock\\s?datas?\\b"
 		},
 		"type.boolean": {
 			"name": "vskript.type.boolean",
@@ -282,7 +284,11 @@
 		},
 		"type.cat": {
 			"name": "vskript.type.cat",
-			"match": "\\bcat\\stypes?\\b"
+			"match": "\\bcat\\s?types?\\b"
+		},
+		"type.chunk": {
+			"name": "vskript.type.chunk",
+			"match": "\\bchunks?\\b"
 		},
 		"type.click": {
 			"name": "vskript.type.click",
@@ -295,6 +301,10 @@
 		"type.sender": {
 			"name": "vskript.type.sender",
 			"match": "\\b(command\\s?)?senders?\\b"
+		},
+		"type.damagecause": {
+			"name": "vskript.type.damagecause",
+			"match": "\\bdamage\\s?causes?\\b"
 		},
 		"type.date": {
 			"name": "vskript.type.date",
@@ -322,7 +332,7 @@
 		},
 		"type.firework": {
 			"name": "vskript.type.firework",
-			"match": "\\bfirework\\s?(effects|type)s?\\b"
+			"match": "\\bfirework\\s?(effect|type)s?\\b"
 		},
 		"type.gamemode": {
 			"name": "vskript.type.gamemode",
