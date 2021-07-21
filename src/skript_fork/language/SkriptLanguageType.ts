@@ -1,64 +1,64 @@
 export enum SkriptLanguageType {
-    ATTRIBUTE_TYPE,
-    BIOME,
-    BLOCK,
-    BLOCK_DATA,
-    BOOLEAN,
-    CAT_TYPE,
-    CHUNK,
-    CLICK_TYPE,
-    COLOUR,
-    COMMAND_SENDER,
-    DAMAGE_CAUSE,
-    DATE,
-    DIFFICULTY,
-    DIRECTION,
-    ENCHANTMENT,
+    ATTRIBUTE_TYPE = "attribute type",
+    BIOME = "biome",
+    BLOCK = "block",
+    BLOCK_DATA = "block data",
+    BOOLEAN = "boolean",
+    CAT_TYPE = "cat type",
+    CHUNK = "chunk",
+    CLICK_TYPE = "click type",
+    COLOUR = "colour",
+    COMMAND_SENDER = "command sender",
+    DAMAGE_CAUSE = "damage cause",
+    DATE = "date",
+    DIFFICULTY = "difficulty",
+    DIRECTION = "direction",
+    ENCHANTMENT = "enchantment",
     // ENCHANTMENT_OFFER,
-    ENCHANTMENT_TYPE,
-    ENTITY,
-    ENTITY_TYPE,
+    ENCHANTMENT_TYPE = "enchantment type",
+    ENTITY = "entity",
+    ENTITY_TYPE = "entity type",
     // ENTITY_TYPE_WITH_AMOUNT,
-    EXPERIENCE,
-    FIREWORK_EFFECT,
-    FIREWORK_TYPE,
-    GAME_MODE,
-    GAMERULE,
-    GAMERULE_VALUE,
-    GENE,
-    HEAL_REASON,
-    INVENTORY,
-    INVENTORY_ACTION,
-    INVENTORY_SLOT,
-    INVENTORY_TYPE,
-    ITEM,
-    ITEM_TYPE,
-    LIVING_ENTITY,
-    LOCATION,
-    METADATA_HOLDER,
-    MONEY,
-    NUMBER,
-    OBJECT,
-    OFFLINE_PLAYER,
-    PLAYER,
-    POTION_EFFECT,
-    POTION_EFFECT_TYPE,
-    PROJECTILE,
-    REGION,
-    RESOURCE_PACK_STATE,
-    SERVER_ICON,
-    SOUND_CATEGORY,
-    SPAWN_REASON,
-    TELEPORT_CAUSE,
-    TEXT,
-    TIME,
-    TIMEPERIOD,
-    TIMESPAN,
-    TREE_TYPE,
-    TYPE,
-    VECTOR,
-
-    ADDON_OBJECT
+    EXPERIENCE = "experience",
+    FIREWORK_EFFECT = "firework effect",
+    FIREWORK_TYPE = "firework type",
+    GAME_MODE = "game mode",
+    GAMERULE = "gamerule",
+    GAMERULE_VALUE = "gamerule value",
+    GENE = "gene",
+    HEAL_REASON = "heal reason",
+    INVENTORY = "inventory",
+    INVENTORY_ACTION = "inventory action",
+    INVENTORY_SLOT = "inventory slot",
+    INVENTORY_TYPE = "inventory type",
+    ITEM = "item",
+    ITEM_TYPE = "item type",
+    LIVING_ENTITY = "living entity",
+    LOCATION = "location",
+    METADATA_HOLDER = "metadata holder",
+    MONEY = "money",
+    NUMBER = "number",
+    OBJECT = "object",
+    OFFLINE_PLAYER = "offline player",
+    PLAYER = "player",
+    POTION_EFFECT = "potion effect",
+    POTION_EFFECT_TYPE = "potion effect type",
+    PROJECTILE = "projectile",
+    REGION = "region",
+    RESOURCE_PACK_STATE = "resource pack state",
+    SERVER_ICON = "server icon",
+    SOUND_CATEGORY = "sound category",
+    SPAWN_REASON = "spawn reason",
+    TELEPORT_CAUSE = "teleport cause",
+    TEXT = "text",
+    TIME = "time",
+    TIMEPERIOD = "timeperiod",
+    TIMESPAN = "timespan",
+    TREE_TYPE = "tree type",
+    TYPE = "type",
+    VECTOR = "vector",
+    
+    UNDEFINED = "undefined"
 }
 
 const TYPE_REGEXP: Map<RegExp, SkriptLanguageType> = (() => {
@@ -134,13 +134,16 @@ export class SkriptType {
                 return new SkriptType(skLangType, isList);
             }
         }
-        return new SkriptType(SkriptLanguageType.ADDON_OBJECT, false);
+        return new SkriptType(SkriptLanguageType.UNDEFINED);
     }
     
     private readonly _type: SkriptLanguageType;
     private readonly _isList: boolean;
 
-    constructor(skLangType:SkriptLanguageType, isList:boolean) {
+    constructor(skLangType:SkriptLanguageType)
+    constructor(skLangType:SkriptLanguageType, isList:boolean)
+    constructor(skLangType:SkriptLanguageType, isList?:boolean) {
+        if (!isList) isList = false;
         this._type = skLangType;
         this._isList = isList;
     }
@@ -150,6 +153,14 @@ export class SkriptType {
     }
     get isList(): boolean {
         return this._isList;
+    }
+    get text(): string {
+        let name = this._type.toString();
+        if (this._isList) {
+            name = name.replace(/y$/i, 'ie');
+            name += 's';
+        }
+        return name;
     }
 
 }

@@ -1,0 +1,23 @@
+{
+	"$schema": "vscode://schemas/color-theme",
+	"type": "dark",
+	"include": "./dark_plus.json",
+	"tokenColors": [
+		{ "name": "Vskript COlor 0", "scope": [ "vskript.color.0" ], "settings": { "foreground": "#000000", "fontStyle": "" } },
+		{ "name": "Vskript COlor 1", "scope": [ "vskript.color.1" ], "settings": { "foreground": "#0000AA", "fontStyle": "" } },
+		{ "name": "Vskript COlor 2", "scope": [ "vskript.color.2" ], "settings": { "foreground": "#00AA00", "fontStyle": "" } },
+		{ "name": "Vskript COlor 3", "scope": [ "vskript.color.3" ], "settings": { "foreground": "#00AAAA", "fontStyle": "" } },
+		{ "name": "Vskript COlor 4", "scope": [ "vskript.color.4" ], "settings": { "foreground": "#AA0000", "fontStyle": "" } },
+		{ "name": "Vskript COlor 5", "scope": [ "vskript.color.5" ], "settings": { "foreground": "#AA00AA", "fontStyle": "" } },
+		{ "name": "Vskript COlor 6", "scope": [ "vskript.color.6" ], "settings": { "foreground": "#FFAA00", "fontStyle": "" } },
+		{ "name": "Vskript COlor 7", "scope": [ "vskript.color.7" ], "settings": { "foreground": "#AAAAAA", "fontStyle": "" } },
+		{ "name": "Vskript COlor 8", "scope": [ "vskript.color.8" ], "settings": { "foreground": "#555555", "fontStyle": "" } },
+		{ "name": "Vskript COlor 9", "scope": [ "vskript.color.9" ], "settings": { "foreground": "#5555FF", "fontStyle": "" } },
+		{ "name": "Vskript COlor A", "scope": [ "vskript.color.a" ], "settings": { "foreground": "#55FF55", "fontStyle": "" } },
+		{ "name": "Vskript COlor B", "scope": [ "vskript.color.b" ], "settings": { "foreground": "#55FFFF", "fontStyle": "" } },
+		{ "name": "Vskript COlor C", "scope": [ "vskript.color.c" ], "settings": { "foreground": "#FF5555", "fontStyle": "" } },
+		{ "name": "Vskript COlor D", "scope": [ "vskript.color.d" ], "settings": { "foreground": "#FF55FF", "fontStyle": "" } },
+		{ "name": "Vskript COlor E", "scope": [ "vskript.color.e" ], "settings": { "foreground": "#FFFF55", "fontStyle": "" } },
+		{ "name": "Vskript COlor F", "scope": [ "vskript.color.f" ], "settings": { "foreground": "#FFFFFF", "fontStyle": "" } }
+	]
+}

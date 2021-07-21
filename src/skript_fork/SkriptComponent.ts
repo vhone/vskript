@@ -203,7 +203,7 @@ export abstract class SkriptComponent {
                 parameters.push({
                     name: search.name.trim(),
                     type: SkriptType.create(search.type.trim()),
-                    default: search.default?.trim()
+                    default: (search.default) ? search.default.trim() : undefined
                 })
                 parameter = parameter.replace(search.parameter, '');
             }
@@ -211,7 +211,7 @@ export abstract class SkriptComponent {
             let info: SkriptFunctionInfomation = {
                 name: headGroup.name.trim(),
                 parameters: parameters,
-                type: headGroup.type?.trim()
+                type: (headGroup.type) ? SkriptType.create(headGroup.type.trim()) : undefined
             };
 
             skFunction =  new SkriptFunction(_skDocument, _range, info);
@@ -372,7 +372,7 @@ export class SkriptCommand extends SkriptParagraphComponent {
 export interface SkriptFunctionInfomation {
     name: string,
     parameters: SkriptFunctionParameter[] | undefined,
-    type: string | undefined
+    type: SkriptType | undefined
 }
 
 export interface SkriptFunctionParameter {
@@ -388,12 +388,12 @@ export class SkriptFunction extends SkriptParagraphComponent {
     constructor(skDocument:SkriptDocument, range:Range, info:SkriptFunctionInfomation) {
         let parameters = new Array<string>();
         for (const parameter of info.parameters!) {
-            let text = `${parameter.name}:${parameter.type}`;
+            let text = `${parameter.name}:${parameter.type.text}`;
             if (parameter.default)
                 text += `=${parameter.default}`
             parameters.push(text);
         }
-        let title = `${info.name}(${parameters.join(', ')})${(info.type) ? ` :: ${info.type}` : `:`}`
+        let title = `${info.name}(${parameters.join(', ')})${(info.type) ? ` :: ${info.type.text}` : `:`}`;
         super(skDocument, range, title);
         this._info = info;
 
@@ -407,7 +407,7 @@ export class SkriptFunction extends SkriptParagraphComponent {
         return this._info.parameters;
     }
 
-    get returnType(): string | undefined {
+    get returnType(): SkriptType | undefined {
         return this._info.type;
     }
 

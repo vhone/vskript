@@ -159,7 +159,6 @@
 				"1": { "name": "vskript.function.keyword" },
 				"2": { "name": "vskript.function.name" },
 				"3": { "patterns": [ { "include": "#function.parameter" } ] },
-				"4": { "name": "vskript.function.type" },
 				"5": { "patterns": [ { "include": "#type" } ] }
 			},
 			"_comment": {
@@ -190,18 +189,8 @@
 			]
 		},
 		"grammar.segment": {
-			"match": "^(\\t|\\s)*(if|else if|else|while|loop)([^-]?.*)(\\:)",
-			"captures": {
-				"2": { "name": "vskript.grammar" },
-				"3": {
-					"patterns": [
-						{ "include": "#variable" },
-						{ "include": "#expr" },
-						{ "include": "#grammar.effect" }
-					]
-				},
-				"4": { "name": "vskript.grammar" }
-			}
+			"name": "vskript.grammar",
+			"match": "^(\\t|\\s)*(if|else if|else|while|loop)"
 		},
 		"grammar.effect": {
 			"name": "vskript.grammar",
@@ -211,252 +200,56 @@
 		
 		"type": {
 			"patterns": [
-				{ "include": "#type.attribute" },
-				{ "include": "#type.biome" },
-				{ "include": "#type.block" },
-				{ "include": "#type.blockdata" },
-				{ "include": "#type.boolean" },
-				{ "include": "#type.cat" },
-				{ "include": "#type.chunk" },
-				{ "include": "#type.click" },
-				{ "include": "#type.color" },
-				{ "include": "#type.sender" },
-				{ "include": "#type.damagecause" },
-				{ "include": "#type.date" },
-				{ "include": "#type.difficulty" },
-				{ "include": "#type.direction" },
-				{ "include": "#type.enchantment" },
-				{ "include": "#type.entity" },
-				{ "include": "#type.experience" },
-				{ "include": "#type.firework" },
-				{ "include": "#type.gamemode" },
-				{ "include": "#type.gamerule" },
-				{ "include": "#type.gene" },
-				{ "include": "#type.healreasons" },
-				{ "include": "#type.integer" },
-				{ "include": "#type.inventory" },
-				{ "include": "#type.item" },
-				{ "include": "#type.livingentity" },
-				{ "include": "#type.location" },
-				{ "include": "#type.metadataholder" },
-				{ "include": "#type.number" },
-				{ "include": "#type.object" },
-				{ "include": "#type.offlineplayer" },
-				{ "include": "#type.player" },
-				{ "include": "#type.potion" },
-				{ "include": "#type.projectile" },
-				{ "include": "#type.region" },
-				{ "include": "#type.resourcepackstate" },
-				{ "include": "#type.servericon" },
-				{ "include": "#type.soundcategory" },
-				{ "include": "#type.spawnreason" },
-				{ "include": "#type.teleportcause" },
-				{ "include": "#type.text" },
-				{ "include": "#type.time" },
-				{ "include": "#type.timeperiod" },
-				{ "include": "#type.timespan" },
-				{ "include": "#type.tree" },
-				{ "include": "#type.vector" },
-				{ "include": "#type.visualeffect" },
-				{ "include": "#type.weather" },
-				{ "include": "#type.world" }
+				{ "name": "vskript.type.attribute",		"match": "\\battribute\\s?types?\\b" },
+				{ "name": "vskript.type.biome",			"match": "\\bbiomes?\\b" },
+				{ "name": "vskript.type.block",			"match": "\\bblocks?\\b" },
+				{ "name": "vskript.type.blockdata",		"match": "\\bblock\\s?datas?\\b" },
+				{ "name": "vskript.type.boolean",		"match": "\\bbooleans?\\b" },
+				{ "name": "vskript.type.cat",			"match": "\\bcat\\s?types?\\b" },
+				{ "name": "vskript.type.chunk",			"match": "\\bchunks?\\b" },
+				{ "name": "vskript.type.click",			"match": "\\bclick\\s?types?\\b" },
+				{ "name": "vskript.type.color",			"match": "\\bcolou?rs?\\b" },
+				{ "name": "vskript.type.sender",		"match": "\\b(command\\s?)?senders?\\b" },
+				{ "name": "vskript.type.damagecause",	"match": "\\bdamage\\s?causes?\\b" },
+				{ "name": "vskript.type.date",			"match": "\\bdates?\\b" },
+				{ "name": "vskript.type.difficulty",	"match": "\\bdifficult(ys?|ies)\\b" },
+				{ "name": "vskript.type.direction",		"match": "\\bdirections?\\b" },
+				{ "name": "vskript.type.enchantment",	"match": "\\benchantment(\\s?type)?s?\\b" },
+				{ "name": "vskript.type.entity",		"match": "\\bentit(ys?|ies)(\\s?type)?s?\\b" },
+				{ "name": "vskript.type.experience",	"match": "\\bexperiences?\\b" },
+				{ "name": "vskript.type.firework",		"match": "\\bfirework\\s?(effect|type)s?\\b" },
+				{ "name": "vskript.type.gamemode",		"match": "\\bgame\\s?modes?\\b" },
+				{ "name": "vskript.type.gamerule",		"match": "\\bgamerule(\\svalue)?s?\\b" },
+				{ "name": "vskript.type.gene",			"match": "\\bgenes?\\b" },
+				{ "name": "vskript.type.healreasons",	"match": "\\bheal\\sreasons?\\b" },
+				{ "name": "vskript.type.integer",		"match": "\\bintegers?\\b" },
+				{ "name": "vskript.type.inventory",		"match": "\\binventor(y((\\s?(action|slot|type))?s?)|ies)\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bitem(\\s?type)?s?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bliving\\s?entit(ys?|ies)\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\blocations?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bmetadata\\s?holders?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bnumbers?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bobjects?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\boffline\\s?players?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bplayers?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bpotion\\s?effect\\s?types?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bprojectiles?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bregions?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bresource\\s?pack\\s?states?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bserver\\s?icons?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bsound\\scategor(ys?|ies)\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bspawn\\s?reasons?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bteleport\\s?causes?\\b" },
+				{ "name": "vskript.type.text",			"match": "\\btexts?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\btimes?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\btime\\s?periods?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\btimespans?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\btree(\\s?type)?s?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bvectors?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bvisual\\seffects?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bweather(\\s?type)?s?\\b" },
+				{ "name": "vskript.type.attribute",		"match": "\\bworlds?\\b" }
 			]
-		},
-		"type.attribute": {
-			"name": "vskript.type.attribute",
-			"match": "\\battribute\\s?types?\\b"
-		},
-		"type.biome": {
-			"name": "vskript.type.biome",
-			"match": "\\bbiomes?\\b"
-		},
-		"type.block": {
-			"name": "vskript.type.block",
-			"match": "\\bblocks?\\b"
-		},
-		"type.blockdata": {
-			"name": "vskript.type.blockdata",
-			"match": "\\bblock\\s?datas?\\b"
-		},
-		"type.boolean": {
-			"name": "vskript.type.boolean",
-			"match": "\\bbooleans?\\b"
-		},
-		"type.cat": {
-			"name": "vskript.type.cat",
-			"match": "\\bcat\\s?types?\\b"
-		},
-		"type.chunk": {
-			"name": "vskript.type.chunk",
-			"match": "\\bchunks?\\b"
-		},
-		"type.click": {
-			"name": "vskript.type.click",
-			"match": "\\bclick\\s?types?\\b"
-		},
-		"type.color": {
-			"name": "vskript.type.color",
-			"match": "\\bcolou?rs?\\b"
-		},
-		"type.sender": {
-			"name": "vskript.type.sender",
-			"match": "\\b(command\\s?)?senders?\\b"
-		},
-		"type.damagecause": {
-			"name": "vskript.type.damagecause",
-			"match": "\\bdamage\\s?causes?\\b"
-		},
-		"type.date": {
-			"name": "vskript.type.date",
-			"match": "\\bdates?\\b"
-		},
-		"type.difficulty": {
-			"name": "vskript.type.difficulty",
-			"match": "\\bdifficult(ys?|ies)\\b"
-		},
-		"type.direction": {
-			"name": "vskript.type.direction",
-			"match": "\\bdirections?\\b"
-		},
-		"type.enchantment": {
-			"name": "vskript.type.enchantment",
-			"match": "\\benchantment(\\s?type)?s?\\b"
-		},
-		"type.entity": {
-			"name": "vskript.type.entity",
-			"match": "\\bentit(ys?|ies)(\\s?type)?s?\\b"
-		},
-		"type.experience": {
-			"name": "vskript.type.experience",
-			"match": "\\bexperiences?\\b"
-		},
-		"type.firework": {
-			"name": "vskript.type.firework",
-			"match": "\\bfirework\\s?(effect|type)s?\\b"
-		},
-		"type.gamemode": {
-			"name": "vskript.type.gamemode",
-			"match": "\\bgame\\s?modes?\\b"
-		},
-		"type.gamerule": {
-			"name": "vskript.type.gamerule",
-			"match": "\\bgamerule(\\svalue)?s?\\b"
-		},
-		"type.gene": {
-			"name": "vskript.type.gene",
-			"match": "\\bgenes?\\b"
-		},
-		"type.healreasons": {
-			"name": "vskript.type.healreasons",
-			"match": "\\bheal\\sreasons?\\b"
-		},
-		"type.integer": {
-			"name": "vskript.type.integer",
-			"match": "\\bintegers?\\b"
-		},
-		"type.inventory": {
-			"name": "vskript.type.inventory",
-			"match": "\\binventor(y((\\s?(action|slot|type))?s?)|ies)\\b"
-		},
-		"type.item": {
-			"name": "vskript.type.attribute",
-			"match": "\\bitem(\\s?type)?s?\\b"
-		},
-		"type.livingentity": {
-			"name": "vskript.type.attribute",
-			"match": "\\bliving\\s?entit(ys?|ies)\\b"
-		},
-		"type.location": {
-			"name": "vskript.type.attribute",
-			"match": "\\blocations?\\b"
-		},
-		"type.metadataholder": {
-			"name": "vskript.type.attribute",
-			"match": "\\bmetadata\\s?holders?\\b"
-		},
-		"type.number": {
-			"name": "vskript.type.attribute",
-			"match": "\\bnumbers?\\b"
-		},
-		"type.object": {
-			"name": "vskript.type.attribute",
-			"match": "\\bobjects?\\b"
-		},
-		"type.offlineplayer": {
-			"name": "vskript.type.attribute",
-			"match": "\\boffline\\s?players?\\b"
-		},
-		"type.player": {
-			"name": "vskript.type.attribute",
-			"match": "\\bplayers?\\b"
-		},
-		"type.potion": {
-			"name": "vskript.type.attribute",
-			"match": "\\bpotion\\s?effect\\s?types?\\b"
-		},
-		"type.projectile": {
-			"name": "vskript.type.attribute",
-			"match": "\\bprojectiles?\\b"
-		},
-		"type.region": {
-			"name": "vskript.type.attribute",
-			"match": "\\bregions?\\b"
-		},
-		"type.resourcepackstate": {
-			"name": "vskript.type.attribute",
-			"match": "\\bresource\\s?pack\\s?states?\\b"
-		},
-		"type.servericon": {
-			"name": "vskript.type.attribute",
-			"match": "\\bserver\\s?icons?\\b"
-		},
-		"type.soundcategory": {
-			"name": "vskript.type.attribute",
-			"match": "\\bsound\\scategor(ys?|ies)\\b"
-		},
-		"type.spawnreason": {
-			"name": "vskript.type.attribute",
-			"match": "\\bspawn\\s?reasons?\\b"
-		},
-		"type.teleportcause": {
-			"name": "vskript.type.attribute",
-			"match": "\\bteleport\\s?causes?\\b"
-		},
-		"type.text": {
-			"name": "vskript.type.text",
-			"match": "\\btexts?\\b"
-		},
-		"type.time": {
-			"name": "vskript.type.attribute",
-			"match": "\\btimes?\\b"
-		},
-		"type.timeperiod": {
-			"name": "vskript.type.attribute",
-			"match": "\\btime\\s?periods?\\b"
-		},
-		"type.timespan": {
-			"name": "vskript.type.attribute",
-			"match": "\\btimespans?\\b"
-		},
-		"type.tree": {
-			"name": "vskript.type.attribute",
-			"match": "\\btree(\\s?type)?s?\\b"
-		},
-		"type.vector": {
-			"name": "vskript.type.attribute",
-			"match": "\\bvectors?\\b"
-		},
-		"type.visualeffect": {
-			"name": "vskript.type.attribute",
-			"match": "\\bvisual\\seffects?\\b"
-		},
-		"type.weather": {
-			"name": "vskript.type.attribute",
-			"match": "\\bweather(\\s?type)?s?\\b"
-		},
-		"type.world": {
-			"name": "vskript.type.attribute",
-			"match": "\\bworlds?\\b"
 		},
 
 
@@ -475,7 +268,23 @@
 			"begin": "\"",
 			"end": "\"",
 			"patterns": [
-				{ "include": "#expr.text" }
+				{ "include": "#expr.text" },
+				{ "match": "&0", "name": "vskript.color.0" },
+				{ "match": "&1", "name": "vskript.color.1" },
+				{ "match": "&2", "name": "vskript.color.2" },
+				{ "match": "&3", "name": "vskript.color.3" },
+				{ "match": "&4", "name": "vskript.color.4" },
+				{ "match": "&5", "name": "vskript.color.5" },
+				{ "match": "&6", "name": "vskript.color.6" },
+				{ "match": "&7", "name": "vskript.color.7" },
+				{ "match": "&8", "name": "vskript.color.8" },
+				{ "match": "&9", "name": "vskript.color.9" },
+				{ "match": "&[Aa]", "name": "vskript.color.a" },
+				{ "match": "&[Bb]", "name": "vskript.color.b" },
+				{ "match": "&[Cc]", "name": "vskript.color.c" },
+				{ "match": "&[Dd]", "name": "vskript.color.d" },
+				{ "match": "&[Ee]", "name": "vskript.color.e" },
+				{ "match": "&[Ff]", "name": "vskript.color.f" }
 			]
 		},
 		"expr.number": {

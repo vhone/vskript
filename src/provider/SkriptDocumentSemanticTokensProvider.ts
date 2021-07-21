@@ -1,6 +1,7 @@
 import { CancellationToken, DocumentSemanticTokensProvider, ProviderResult, SemanticTokens, SemanticTokensBuilder, SemanticTokensLegend, TextDocument } from "vscode";
 import * as Skript from '../Skript'
 import { SkriptFunction } from "../skript_fork/SkriptComponent";
+import { SkriptVariable } from "../skript_fork/SkriptExpression";
 
 export const LEGEND = new SemanticTokensLegend(['aliases','parameter']);
 
@@ -19,27 +20,31 @@ export class SkriptDocumentSemanticTokensProvider implements DocumentSemanticTok
         for (const skFunc of skFunctions) {
             console.log(skFunc)
             let parameters = skFunc.parameters;
-            if (parameters) for (const param of parameters) for (const variable of skFunc.paragraph.variables) {
-                let name = (param.type.isList) ? `{_${param.name}::*}` : `{_${param.name}}`;
-                if ( name === variable.raw ) {
-                    builder.push(variable.range, 'parameter');
+            if (parameters) for (const parameter of parameters) for (const variable of skFunc.paragraph.variables) {
+                let name = (parameter.type.isList) ? `{_${parameter.name}::*}` : `{_${parameter.name}}`;
+                for (const v of this._getAllChildVariables(variable)) {
+                    if ( name === v.raw ) {
+                        builder.push(v.range, 'parameter');
+                    }
                 }
             }
         }
-        // for (const comp of skFile.components) if (comp instanceof SkriptAliases) {
-        //     let position = comp.range.end;
-        //     for (const key of comp.aliases.keys()) {
-        //         for (const range of skFile.getRanges(key)) if (range.start.isAfterOrEqual(position)) {
-        //             let thisComp = skFile.componentOf(range.start);
-        //             let context = thisComp?.contextOf(range.start);
-        //             if (!(thisComp?.contextOf(range.start) instanceof SkriptExprText)) {
-        //                 builder.push(range, 'aliases');
-        //             }
-        //         }
-        //     }
-        // }
         let build = builder.build();
         
         return build;
     }
+
+    private _getAllChildVariables(variable:SkriptVariable): SkriptVariable[] {
+        let array: SkriptVariable[] = [];
+        array.push(variable);
+        for (const child of variable.child) {
+            array.push(...this._getAllChildVariables(child));
+        }
+        _asdf('a')
+        return array;
+    }
+}
+
+function _asdf(text:string): string {
+    return 'a' + text
 }

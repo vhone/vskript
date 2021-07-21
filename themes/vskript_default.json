@@ -2,7 +2,7 @@
 	"$schema": "vscode://schemas/color-theme",
 	"name": "VSkript",
 	"type": "dark",
-	"include": "./dark_plus.json",
+	"include": "./vskript_base.json",
 	"colors": {
 		"editor.background": "#1c1c1c",
 		"editor.foreground": "#a0a0a0"
@@ -10,15 +10,31 @@
 	"semanticHighlighting": true,
 	"semanticTokenColors": {
 		"aliases": { "foreground": "#7fcceb" },
-		"parameter": { "foreground": "#ff0000" }
+		"parameter": { "foreground": "#cd9dec", "italic": true }
 	},
 	"tokenColors": [
 		
-
+		{ "name": "Vskript COlor 0", "scope": [ "vskript.color.0" ], "settings": { "foreground": "#000000", "fontStyle": "" } },
+		{ "name": "Vskript COlor 1", "scope": [ "vskript.color.1" ], "settings": { "foreground": "#0000AA", "fontStyle": "" } },
+		{ "name": "Vskript COlor 2", "scope": [ "vskript.color.2" ], "settings": { "foreground": "#00AA00", "fontStyle": "" } },
+		{ "name": "Vskript COlor 3", "scope": [ "vskript.color.3" ], "settings": { "foreground": "#00AAAA", "fontStyle": "" } },
+		{ "name": "Vskript COlor 4", "scope": [ "vskript.color.4" ], "settings": { "foreground": "#AA0000", "fontStyle": "" } },
+		{ "name": "Vskript COlor 5", "scope": [ "vskript.color.5" ], "settings": { "foreground": "#AA00AA", "fontStyle": "" } },
+		{ "name": "Vskript COlor 6", "scope": [ "vskript.color.6" ], "settings": { "foreground": "#FFAA00", "fontStyle": "" } },
+		{ "name": "Vskript COlor 7", "scope": [ "vskript.color.7" ], "settings": { "foreground": "#AAAAAA", "fontStyle": "" } },
+		{ "name": "Vskript COlor 8", "scope": [ "vskript.color.8" ], "settings": { "foreground": "#555555", "fontStyle": "" } },
+		{ "name": "Vskript COlor 9", "scope": [ "vskript.color.9" ], "settings": { "foreground": "#5555FF", "fontStyle": "" } },
+		{ "name": "Vskript COlor A", "scope": [ "vskript.color.a" ], "settings": { "foreground": "#55FF55", "fontStyle": "" } },
+		{ "name": "Vskript COlor B", "scope": [ "vskript.color.b" ], "settings": { "foreground": "#55FFFF", "fontStyle": "" } },
+		{ "name": "Vskript COlor C", "scope": [ "vskript.color.c" ], "settings": { "foreground": "#FF5555", "fontStyle": "" } },
+		{ "name": "Vskript COlor D", "scope": [ "vskript.color.d" ], "settings": { "foreground": "#FF55FF", "fontStyle": "" } },
+		{ "name": "Vskript COlor E", "scope": [ "vskript.color.e" ], "settings": { "foreground": "#FFFF55", "fontStyle": "" } },
+		{ "name": "Vskript COlor F", "scope": [ "vskript.color.f" ], "settings": { "foreground": "#FFFFFF", "fontStyle": "" } },
+			
 		{
 			"name": "VSkript Comment",
 			"scope": [ "vskript.comment" ],
-			"settings": { "foreground": "#e0e0e0", "fontStyle": "" }
+			"settings": { "foreground": "#616161", "fontStyle": "" }
 		},
 		{
 			"name": "VSkript Docs",
@@ -28,7 +44,7 @@
 		{
 			"name": "VSkript Docs Annotation",
 			"scope": [ "vskript.docs.annotation" ],
-			"settings": { "foreground": "#7fd8f3", "fontStyle": "" }
+			"settings": { "foreground": "#9cdcfe", "fontStyle": "" }
 		},
 		{
 			"name": "VSkript Docs Parameter",
@@ -64,7 +80,7 @@
 				"vskript.expr.aliases",
 				"vskript.type",
 			],
-			"settings": { "foreground": "#7fcceb", "fontStyle": "" }
+			"settings": { "foreground": "#9cdcfe", "fontStyle": "" }
 		},
 
 
@@ -91,9 +107,19 @@
 
 
 		{
-			"name": "VSkript Function",
-			"scope": "vskript.function",
+			"name": "VSkript Function Keyword",
+			"scope": [ "vskript.function.keyword" ],
 			"settings": { "foreground": "#b86fe9", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Function Name",
+			"scope": [ "vskript.function.name" ],
+			"settings": { "foreground": "#b86fe9", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Function Parameter",
+			"scope": [ "vskript.function.parameter" ],
+			"settings": { "foreground": "#616161", "fontStyle": "" }
 		},
 		{
 			"name": "VSkript Expression Function",
@@ -106,7 +132,7 @@
 		{
 			"name": "VSkript Grammar",
 			"scope":  "vskript.grammar",
-			"settings": { "foreground": "#ec8d59", "fontStyle": "bold" }
+			"settings": { "foreground": "#ff8560", "fontStyle": "bold" }
 		},
 		{
 			"name": "VSkript Expression Grammar",
@@ -139,7 +165,14 @@
 				"vskript.variable.normal",
 				"vskript.variable.runtime"
 			],
-			"settings": { "foreground": "#616161", "fontStyle": "bold" }
+			"settings": { "foreground": "#616161", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Variable Backet",
+			"scope": [
+				"vskript.variable.bracket"
+			],
+			"settings": { "foreground": "#ff2e97", "fontStyle": "" }
 		}
 	]
 }
