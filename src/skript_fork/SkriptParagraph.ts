@@ -27,6 +27,9 @@ export class SkriptParagraph {
     public get variables(): SkriptVariable[] {
         return this._variables;
     }
+    public get legacy(): string {
+        return this._paragraph;
+    }
 
     // 글자 = "%익스프레션%, %변수%, %함수%"
     // 변수 = {%익스프레션%::%변수%}

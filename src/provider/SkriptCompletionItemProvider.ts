@@ -59,8 +59,8 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
 
             // let skComponent = skDocument.componentOf(position);
             let skComponent = skDocument.lastComponentOf(position);
-            console.log(skComponent)
-            console.log([subText]);
+            // console.log(skComponent)
+            // console.log([subText]);
             if (skComponent) {
                 if (skComponent instanceof SkriptCommand) {
                     if (subText.match(/^(\t|\s{4})($|[^\t\s\:]*$)/)) {

@@ -3,8 +3,6 @@
 	"name": "VSkript",
 	"scopeName": "source.sk",
 
-
-
 	"patterns": [
 		{ "include": "#comment"	},
 		{ "include": "#options"	},
@@ -13,14 +11,12 @@
 		{ "include": "#event" },
 		{ "include": "#function" },
 		{ "include": "#grammar" },
+		{ "include": "#variable.option" },
 		{ "include": "#variable" },
-		{ "include": "#expr" }
+		{ "include": "#expression" }
 	],
 
-
-
 	"repository": {
-
 
 		"comment": {
 			"name": "vskript.comment",
@@ -91,7 +87,7 @@
 				"1": { "name": "vskript.aliases.variable" },
 				"2": { "patterns": [
 						{ "include": "#comment" },
-						{ "include": "#expr.minecraftitem" }
+						{ "include": "#expression.minecraftitem" }
 				] }
 			}
 		},
@@ -99,8 +95,8 @@
 
 		"command": {
 			"patterns": [
-				{	"include": "#command.define"	},
-				{	"include": "#command.options"	}
+				{ "include": "#command.define"	},
+				{ "include": "#command.options"	}
 			]
 		},
 		"command.define": {
@@ -135,10 +131,10 @@
 		"command.options": {
 			"match": "^(\\t|\\s{4})(aliases|description|usage|permission message|executable by|permission|cooldown|cooldown message|cooldown bypass|cooldown storage|trigger)\\:",
 			"captures": {
-				"2": {	"name": "vskript.command.options"},
+				"2": { "name": "vskript.command.options"},
 				"3": {	
 					"patterns": [
-						{	"include": "#variable"	}
+						{ "include": "#variable"	}
 					]
 				}
 			}
@@ -253,22 +249,21 @@
 		},
 
 
-		"expr": {
+		"expression": {
 			"patterns": [
-				{ "include": "#expr.text" },
-				{ "include": "#expr.number" },
-				{ "include": "#expr.grammar" },
-				{ "include": "#expr.minecraftitem" },
-				{ "include": "#expr.aliases" },
-				{ "include": "#expr.fucntion" }
+				{ "include": "#expression.text" },
+				{ "include": "#expression.number" },
+				{ "include": "#expression.grammar" },
+				{ "include": "#expression.minecraftitem" },
+				{ "include": "#expression.fucntion" }
 			]
 		},
-		"expr.text": {
+		"expression.text": {
 			"name": "vskript.expr.text",
 			"begin": "\"",
 			"end": "\"",
 			"patterns": [
-				{ "include": "#expr.text" },
+				{ "include": "#nested.text" },
 				{ "match": "&0", "name": "vskript.color.0" },
 				{ "match": "&1", "name": "vskript.color.1" },
 				{ "match": "&2", "name": "vskript.color.2" },
@@ -284,27 +279,23 @@
 				{ "match": "&[Cc]", "name": "vskript.color.c" },
 				{ "match": "&[Dd]", "name": "vskript.color.d" },
 				{ "match": "&[Ee]", "name": "vskript.color.e" },
-				{ "match": "&[Ff]", "name": "vskript.color.f" }
+				{ "match": "&[Ff]", "name": "vskript.color.f" },
+				{ "include": "#expression.text" }
 			]
 		},
-		"expr.number": {
+		"expression.number": {
 			"name": "vskript.expr.number",
 			"match": "\\-?[\\d](\\.\\d)?"
 		},
-		"expr.grammar": {
+		"expression.grammar": {
 			"name": "vskript.expr.grammar",
 			"match": "(the )?(event\\-\\w*|arg\\-\\w*|loop\\-\\w*(\\-\\d)?)"
 		},
-		"expr.minecraftitem": {
+		"expression.minecraftitem": {
 			"name": "vskript.expr.minecraftitem",
 			"match": "minecraft\\:[^\\s\\,]*"
 		},
-		"expr.aliases": {
-			"name": "vskript.expr.aliases",
-			"begin": "\\'\\'",
-			"end": "\\'\\'"
-		},
-		"expr.fucntion": {
+		"expression.fucntion": {
 			"begin": "(\\w+\\()",
 			"end": "(\\))",
 			"beginCaptures": {
@@ -315,16 +306,16 @@
 			},
 			"patterns": [
 				{ "include": "#variable"},
-				{ "include": "#expr"},
-				{ "include": "#expr.fucntion.argument"}
+				{ "include": "#expression"},
+				{ "include": "#expression.fucntion.argument"}
 			]
 		},
-		"expr.fucntion.argument": {
+		"expression.fucntion.argument": {
 			"match": "(\"[^\"]*\")|(\\,)",
 			"captures": {
 				"1": { 
 					"patterns": [
-						{ "include": "#expr.text"}
+						{ "include": "#expression.text"}
 					]
 				},
 				"2": { }
@@ -334,10 +325,9 @@
 
 		"variable": {
 			"patterns": [
-				{	"include": "#variable.option"	},
-				{	"include": "#variable.local"	},
-				{	"include": "#variable.runtime"	},
-				{	"include": "#variable.normal"	}
+				{ "include": "#variable.local" },
+				{ "include": "#variable.runtime" },
+				{ "include": "#variable.normal" }
 			]
 		},
 		"variable.option": {
@@ -352,10 +342,8 @@
 			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"patterns": [
-				{	"include": "#variable.option"	},
-				{	"include": "#variable.runtime"	},
-				{	"include": "#variable.local"	},
-				{	"include": "#variable.normal"	}
+				{ "include": "#variable.inner" },
+				{ "include": "#variable" }
 			]
 		},
 		"variable.runtime": {
@@ -365,10 +353,8 @@
 			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"patterns": [
-				{	"include": "#variable.option"	},
-				{	"include": "#variable.local"	},
-				{	"include": "#variable.runtime"	},
-				{	"include": "#variable.normal"	}
+				{ "include": "#variable.inner" },
+				{ "include": "#variable" }
 			]
 		},
 		"variable.normal": {
@@ -378,10 +364,48 @@
 			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"patterns": [
-				{	"include": "#variable.option"	},
-				{	"include": "#variable.local"	},
-				{	"include": "#variable.runtime"	},
-				{	"include": "#variable.normal"	}
+				{ "include": "#variable.inner" },
+				{ "include": "#variable" }
+			]
+		},
+		"variable.inner": {
+			"patterns": [
+				{ "include": "#variable.colon" },
+				{ "include": "#nested.variable" }
+			]
+		},
+		"variable.colon": {
+			"name": "vskript.variable.bracket",
+			"match": "::"
+		},
+
+
+		"nested": {
+			"patterns": [
+				{ "include": "#function" },
+				{ "include": "#grammar.effect" },
+				{ "include": "#expression" },
+				{ "include": "#variable" }
+			]
+		},
+		"nested.variable": {
+			"name": "vskript.nested",
+			"begin": "%",
+			"end": "%",
+			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
+			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
+			"patterns": [
+				{ "include": "#nested" }
+			]
+		},
+		"nested.text": {
+			"name": "vskript.nested",
+			"begin": "%",
+			"end": "%",
+			"beginCaptures": { "0": { "name": "vskript.expr.text"} },
+			"endCaptures": { "0": { "name": "vskript.expr.text"} },
+			"patterns": [
+				{ "include": "#nested" }
 			]
 		}
 	}
