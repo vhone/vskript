@@ -1,6 +1,6 @@
 import { CancellationToken, DocumentSemanticTokensProvider, Position, ProviderResult, Range, SemanticTokens, SemanticTokensBuilder, SemanticTokensLegend, TextDocument } from "vscode";
 import * as Skript from '../Skript'
-import { SkriptAliases, SkriptFunction } from "../skript_fork/SkriptComponent";
+import { SkriptAliases, SkriptEvent, SkriptFunction } from "../skript_fork/SkriptComponent";
 import { SkriptVariable } from "../skript_fork/SkriptExpression";
 
 export const LEGEND = new SemanticTokensLegend(['aliases','parameter']);
@@ -43,7 +43,6 @@ export class SkriptDocumentSemanticTokensProvider implements DocumentSemanticTok
 
             // Aliases
             for (const alias_pos of aliases.keys()) if (alias_pos.isBefore(skFunc.range.start)) {
-                console.log(skFunc);
                 let legacy = paragraph.legacy;
                 let start =paragraph.range.start;
                 let set = aliases.get(alias_pos)!;
@@ -58,6 +57,28 @@ export class SkriptDocumentSemanticTokensProvider implements DocumentSemanticTok
                 }
             }
         }
+
+        // Event
+        skDocument.getComponents(SkriptEvent).forEach(skEvent => {
+
+            let paragraph = skEvent.paragraph;
+
+            // Aliases
+            for (const alias_pos of aliases.keys()) if (alias_pos.isBefore(skEvent.range.start)) {
+                let legacy = paragraph.legacy;
+                let start =paragraph.range.start;
+                let set = aliases.get(alias_pos)!;
+                for (const alias of set) {
+                    let position = 0;
+                    let index;
+                    while ((index = legacy.indexOf(alias, position)) >= 0) {
+                        position = index + alias.length;
+                        let range = new Range(start.line, index, start.line, position);
+                        builder.push(range, 'aliases');
+                    }
+                }
+            }
+        });
 
         let build = builder.build();
         
