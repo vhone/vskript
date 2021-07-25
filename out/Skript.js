@@ -1,63 +1,71 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findFile = exports.getFileList = exports.onSkriptEnable = exports.Component = void 0;
+exports.find = exports.onSkriptEnable = exports.DOCUMENTS = void 0;
 const vscode_1 = require("vscode");
-const fs_1 = require("fs");
-const path_1 = require("path");
-const SkriptFile_1 = require("./skript/SkriptFile");
-const Component_1 = require("./skript/Component");
-exports.Component = require("./skript/Component");
-const FILE_LIST = new Array();
+const FileSystem = require("fs");
+const Path = require("path");
+const SkriptDocument_1 = require("./skript/SkriptDocument");
+const WORKSAPCE_FATH = vscode_1.workspace.workspaceFolders;
+exports.DOCUMENTS = new Array();
 /** 스크립트 실행 */
 function onSkriptEnable() {
-    let amtFunc = 0;
-    let folders = vscode_1.workspace.workspaceFolders;
-    if (folders) {
-        for (const iter of folders) {
-            let skPath = iter.uri.fsPath;
-            for (let fsPath of getSkriptPathArray(skPath)) {
-                let skName = fsPath.replace(skPath + '\\', '');
-                let skFile = new SkriptFile_1.default(fs_1.readFileSync(fsPath, 'UTF-8'), skPath, skName, vscode_1.EndOfLine.CRLF);
-                FILE_LIST.push(skFile);
-                amtFunc += skFile.components.filter(comp => comp instanceof Component_1.SkriptFunction).length;
+    return __awaiter(this, void 0, void 0, function* () {
+        if (WORKSAPCE_FATH) {
+            // let amtFunc: number = 0;
+            for (const path of WORKSAPCE_FATH) {
+                let rootPath = new SkriptDocument_1.SkriptPath(path.uri.fsPath, '');
+                for (let skPath of yield _getSkriptPaths(rootPath)) {
+                    let document = FileSystem.readFileSync(skPath.fsPath, { encoding: 'UTF-8' });
+                    let skDocument = new SkriptDocument_1.SkriptDocument(skPath, document);
+                    exports.DOCUMENTS.push(skDocument);
+                }
+                ;
             }
-        }
-    }
-    if (amtFunc > 0)
-        vscode_1.window.showInformationMessage(`Loaded ${amtFunc} functions.`);
-    if (FILE_LIST.length > 0)
-        vscode_1.window.showInformationMessage(`Loaded ${FILE_LIST.length} skript files.`);
-}
-exports.onSkriptEnable = onSkriptEnable;
-/** 모든 SkriptFile 반환 */
-function getFileList() {
-    return FILE_LIST;
-}
-exports.getFileList = getFileList;
-/** 경로와 같은 SkriptFile이 있으면 반환 */
-function findFile(fsPath) {
-    for (const file of FILE_LIST)
-        if (file.fsPath === fsPath)
-            return file;
-    return;
-}
-exports.findFile = findFile;
-/** path의 하위경로를 포함한 모든 skript path 받아오기 */
-function getSkriptPathArray(path) {
-    let skPathArray = new Array();
-    fs_1.readdirSync(path, { withFileTypes: true }).forEach((file) => {
-        if (file.name.charAt(0) == '-')
-            return;
-        let dir = path_1.join(path, file.name);
-        if (file.isDirectory()) {
-            for (const iter of getSkriptPathArray(dir)) {
-                skPathArray.push(iter);
-            }
-        }
-        else if (path_1.extname(file.name) == '.sk') {
-            skPathArray.push(dir);
+            // window.showInformationMessage(`Loaded ${amtFunc} functions.`);
+            // window.showInformationMessage(`Loaded ${FILE_LIST.length} skript files.`);
+            vscode_1.window.showInformationMessage(`Loaded ${exports.DOCUMENTS.length} skript files.`);
         }
     });
-    return skPathArray;
+}
+exports.onSkriptEnable = onSkriptEnable;
+/** 경로와 같은 SkriptFile이 있으면 반환 */
+function find(fsPath) {
+    for (const document of exports.DOCUMENTS)
+        if (document.skPath.fsPath === fsPath) {
+            return document;
+        }
+    return;
+}
+exports.find = find;
+/** 하위경로 받아오기 */
+function _getSkriptPaths(loopPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let skPathArray = new Array();
+        for (const file of FileSystem.readdirSync(loopPath.fsPath, { encoding: 'UTF-8', withFileTypes: true })) {
+            let skPath = new SkriptDocument_1.SkriptPath(loopPath.root, Path.join(loopPath.name, file.name));
+            if (file.name.charAt(0) === '-') {
+                continue;
+            }
+            if (file.isDirectory()) {
+                skPathArray.push(...yield _getSkriptPaths(skPath));
+            }
+            else if (Path.extname(file.name) === '.sk') {
+                skPathArray.push(skPath);
+            }
+        }
+        ;
+        return new Promise((resolve) => {
+            resolve(skPathArray);
+        });
+    });
 }
 //# sourceMappingURL=Skript.js.map

@@ -9,15 +9,14 @@ const Skript = require("../Skript");
 class SkriptWorkspaceSymbolProvider {
     provideWorkspaceSymbols(query, _token) {
         let results = new Array();
-        for (const skFile of Skript.getFileList()) {
-            for (const comp of skFile.components)
-                if (comp.name.includes(query)) {
-                    let uri = vscode_1.Uri.file(skFile.fsPath);
-                    let location = new vscode_1.Location(uri, comp.range);
-                    results.push(new vscode_1.SymbolInformation(comp.name, comp.symbol, skFile.skName, location));
+        Skript.DOCUMENTS.forEach(skDocument => {
+            for (const component of skDocument.components)
+                if (!component.isInvisible && component.title.includes(query)) {
+                    let uri = vscode_1.Uri.file(skDocument.skPath.fsPath);
+                    let location = new vscode_1.Location(uri, component.range);
+                    results.push(new vscode_1.SymbolInformation(component.title, component.symbolKind, skDocument.skPath.name, location));
                 }
-        }
-        console.log(results);
+        });
         return results;
     }
 }

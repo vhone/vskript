@@ -3,8 +3,45 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkriptCompletionItemProvider = void 0;
 const vscode_1 = require("vscode");
 const Skript = require("../Skript");
-const Component_1 = require("../skript/Component");
+const SkriptComponent_1 = require("../skript/SkriptComponent");
+const Materials_1 = require("../skript/language/Materials");
 const ITEMS_MAP = new Map();
+const Components = (() => {
+    let list = new Array();
+    [{ isKeyword: true, name: 'aliases', snippet: 'aliases:\r\n\t' },
+        { isKeyword: true, name: 'options', snippet: 'options:\r\n\t' },
+        { isKeyword: true, name: 'command', snippet: 'command /${1:label} ${2:arguments}:\r\n\ttrigger:\r\n\t\t' },
+        { isKeyword: true, name: 'function', snippet: 'function ${1:name}(${2:parameters}) :: ${3:return type}:\r\n\t' },
+        { isKeyword: false, name: 'function void', snippet: 'function ${1:name}(${2:parameters}):\r\n\t' }
+    ].forEach(value => {
+        if (value.isKeyword)
+            list.push(new vscode_1.CompletionItem(value.name, vscode_1.CompletionItemKind.Keyword));
+        let snippet = new vscode_1.CompletionItem(value.name, vscode_1.CompletionItemKind.Snippet);
+        snippet.insertText = new vscode_1.SnippetString(value.snippet);
+        list.push(snippet);
+    });
+    return list;
+})();
+const CMD_Options = (() => {
+    let list = new Array();
+    [{ name: 'aliases', snippet: 'aliases: ' },
+        { name: 'description', snippet: 'description: ' },
+        { name: 'usage', snippet: 'usage: ' },
+        { name: 'permission', snippet: 'permission: ' },
+        { name: 'permission message', snippet: 'permission message: ' },
+        { name: 'executable by', snippet: 'executable by: ' },
+        { name: 'cooldown', snippet: 'cooldown: ' },
+        { name: 'cooldown message', snippet: 'cooldown message: ' },
+        { name: 'cooldown bypass', snippet: 'cooldown bypass: ' },
+        { name: 'cooldown storage', snippet: 'cooldown storage: ' },
+        { name: 'trigger', snippet: 'trigger: ' }
+    ].forEach(value => {
+        let snippet = new vscode_1.CompletionItem(value.name, vscode_1.CompletionItemKind.Property);
+        snippet.insertText = new vscode_1.SnippetString(value.snippet);
+        list.push(snippet);
+    });
+    return list;
+})();
 /**
  * ```Ctrl + space``` 단축키로 completion을 연다.
  * ***
@@ -12,58 +49,72 @@ const ITEMS_MAP = new Map();
  * resolveCompletionItem는 목록을 스크롤할 때 동작한다.
  */
 class SkriptCompletionItemProvider {
-    provideCompletionItems(document /*position: Position, token: CancellationToken, context: CompletionContext*/) {
-        let fsPath = document.uri.fsPath;
-        if (ITEMS_MAP.size === 0) {
-            for (let skFile of Skript.getFileList()) {
-                this.updateFunctionCompletionItem(skFile);
+    provideCompletionItems(document, position, _token, _context) {
+        let result = new Array();
+        let line = document.lineAt(position.line);
+        let range = document.getWordRangeAtPosition(position);
+        let word = (range) ? document.getText(range) : undefined;
+        let skDocument = Skript.find(document.uri.fsPath);
+        // 첫 입력 (keyword)
+        if (!skDocument.componentOf(position) && (line.text === '' || line.text.indexOf(word) === 0)) {
+            return Components;
+        }
+        // 메터리얼 입력
+        let matrial_range = document.getWordRangeAtPosition(position, /minecraft:\w*/i);
+        let matrial_word = (matrial_range) ? document.getText(matrial_range) : undefined;
+        if (matrial_word) {
+            for (const mat of Materials_1.Materials) {
+                result.push(new vscode_1.CompletionItem(mat.toLowerCase(), vscode_1.CompletionItemKind.Enum));
             }
         }
-        else if (!ITEMS_MAP.has(fsPath) || document.isDirty) {
-            this.updateFunctionCompletionItem(Skript.findFile(fsPath));
-        }
-        let response = new Array();
-        for (let key of ITEMS_MAP.keys()) {
-            for (let items of ITEMS_MAP.get(key)) {
-                response.push(items);
+        // Component
+        let subText = line.text.substring(0, position.character);
+        let skComponent = skDocument.componentOf(position, { isBefore: true });
+        if (skComponent) {
+            // Command Options
+            if (skComponent instanceof SkriptComponent_1.SkriptCommand
+                && subText.match(/^(\t|\s{4})($|[^\t\s\:]*$)/)) {
+                let items = Object.assign(CMD_Options, {});
+                if (skComponent.options)
+                    for (const option of skComponent.options) {
+                        items = items.filter(v => v.label !== option.key);
+                    }
+                result.push(...items);
+                // return items;
             }
-        }
-        return response;
-    }
-    updateFunctionCompletionItem(skFile) {
-        let items = this.createCompletionItemsInFile(skFile);
-        ITEMS_MAP.set(skFile.fsPath, items);
-        return items;
-    }
-    createCompletionItemsInFile(skFile) {
-        let items = new Array();
-        for (let comp of skFile.components)
-            if (comp instanceof Component_1.SkriptFunction) {
-                // item
-                let item = new vscode_1.CompletionItem(comp.name, vscode_1.CompletionItemKind.Function);
-                item.detail = skFile.skName;
-                // insert
-                let paramList = new Array();
-                let i = 1;
-                for (const p of comp.parameters) {
-                    let param = '${' + i++ + '|\{_' + p.name + '\}|}';
-                    paramList.push(param);
+            // Grobal Functions
+            if (skComponent instanceof SkriptComponent_1.SkriptParagraphComponent && skComponent.paragraph.range.contains(position)) {
+                for (const skDocs of Skript.DOCUMENTS) {
+                    let isThis = skDocs === skDocument;
+                    for (const skFunc of skDocs.getComponents(SkriptComponent_1.SkriptFunction))
+                        if (!skFunc.isInvisible || isThis) {
+                            let item = new vscode_1.CompletionItem(skFunc.name, vscode_1.CompletionItemKind.Function);
+                            item.detail = skDocs.skPath.name;
+                            if (skFunc.tooltip)
+                                item.documentation = skFunc.tooltip.markdown;
+                            let parameters = [];
+                            if (skFunc.parameters)
+                                for (const skParam of skFunc.parameters) {
+                                    let i = parameters.length + 1;
+                                    if (skParam.type.isList) {
+                                        parameters.push(`\${${i}:{_${skParam.name}::*\\\}}`);
+                                    }
+                                    else {
+                                        parameters.push(`\${${i}:{_${skParam.name}\\\}}`);
+                                    }
+                                }
+                            item.insertText = new vscode_1.SnippetString(`${skFunc.name}( ${parameters.join(', ')} )`);
+                            result.push(item);
+                        }
                 }
-                item.insertText = new vscode_1.SnippetString(comp.name + '( ' + paramList.join(', ') + ' )');
-                // docs
-                // let docs = new Array<string>();
-                // if (comp.docs) {
-                //     for (const info of comp.docs!)
-                //         docs.push(info.replace(/(^|\b)(\@\w*)($|\b)/i, '_$2_'));
-                //     docs.push('***');
-                // }
-                // docs.push(skFile.skName!);
-                // item.documentation = new MarkdownString(docs.join('  \r\n'));
-                item.documentation = comp.markdown;
-                items.push(item);
             }
-        return items;
-    }
+        }
+        return result;
+    } /*,
+
+    resolveCompletionItem(item: CompletionItem, token: CancellationToken): CompletionItem {
+        return item;
+    }*/
 }
 exports.SkriptCompletionItemProvider = SkriptCompletionItemProvider;
 //# sourceMappingURL=SkriptCompletionItemProvider.js.map

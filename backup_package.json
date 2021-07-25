@@ -1,0 +1,80 @@
+{
+	"name": "vskript",
+	"displayName": "VSkript",
+	"description": "Visual Skript",
+	"author": {"name": "vhone", "email": "v_hone@naver.com", "url": "https://blog.naver.com/v_hone"},
+	"version": "0.0.5",
+	"engines": {
+		"vscode": "^1.56.0"
+	},
+	"publisher": "Vhone",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/vhone/vskript.git"
+	},
+	"icon": "img/cover.png",
+	"categories": [
+		"Themes",
+		"Snippets"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"languages": [
+			{
+				"id": "vskript",
+				"aliases": ["skript","sk"],
+				"extensions": [".sk"]
+			}
+		],
+		"snippets": [
+			{
+				"language": "vskript",
+				"path": "snippets.code-snippets"
+			}
+		],
+		"grammars": [
+			{
+				"language": "vskript",
+				"scopeName": "source.sk",
+				"path": "theme/vskript.tmLanguage.json"
+			}
+		],
+		"themes": [
+			{
+				"label": "VSkript (Rainbow Vivid)",
+				"uiTheme": "vs-dark",
+				"path": "theme/vskript_rainbow_vivid.json"
+			},
+			{
+				"label": "VSkript (Default)",
+				"uiTheme": "vs-dark",
+				"path": "theme/vskript_default.json"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js",
+		"publish": "vsce package"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.56.0",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.4",
+		"@types/node": "^12.11.7",
+		"eslint": "^7.19.0",
+		"@typescript-eslint/eslint-plugin": "^4.14.1",
+		"@typescript-eslint/parser": "^4.14.1",
+		"glob": "^7.1.6",
+		"mocha": "^8.2.1",
+		"typescript": "^4.1.3",
+		"vscode-test": "^1.5.0"
+	}
+}

@@ -2,8 +2,12 @@
 	"name": "vskript",
 	"displayName": "VSkript",
 	"description": "Visual Skript",
-	"author": {"name": "vhone", "email": "v_hone@naver.com", "url": "https://blog.naver.com/v_hone"},
-	"version": "0.0.5",
+	"author": {
+		"name": "vhone",
+		"email": "v_hone@naver.com",
+		"url": "https://blog.naver.com/v_hone"
+	},
+	"version": "0.0.6",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -13,10 +17,7 @@
 		"url": "https://github.com/vhone/vskript.git"
 	},
 	"icon": "img/cover.png",
-	"categories": [
-		"Themes",
-		"Snippets"
-	],
+	"categories": [],
 	"activationEvents": [
 		"*"
 	],
@@ -25,30 +26,48 @@
 		"languages": [
 			{
 				"id": "vskript",
-				"aliases": ["skript","sk"],
-				"extensions": [".sk"]
-			}
-		],
-		"snippets": [
-			{
-				"language": "vskript",
-				"path": "snippets.code-snippets"
+				"aliases": [
+					"skript",
+					"sk"
+				],
+				"extensions": [
+					".sk"
+				]
 			}
 		],
 		"grammars": [
 			{
 				"language": "vskript",
 				"scopeName": "source.sk",
-				"path": "theme/vskript.tmLanguage.json"
+				"path": "themes/vskript.tmLanguage.json"
 			}
 		],
 		"themes": [
 			{
-				"label": "VSkript",
+				"label": "VSkript (Dark)",
+				"id": "vskript",
 				"uiTheme": "vs-dark",
-				"path": "theme/vskript-color-theme.json"
+				"path": "./themes/vskript_default.json"
 			}
-		]
+		],
+		"semanticTokenTypes": [
+			{
+				"id": "templateType",
+				"superType": "type",
+				"description": "A templete type"
+			}
+		],
+		"semanticTokenModifiers": [
+			{
+				"id": "native",
+				"description" : "test token modifiers"
+			}
+		],
+		"configurationDefaults": {
+			"[vskript]": {
+				"editor.semanticHighlighting.enabled": true
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
