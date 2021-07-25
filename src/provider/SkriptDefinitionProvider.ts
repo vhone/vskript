@@ -5,7 +5,6 @@ import { SkriptFunction } from "../skript/SkriptComponent";
 /** 바로가기 */
 export class SkriptDefinitionProvider implements DefinitionProvider {
 	provideDefinition(document: TextDocument, position: Position, _token: CancellationToken) {
-		// console.log('SkriptDefinitionProvider');
         let range = document.getWordRangeAtPosition(position);
         if (range) {
             let funcName = document.getText(range);

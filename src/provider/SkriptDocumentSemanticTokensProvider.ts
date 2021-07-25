@@ -7,7 +7,6 @@ export const LEGEND = new SemanticTokensLegend(['aliases','parameter']);
 
 export class SkriptDocumentSemanticTokensProvider implements DocumentSemanticTokensProvider {
     provideDocumentSemanticTokens(document: TextDocument, _token: CancellationToken): ProviderResult<SemanticTokens> {
-        // console.log('SkriptDocumentSemanticTokensProvider');
 
         let skDocument = Skript.find(document.uri.fsPath);
         if (!skDocument) {

@@ -160,7 +160,6 @@ export abstract class SkriptComponent {
         let options = new Array<SkriptKeyValue<string>>();
         let match =_component.match(/(?!\r\n|\r|\n)(\t|\s{4})([^:]*)\:(.*)((\r\n|\r|\n)((\t|\s)*\#.*|(\t|\s{4}){2}.*))*/ig);
         if (match) for (const m of match) {
-            console.log(m);
             let groups = m.match(/(\t|\s{4})*(?<option>(?<key>[^\t\s][^:]*)\:(?<value>.*)((\r\n|\r|\n)(?<paragraph>((\W[^\r\n]*)?(\r\n|\r|\n)?)+))?)/)?.groups;
             if (groups) {
                 let index = offset + _component.indexOf(groups.option);

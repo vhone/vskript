@@ -30,17 +30,6 @@ export function activate(_context:ExtensionContext) {
 	// Event;
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
 
-	/*
-	
-
-	languages.registerEvaluatableExpressionProvider('vskript', {
-		provideEvaluatableExpression(_document: TextDocument, _position: Position, _token: CancellationToken): EvaluatableExpression {
-			console.log('registerEvaluatableExpressionProvider');
-			return new EvaluatableExpression(new Range(new Position(1,0), new Position(1,10)));
-		}
-	})
-	*/
-
 }
 
 export function deactivate() {}

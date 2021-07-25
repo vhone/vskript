@@ -86,7 +86,6 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
             // Command Options
             if (skComponent instanceof SkriptCommand
                 && subText.match(/^(\t|\s{4})($|[^\t\s\:]*$)/)) {
-                    console.log('a');
                     
                     let items = Object.assign(CMD_Options, {});
                     if (skComponent.options) for (const option of skComponent.options) {
@@ -122,8 +121,6 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
 
 
         }
-        
-        console.log(result)
 
         return result;
     }/*,

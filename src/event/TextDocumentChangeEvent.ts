@@ -44,7 +44,6 @@ function inputEnter(context: TextDocumentContentChangeEvent, document: TextDocum
             
         // '#>>'
         if (prefix === '#>>') {
-            console.log('[docs create]');
 
             // remove input
             editor.edit(builder => { builder.delete(new Range(document.lineAt(i).range.start, document.lineAt(i+1).range.end)) });

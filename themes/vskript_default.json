@@ -2,7 +2,7 @@
 	"$schema": "vscode://schemas/color-theme",
 	"name": "VSkript",
 	"type": "dark",
-	"include": "./vskript_base.json",
+	"include": "./dark_plus.json",
 	"colors": {
 		"editor.background": "#1c1c1c",
 		"editor.foreground": "#a0a0a0"

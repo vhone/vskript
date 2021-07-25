@@ -16,8 +16,7 @@ export class SkriptWorkspaceSymbolProvider implements WorkspaceSymbolProvider {
                 results.push(new SymbolInformation(component.title, component.symbolKind, skDocument.skPath.name, location));
             }
         })
-
-        console.log(results);
+        
         return results;
     }
 }
