@@ -1,57 +1,40 @@
 import { create } from 'node:domain';
 import { Hover, HoverProvider, MarkdownString, Position, Range, TextDocument, Uri } from 'vscode'
 import * as Skript from "../Skript"
-import { SkriptFunction, SkriptOptions, SkriptAliases } from '../skript_fork/SkriptComponent';
+import { SkriptFunction, SkriptOptions, SkriptAliases } from '../skript/SkriptComponent';
 
 export class SkriptHoverProvider implements HoverProvider {
 
     provideHover(document: TextDocument, position: Position /*token: CancellationToken*/) {
 
         let lineText = document.lineAt(position.line).text;
-        
-        for(const skDocument of Skript.DOCUMENTS) {
 
-            let docThis = skDocument.skPath.fsPath === document.uri.fsPath;
-            for (const paragraph of skDocument.components) {
+        // Function
+        let skFunctions: SkriptFunction[] = [];
+        Skript.DOCUMENTS.forEach(skDocument => skFunctions.push(...skDocument.getComponents(SkriptFunction)));
+        for (const skFunction of skFunctions) {
+            let markdown = (skFunction.tooltip) ? skFunction.tooltip.markdown : new MarkdownString();
+            let hover = this._createHover(lineText, position, skFunction.name, markdown);
+            if (hover) return hover;
+        }
 
-                let hover = null;
-
-                // Function
-                if (paragraph instanceof SkriptFunction) {
-                    let markdown = (paragraph.tooltip) ? paragraph.tooltip.markdown : new MarkdownString();
-                    hover = this._createHover(lineText, position, paragraph.name, markdown);
-                    if (hover) 
-                        return hover;
-                }
-
-                if (docThis) {
-
-                    // Options
-                    if (paragraph instanceof SkriptOptions) {
-                        for (const variable of paragraph.options) {
-                            hover = this._createHover(lineText, position,
-                                `{@${variable.key}}`,
-                                new MarkdownString().appendCodeblock(variable.value, 'vskript'));
-                            if (hover) {
-                                return hover;
-                            }
-                        }
-                    
-                    // Skript Aliases
-                    } else if (paragraph instanceof SkriptAliases)  {
-                        for (const itemtype of paragraph.aliases) {
-                            let hover = this._createHover(lineText, position,
-                                itemtype.key,
-                                new MarkdownString().appendCodeblock(itemtype.value.join('\r\n')));
-                            if (hover) {
-                                return hover;
-                            }
-                        }
-                    }
-                }
-
+        // Options
+        let skDocument = Skript.find(document.uri.fsPath)!;
+        for (const skOptions of skDocument.getComponents(SkriptOptions)) {
+            for (const option of skOptions.options) {
+                let hover = this._createHover(lineText, position, `{@${option.key}}`,
+                    new MarkdownString().appendCodeblock(option.value, 'vskript'));
+                if (hover) return hover;
             }
+        }
 
+        // Aliases
+        for (const skAliases of skDocument.getComponents(SkriptAliases)) {
+            for (const alias of skAliases.aliases) {
+                let hover = this._createHover(lineText, position, alias.key,
+                    new MarkdownString().appendCodeblock(alias.value.join('\r\n')));
+                if (hover) return hover;
+            }
         }
 
         return;

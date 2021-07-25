@@ -1,11 +1,51 @@
-import { CompletionItemProvider, CompletionItem, TextDocument, CompletionItemKind, SnippetString, CancellationToken, CompletionContext, Position } from 'vscode'
+import { CompletionItemProvider, CompletionItem, TextDocument, CompletionItemKind, SnippetString, CancellationToken, CompletionContext, Position, IndentAction } from 'vscode'
 import * as Skript from '../Skript'
-import { SkriptCommand } from '../skript_fork/SkriptComponent';
-import { Materials as SkriptMaterials } from '../skript_fork/language/Materials';
+import { SkriptCommand, SkriptFunction, SkriptParagraphComponent } from '../skript/SkriptComponent';
+import { Materials as SkriptMaterials } from '../skript/language/Materials';
+import { resourceLimits } from 'node:worker_threads';
 
 const ITEMS_MAP = new Map<string,CompletionItem[]>();
 
-const kaywords = [ 'aliases', 'options', 'on', 'command', 'function' ];
+
+const Components = (() => {
+    let list = new Array<CompletionItem>();
+    [   {isKeyword: true, name:'aliases', snippet:'aliases:\r\n\t'},
+        {isKeyword: true, name:'options', snippet:'options:\r\n\t'},
+        {isKeyword: true, name:'command', snippet:'command /${1:label} ${2:arguments}:\r\n\ttrigger:\r\n\t\t'},
+        {isKeyword: true, name:'function', snippet:'function ${1:name}(${2:parameters}) :: ${3:return type}:\r\n\t'},
+        {isKeyword: false, name:'function void', snippet:'function ${1:name}(${2:parameters}):\r\n\t'}
+    ].forEach(value => {
+        if (value.isKeyword)
+            list.push(new CompletionItem(value.name, CompletionItemKind.Keyword));
+        let snippet = new CompletionItem(value.name, CompletionItemKind.Snippet);
+        snippet.insertText = new SnippetString(value.snippet);
+        list.push(snippet);
+    });
+    return list;
+})();
+
+const CMD_Options = (() =>{
+    let list = new Array<CompletionItem>();
+    [   {name:'aliases', snippet:'aliases: '},
+        {name:'description', snippet:'description: '},
+        {name:'usage', snippet:'usage: '},
+        {name:'permission', snippet:'permission: '},
+        {name:'permission message', snippet:'permission message: '},
+        {name:'executable by', snippet:'executable by: '},
+        {name:'cooldown', snippet:'cooldown: '},
+        {name:'cooldown message', snippet:'cooldown message: '},
+        {name:'cooldown bypass', snippet:'cooldown bypass: '},
+        {name:'cooldown storage', snippet:'cooldown storage: '},
+        {name:'trigger', snippet:'trigger: '}
+    ].forEach(value => {
+        let snippet = new CompletionItem(value.name, CompletionItemKind.Property);
+        snippet.insertText = new SnippetString(value.snippet);
+        list.push(snippet);
+    })
+    return list;
+})() ;
+
+
 
 /**
  * ```Ctrl + space``` 단축키로 completion을 연다.
@@ -22,6 +62,13 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
         let range = document.getWordRangeAtPosition(position);
         let word: string | undefined = (range) ? document.getText(range) : undefined;
 
+        let skDocument = Skript.find(document.uri.fsPath)!;
+
+        // 첫 입력 (keyword)
+        if (!skDocument.componentOf(position) && (line.text === '' || line.text.indexOf(word!) === 0)) {
+            return Components;
+        }
+
         // 메터리얼 입력
         let matrial_range = document.getWordRangeAtPosition(position, /minecraft:\w*/i);
         let matrial_word: string | undefined = (matrial_range) ? document.getText(matrial_range) : undefined;
@@ -31,87 +78,52 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
             }
         }
 
-        // 첫 입력 (keyword)
-        if (line.text === '' || line.text.indexOf(word!) === 0) {
-            for (const keyword of kaywords) {
-                let item = new CompletionItem(keyword, CompletionItemKind.Keyword);
-                result.push(item);
-            }
-            let as = new CompletionItem('aliases', CompletionItemKind.Snippet);
-            as.insertText = new SnippetString('aliases:\r\n\t')
-            let opt = new CompletionItem('options', CompletionItemKind.Snippet);
-            opt.insertText = new SnippetString('options:\r\n\t')
-            let cmd = new CompletionItem('command', CompletionItemKind.Snippet);
-            cmd.insertText = new SnippetString('command /${1:label} ${2:arguments}:\r\n\ttrigger:\r\n\t\t')
-            let func_void = new CompletionItem('void function', CompletionItemKind.Snippet);
-            func_void.insertText = new SnippetString('function ${1:name}(${2:parameters}):\r\n\t')
-            let func = new CompletionItem('function', CompletionItemKind.Snippet);
-            func.insertText = new SnippetString('function ${1:name}(${2:parameters}) :: ${3:return type}:\r\n\t')
-            result.push(as, opt, cmd, func_void, func);
-
-            return result;
-        }
-
-        // Command Option 입력
+        // Component
         let subText = line.text.substring(0, position.character);
-        let skDocument = Skript.find(document.uri.fsPath);
-        if (skDocument) {
+        let skComponent = skDocument.componentOf(position, {isBefore:true});
+        if (skComponent) {
 
-            // let skComponent = skDocument.componentOf(position);
-            let skComponent = skDocument.lastComponentOf(position);
-            // console.log(skComponent)
-            // console.log([subText]);
-            if (skComponent) {
-                if (skComponent instanceof SkriptCommand) {
-                    if (subText.match(/^(\t|\s{4})($|[^\t\s\:]*$)/)) {
+            // Command Options
+            if (skComponent instanceof SkriptCommand
+                && subText.match(/^(\t|\s{4})($|[^\t\s\:]*$)/)) {
+                    console.log('a');
+                    
+                    let items = Object.assign(CMD_Options, {});
+                    if (skComponent.options) for (const option of skComponent.options) {
+                        items = items.filter(v => v.label !== option.key);  
+                    }
+                    result.push(...items);
+                    // return items;
+            }
 
-                        let as = new CompletionItem('aliases', CompletionItemKind.Property);
-                        as.insertText = new SnippetString('aliases: ')
+            // Grobal Functions
+            if (skComponent instanceof SkriptParagraphComponent && skComponent.paragraph.range.contains(position)) {
+                for (const skDocs of Skript.DOCUMENTS) {
+                    let isThis = skDocs === skDocument;
+                    for (const skFunc of skDocs.getComponents(SkriptFunction)) if (!skFunc.isInvisible || isThis) {
+                        let item = new CompletionItem(skFunc.name, CompletionItemKind.Function);
+                        item.detail = skDocs.skPath.name;
+                        if (skFunc.tooltip) item.documentation = skFunc.tooltip.markdown;
 
-                        let desc = new CompletionItem('description', CompletionItemKind.Property);
-                        desc.insertText = new SnippetString('description: ')
-                        // desc.documentation = 'A description of what this command does.';
-
-                        let usage = new CompletionItem('usage', CompletionItemKind.Property);
-                        usage.insertText = new SnippetString('usage: ')
-                        // usage.documentation = 'How to use the command.   \r\ne.g. /commandname <arguments>';
-
-                        let perm = new CompletionItem('permission', CompletionItemKind.Property);
-                        perm.insertText = new SnippetString('permission: ')
-
-                        let perm_msg = new CompletionItem('permission message', CompletionItemKind.Property);
-                        perm_msg.insertText = new SnippetString('permission message: ')
-
-                        let exec = new CompletionItem('executable by', CompletionItemKind.Property);
-                        exec.insertText = new SnippetString('executable by: ${1|players,console,players and console|}')
-
-                        let cool = new CompletionItem('cooldown', CompletionItemKind.Property);
-                        cool.insertText = new SnippetString('cooldown: ')
-
-                        let cool_msg = new CompletionItem('cooldown message', CompletionItemKind.Property);
-                        cool_msg.insertText = new SnippetString('cooldown message: ')
-
-                        let cool_byp = new CompletionItem('cooldown bypass', CompletionItemKind.Property);
-                        cool_byp.insertText = new SnippetString('cooldown bypass: ')
-
-                        let cool_str = new CompletionItem('cooldown storage', CompletionItemKind.Property);
-                        cool_str.insertText = new SnippetString('cooldown storage: ')
-                        
-                        let trg = new CompletionItem('trigger', CompletionItemKind.Property);
-                        trg.insertText = new SnippetString('trigger:\r\n\t\t')
-                        
-                        let items = [ as, desc, usage, perm, perm_msg, exec, cool, cool_msg, cool_byp, cool_str, trg ];
-
-                        if (skComponent.options) for (const option of skComponent.options) {
-                            items = items.filter(v => v.label !== option.key);  
+                        let parameters: string[] = [];
+                        if (skFunc.parameters) for (const skParam of skFunc.parameters) {
+                            let i = parameters.length + 1;
+                            if (skParam.type.isList) {
+                                parameters.push(`\${${i}:{_${skParam.name}::*\\\}}`)
+                            } else {
+                                parameters.push(`\${${i}:{_${skParam.name}\\\}}`)
+                            }
                         }
-                        result.push(...items);
+                        item.insertText = new SnippetString(`${skFunc.name}( ${parameters.join(', ')} )`)
+                        result.push(item);
                     }
                 }
-
             }
 
+
         }
+        
+        console.log(result)
 
         return result;
     }/*,
@@ -119,8 +131,6 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
     resolveCompletionItem(item: CompletionItem, token: CancellationToken): CompletionItem {
         return item;
     }*/
-
-
 
     // private _updateFunctionCompletionItem(skFile:SkriptFile): CompletionItem[] {
     //     let items = this._createCompletionItemsInFile(skFile);

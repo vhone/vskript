@@ -2,11 +2,10 @@
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "VSkript",
 	"scopeName": "source.sk",
-
 	"patterns": [
-		{ "include": "#comment"	},
-		{ "include": "#options"	},
-		{ "include": "#aliases"	},
+		{ "include": "#comment" },
+		{ "include": "#options" },
+		{ "include": "#aliases" },
 		{ "include": "#command" },
 		{ "include": "#event" },
 		{ "include": "#function" },
@@ -17,6 +16,10 @@
 	],
 
 	"repository": {
+
+		"hexcolor": {
+			"match": "\\<\\#\\#[0-9a-fA-F]{3,6}\\>"
+		},
 
 		"comment": {
 			"name": "vskript.comment",
@@ -38,7 +41,7 @@
 			}
 		},
 		"docs.parm": {
-			"match": "(\\@parm)\\s([^\\s]*)",
+			"match": "(\\@param)\\s([^\\s]*)",
 			"captures": {
 				"1": { "name": "vskript.docs.annotation" },
 				"2": { "name": "vskript.docs.parm" }
@@ -65,7 +68,10 @@
 			"match": "([^:]+)\\s*?\\:\\s*?(.+)",
 			"captures": {
 				"1": { "name": "vskript.options.variable" },
-				"2": { "patterns": [ { "include": "#comment" } ] }
+				"2": { "patterns": [
+						{ "include": "#hexcolor" },
+						{ "include": "#comment" }
+					] }
 			}
 		},
 
@@ -142,7 +148,7 @@
 
 
 		"event": {
-			"match": "^(on\\s+?(?:[^\\:]*))\\:",
+			"match": "^((?:on|every)\\s+(?:[^\\:]*)|at\\s+(?:\\d{1,2}\\:\\d{1,2}|[^\\:]*))\\:",
 			"captures": {
 				"1": { "name": "vskript.event" }
 			}
@@ -150,11 +156,12 @@
 
 
 		"function": {
-			"match": "^(function)\\s(\\w+)\\((.*)\\)(\\:|\\s\\:\\:\\s([^:]+)\\:)",
+			"match": "^(function)\\s(\\w+\\()(.*)(\\))(?:\\:|\\s\\:\\:\\s([^:]+)\\:)",
 			"captures": {
 				"1": { "name": "vskript.function.keyword" },
 				"2": { "name": "vskript.function.name" },
 				"3": { "patterns": [ { "include": "#function.parameter" } ] },
+				"4": { "name": "vskript.function.name" },
 				"5": { "patterns": [ { "include": "#type" } ] }
 			},
 			"_comment": {

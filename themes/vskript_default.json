@@ -96,12 +96,12 @@
 		{
 			"name": "VSkript Event",
 			"scope": ["vskript.event"],
-			"settings": { "foreground": "#f0d671", "fontStyle": "bold" }
+			"settings": { "foreground": "#f8ef74", "fontStyle": "bold" }
 		},
 		{
 			"name": "VSkript Command",
 			"scope": ["vskript.command"],
-			"settings": { "foreground": "#f0d671", "fontStyle": "bold" }
+			"settings": { "foreground": "#f8ef74", "fontStyle": "bold" }
 		},
 		{
 			"name": "VSkript Command Label & Options",
@@ -109,7 +109,7 @@
 				"vskript.command.label",
 				"vskript.command.options"
 			],
-			"settings": { "foreground": "#d1bb63", "fontStyle": "" }
+			"settings": { "foreground": "#d1b854", "fontStyle": "" }
 		},
 
 
@@ -122,7 +122,7 @@
 		{
 			"name": "VSkript Function Name",
 			"scope": [ "vskript.function.name" ],
-			"settings": { "foreground": "#b86fe9", "fontStyle": "" }
+			"settings": { "foreground": "#9f5ccc", "fontStyle": "" }
 		},
 		{
 			"name": "VSkript Function Parameter",
@@ -132,7 +132,7 @@
 		{
 			"name": "VSkript Expression Function",
 			"scope": "vskript.expr.function",
-			"settings": { "foreground": "#b86fe9", "fontStyle": "" }
+			"settings": { "foreground": "#9f5ccc", "fontStyle": "" }
 		},
 
 
@@ -140,7 +140,7 @@
 		{
 			"name": "VSkript Grammar",
 			"scope":  "vskript.grammar",
-			"settings": { "foreground": "#ff8560", "fontStyle": "bold" }
+			"settings": { "foreground": "#f58a4d", "fontStyle": "bold" }
 		},
 		{
 			"name": "VSkript Expression Grammar",
@@ -165,7 +165,7 @@
 		{
 			"name": "VSkript Variable Local",
 			"scope": "vskript.variable.local",
-			"settings": { "foreground": "#447baf", "fontStyle": "" }
+			"settings": { "foreground": "#4a84bb", "fontStyle": "" }
 		},
 		{
 			"name": "VSkript Variable Normal, Runtime",
@@ -173,14 +173,14 @@
 				"vskript.variable.normal",
 				"vskript.variable.runtime"
 			],
-			"settings": { "foreground": "#447baf", "fontStyle": "" }
+			"settings": { "foreground": "#4a84bb", "fontStyle": "" }
 		},
 		{
 			"name": "VSkript Variable Backet",
 			"scope": [
 				"vskript.variable.bracket"
 			],
-			"settings": { "foreground": "#447baf", "fontStyle": "" }
+			"settings": { "foreground": "#4a84bb", "fontStyle": "" }
 		}
 	]
 }

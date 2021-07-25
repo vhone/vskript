@@ -1,15 +1,25 @@
 import { Position, Range } from "vscode";
-import { SkriptComponent, SkriptMapComponent, SkriptParagraphComponent } from "./SkriptComponent";
-import { SkriptPath } from "./SkriptPath";
-import { SkriptToolTip } from "./SkriptToolTip";
-
+import { SkriptComponent, SkriptToolTip } from "./SkriptComponent";
+import * as Path from 'path';
 
 
 type Class<T> = { new (...args: any[]): T };
 
 
-// phrase 구절 : 두개 단어 이상으로 문장의 역할을 하는 것
-// sentence 문장
+
+export class SkriptPath {
+
+	public readonly fsPath: string;
+
+	constructor(
+		public readonly root: string,
+		public readonly name: string
+	) {
+		this.fsPath = Path.join(root, name);
+	}
+}
+
+
 
 export class SkriptDocument {
 
@@ -75,14 +85,20 @@ export class SkriptDocument {
     }
 
 	/** Positon에 맞는 요소를 반환 */
-	public componentOf(position:Position): SkriptComponent | undefined {
+	public componentOf(position:Position,options?:{isBefore?:boolean,isAfter?:boolean}): SkriptComponent | undefined {
 		for (let i=0; i < this._components.length; i++) {
 			let comp = this._components[i];
 			if (comp.range.contains(position)) {
 				return comp;
-			} else if (position.isBeforeOrEqual(comp.range.start)){
-				return;
-			}
+			} else if (position.isBeforeOrEqual(comp.range.start)) {
+                if (!options) {
+                    return;
+                } else if (options.isBefore) {
+                    return this._components[i-1];
+                } else if (options.isAfter) {
+                    return comp
+                }
+            }
 		}
 		return;
 	}
@@ -107,15 +123,6 @@ export class SkriptDocument {
         }
         return array;
     }
-    
-    /*
-    public validateRange(range: Range): Range {
-        throw new Error("Method not implemented.");
-    }
-    public validatePosition(position: Position): Position {
-        throw new Error("Method not implemented.");
-    }
-    */
 
     public update(document:string) {
 		this._document = document;

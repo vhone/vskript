@@ -1,16 +1,18 @@
-import { Test } from "mocha";
-import { TextDecoder } from "node:util";
-import { Position, Range, SymbolKind } from "vscode";
-import { SkriptType } from "./language/SkriptLanguageType";
+import { MarkdownString, Position, Range, SymbolKind } from "vscode";
+import { SkriptType } from "./language/SkriptType";
 import { SkriptDocument, SkriptLine } from "./SkriptDocument";
 import { SkriptParagraph } from "./SkriptParagraph";
-import { SkriptToolTip } from "./SkriptToolTip";
+
+
 
 export interface SkriptKeyValue<T> {
     range: Range,
     key: string,
     value: T
 }
+
+
+
 export abstract class SkriptComponent {
 
     private readonly _skDocument: SkriptDocument;
@@ -24,21 +26,29 @@ export abstract class SkriptComponent {
         this._title = title;
     }
 
-    public get document(): SkriptDocument {
+    get document(): SkriptDocument {
         return this._skDocument;
     }
-    public get range(): Range {
+    get range(): Range {
         return this._range;
     }
-    public get title(): string {
+    get title(): string {
         return this._title;
     }
-    public get tooltip(): SkriptToolTip | undefined {
+    get tooltip(): SkriptToolTip | undefined {
         return this._skToolTip;
     }
     public setToolTip(skTooltip:SkriptToolTip) {
         this._skToolTip = skTooltip;
     }
+
+    get isInvisible(): boolean {
+        if (!this._skToolTip)
+            return false;
+        return this._skToolTip.option.invisible
+    }
+
+
     abstract get symbolKind(): SymbolKind;
 
 
@@ -55,7 +65,7 @@ export abstract class SkriptComponent {
         } else if (search = component.match(/^(?<component>(?<head>options)\:(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)+))/i)?.groups) {
             return this._createOptions(skDocument, range, search.component, search.head, search.body);
             
-        } else if (search = component.match(/^(?<component>(?<head>on\s([^\:]+))\:(.*)((\r\n|\r|\n)(?<body>((\W[^\r\n]*)?(\r\n|\r|\n)?)+))?)/i)?.groups) {
+        } else if (search = component.match(/^(?<component>(?<head>(on|every)\s+([^\:]+)|at\s+(\d{1,2}\:\d{1,2}|[^\:]+))\:(.*)((\r\n|\r|\n)(?<body>((\W[^\r\n]*)?(\r\n|\r|\n)?)+))?)/i)?.groups) {
             return this._createEvent(skDocument, range, search.component, search.head, search.body);
             
         } else if (search = component.match(/^(?<component>(command\s?(?<head>[^\:]*))\:?(.*)(?<body>((\r\n|\r|\n)([^a-zA-Z][^\r\n]*)?)*))/i)?.groups) {
@@ -148,31 +158,23 @@ export abstract class SkriptComponent {
 
         let paragraph: {range:Range, text:string} | undefined;
         let options = new Array<SkriptKeyValue<string>>();
-        let match =_component.match(/(?!\r\n|\r|\n)(\t|\s{4})([^:]*)\:(.*)((\r\n|\r|\n)((\t|\s)*\#.*|(\t|\s{4}){2}.*))*/g);
+        let match =_component.match(/(?!\r\n|\r|\n)(\t|\s{4})([^:]*)\:(.*)((\r\n|\r|\n)((\t|\s)*\#.*|(\t|\s{4}){2}.*))*/ig);
         if (match) for (const m of match) {
-            let groups = m.match(/(\t|\s)*(?<option>(?<key>[^\t\s][^:]*)\:(?<value>.*)((\r\n|\r|\n)(?<paragraph>((\W[^\r\n]*)?(\r\n|\r|\n)?)+))?)/)?.groups;
+            console.log(m);
+            let groups = m.match(/(\t|\s{4})*(?<option>(?<key>[^\t\s][^:]*)\:(?<value>.*)((\r\n|\r|\n)(?<paragraph>((\W[^\r\n]*)?(\r\n|\r|\n)?)+))?)/)?.groups;
             if (groups) {
                 let index = offset + _component.indexOf(groups.option);
-                if (!groups.paragraph) {
-                    options.push({
-                        key: groups.key.trim(),
-                        value: groups.value.trim(),
-                        range: new Range(_skDocument.positionAt(index)!, _skDocument.positionAt(index + groups.option.length)!)
-                    })
+                let start = _skDocument.positionAt(index);
+                let end = _skDocument.positionAt(index + groups.option.length);
+                if (!start || !end) continue;
+
+                let key = groups.key.trim().toLowerCase();
+                if (key !== 'trigger') {
+                        options.push({key: key, value: groups.value.trim(), range: new Range(start, end)});
 
                 } else {
-                    let start = _skDocument.positionAt(index)!;
-
-                    paragraph = {
-                        text: groups.paragraph,
-                        range: new Range(new Position(start.line + 1, 0), _skDocument.positionAt(index + groups.option.length)!)
-                    };
-
-                    options.push({
-                        key: groups.key.trim(),
-                        value: '',
-                        range: new Range(new Position(start.line, 0), _skDocument.positionAt(index + groups.option.length)!)
-                    })
+                    options.push({key: key, value: '', range: new Range(new Position(start.line, 0), end)});
+                    paragraph = {text: groups.paragraph, range: new Range(new Position(start.line + 1, 0), end)};
                 }
             }
         }
@@ -238,6 +240,24 @@ export abstract class SkriptMapComponent extends SkriptComponent {
 }
 
 
+/**
+ * 로직을 가지는 컴포넌트
+ * SkriptEvent, SkriptCommand, SkriptFunction
+ */
+ export abstract class SkriptParagraphComponent extends SkriptComponent {
+
+    protected _skParagraph!: SkriptParagraph;
+
+    get paragraph(): SkriptParagraph {
+        return this._skParagraph;
+    }
+    set paragraph(skParagraph: SkriptParagraph) {
+        this._skParagraph = skParagraph;
+    }
+
+}
+
+
 
 export class SkriptAliases extends SkriptMapComponent {
 
@@ -281,26 +301,6 @@ export class SkriptOptions extends SkriptMapComponent {
 
     public get options(){
         return this._options
-    }
-
-}
-
-
-
-
-/**
- * 로직을 가지는 컴포넌트
- * SkriptEvent, SkriptCommand, SkriptFunction
- */
- export abstract class SkriptParagraphComponent extends SkriptComponent {
-
-    protected _skParagraph!: SkriptParagraph;
-
-    get paragraph(): SkriptParagraph {
-        return this._skParagraph;
-    }
-    set paragraph(skParagraph: SkriptParagraph) {
-        this._skParagraph = skParagraph;
     }
 
 }
@@ -393,7 +393,7 @@ export class SkriptFunction extends SkriptParagraphComponent {
                 text += `=${parameter.default}`
             parameters.push(text);
         }
-        let title = `${info.name}(${parameters.join(', ')})${(info.type) ? ` :: ${info.type.text}` : `:`}`;
+        let title = `${info.name}(${parameters.join(', ')})${(info.type) ? ` :: ${info.type.text}:` : `:`}`;
         super(skDocument, range, title);
         this._info = info;
 
@@ -418,4 +418,57 @@ export class SkriptFunction extends SkriptParagraphComponent {
         return SymbolKind.Function;
     }
     
+}
+
+
+
+interface SkriptComponentOption {
+    invisible: boolean;
+}
+
+export class SkriptToolTip {
+    
+
+	private readonly _skParagraph: SkriptComponent;
+    private readonly _tooltip: string[];
+    private _markdown: MarkdownString | undefined;
+    private readonly _skCompOption: SkriptComponentOption;
+
+
+    constructor(skParagraph:SkriptComponent, tooltip:string[]) {
+		this._skParagraph = skParagraph;
+        this._tooltip = tooltip;
+        this._skCompOption = {invisible: false}
+        tooltip.forEach(line => {
+            if (line.match(/\@invisible/i)) this._skCompOption.invisible = true;
+        })
+    }
+
+    get option(): SkriptComponentOption {
+        return this._skCompOption;
+    }
+    
+	get markdown(): MarkdownString {
+		if (!this._markdown) {
+			let docs = new Array<string>();
+			let regex_parm = /(\@param)\s(\w*)\s(.*)/g;
+			let regex_return = /(\@return)\s(.*)/g;
+			for (const line of this._tooltip) {
+				docs.push(line
+					.replace(regex_parm, '_$1_ ```$2``` ─ $3')
+					.replace(regex_return, '_$1_ ─ $2')
+				);
+			}
+			this._markdown = new MarkdownString()
+				.appendCodeblock('function ' + this._skParagraph.title);
+			
+			if (docs.length > 0) {
+				docs.unshift('***');
+				docs.push('');
+				this._markdown.appendMarkdown(docs.join('  \r\n'));
+			}
+			this._markdown.appendMarkdown(['***', 'from ```' + this._skParagraph.document.skPath.name + '```'].join('  \r\n'))
+		}
+		return this._markdown;
+	}
 }

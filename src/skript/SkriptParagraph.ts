@@ -1,6 +1,6 @@
-import { SkriptComponent, SkriptKeyValue, SkriptOptions } from "./SkriptComponent";
-import { Position, Range } from "vscode";
-import { SkriptVariable } from "./SkriptExpression";
+import { SkriptComponent } from "./SkriptComponent";
+import { Range } from "vscode";
+import { SkriptVariable } from "./language/SkriptExpressions";
 import { SkriptDocument } from "./SkriptDocument";
 
 export class SkriptParagraph {

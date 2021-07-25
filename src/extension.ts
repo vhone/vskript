@@ -25,13 +25,13 @@ export function activate(_context:ExtensionContext) {
 	languages.registerDefinitionProvider('vskript', new Provider.SkriptDefinitionProvider());
 	languages.registerCompletionItemProvider('vskript', new Provider.SkriptCompletionItemProvider());
 	languages.registerDocumentSemanticTokensProvider('vskript', new Provider.SkriptDocumentSemanticTokensProvider(), LEGEND);
+	languages.registerColorProvider('vskript', new Provider.SkriptDocumentColorProvider());
 	
 	// Event;
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
 
 	/*
 	
-	languages.registerColorProvider('vskript', new Provider.SkriptDocumentColorProvider());
 
 	languages.registerEvaluatableExpressionProvider('vskript', {
 		provideEvaluatableExpression(_document: TextDocument, _position: Position, _token: CancellationToken): EvaluatableExpression {

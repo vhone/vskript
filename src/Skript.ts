@@ -1,10 +1,7 @@
 import { workspace, window } from 'vscode'
 import * as FileSystem from 'fs'
 import * as Path from 'path'
-import { SkriptDocument } from './skript_fork/SkriptDocument';
-import { SkriptPath } from './skript_fork/SkriptPath';
-
-export * as Component from './skript/Component';
+import { SkriptDocument, SkriptPath } from './skript/SkriptDocument';
 
 
 
