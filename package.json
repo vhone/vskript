@@ -67,54 +67,7 @@
 			"[vskript]": {
 				"editor.semanticHighlighting.enabled": true
 			}
-		},
-		"configuration":[
-			{
-				"title": "VSkript",
-				"properties": {
-					"vskript.syntaxHighlight.comment": {
-						"type": "string",
-						"default": "e0e0e0"
-					},
-					"vskript.syntaxHighlight.text": {
-						"type": "string",
-						"default": "78ac79"
-					},
-					"vskript.syntaxHighlight.number": {
-						"type": "string",
-						"default": "ffffff"
-					},
-					"vskript.syntaxHighlight.options": {
-						"type": "string",
-						"default": "ff2e97"
-					},
-					"vskript.syntaxHighlight.aliases": {
-						"type": "string",
-						"default": "7fd8f3"
-					},
-					"vskript.syntaxHighlight.event": {
-						"type": "string",
-						"default": "ffe683"
-					},
-					"vskript.syntaxHighlight.command": {
-						"type": "string",
-						"default": "ffe683"
-					},
-					"vskript.syntaxHighlight.function": {
-						"type": "string",
-						"default": "b86fe9"
-					},
-					"vskript.syntaxHighlight.variable": {
-						"type": "string",
-						"default": "616161"
-					},
-					"vskript.syntaxHighlight.grammar": {
-						"type": "string",
-						"default": "ec8d59"
-					}
-				}
-			}
-		]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
