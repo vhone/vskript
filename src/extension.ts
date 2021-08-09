@@ -3,6 +3,7 @@ import { onSkriptEnable } from './Skript';
 import * as Provider from './provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
 import { LEGEND } from './provider/SkriptDocumentSemanticTokensProvider';
+import { SkriptPattern } from './Pattern';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -15,6 +16,22 @@ languages.setLanguageConfiguration('vskript', {
 });
 
 export function activate(_context:ExtensionContext) {
+
+	// let text 'send [the] action bar [with text] %text% to %players%';
+	let text = 'set {_a::%{_c}%} to {_b}';
+	
+	let pattern = new SkriptPattern('normal_variable', '{', '}');
+	console.log(pattern.exec(text));
+	console.log(pattern.exec(text));
+	console.log(pattern.exec(text));
+	/*
+	패턴 종류
+	소괄호() - 필수 선택
+	대괄호[] - 비필수 선택
+	세로바| - 선택지
+	퍼센트%% - 타입
+	하이픈- - 나열형 타입
+	*/
 
 	onSkriptEnable();
 
