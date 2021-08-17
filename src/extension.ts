@@ -17,13 +17,38 @@ languages.setLanguageConfiguration('vskript', {
 
 export function activate(_context:ExtensionContext) {
 
-	// let text 'send [the] action bar [with text] %text% to %players%';
-	let text = 'set {_a::%{_c}%} to {_b}';
+	/*
+	let line = 'send [the] action bar [with text] %text% to %players%';
+	let regexp = new RegExp("send\\s+(?!the\\s+)?action\\s+bar\\s+(?!with\\s+text\\s+)?%([^%])%\\s+to\\s+%([^%])%")
+	console.log(regexp.exec(line))
+	*/
+
+
+
+	/* 변수, 글자 찾기
+	*/
+	// let line = 'set {_a::%{_c}%::%{_d}%} to {_b}';
+	let line = 'set {_a::%{_c}%::%{_d}%} to "text""in %length of "Test"%"';
 	
-	let pattern = new SkriptPattern('normal_variable', '{', '}');
-	console.log(pattern.exec(text));
-	console.log(pattern.exec(text));
-	console.log(pattern.exec(text));
+	let text = new SkriptPattern('text', '"', '"', ['""']);
+	let variable = new SkriptPattern('normal_variable', '{', '}');
+	let nested = new SkriptPattern('nested_expression', '%', '%');
+
+	// text.addInclude('text');
+	text.addInclude('nested_expression');
+	variable.addInclude('nested_expression');
+	
+	nested.addInclude('normal_variable');
+	nested.addInclude('text');
+
+	// console.log(variable.exec(line));
+	// console.log(variable.exec(line));
+	
+	console.log(text.exec(line));
+	// console.log(text.exec(line));
+
+
+
 	/*
 	패턴 종류
 	소괄호() - 필수 선택
