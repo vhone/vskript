@@ -1,3 +1,5 @@
+import { Position } from "vscode";
+
 const REPOSITORY = new Map<string,SkriptPattern>();
 
 export class SkriptPattern implements ISkriptPattern{
@@ -94,77 +96,139 @@ class SkriptPatternRegexp extends SkriptPatternAbstract {
 
 class SkriptPatternBracket extends SkriptPatternAbstract {
 
-    private readonly _opener: string;
-    private readonly _closer: string;
-    private readonly _escape: string[] | undefined;
+    private readonly _opener: RegExp;
+    private readonly _closer: RegExp;
+    private readonly _escape: RegExp[] | undefined;
 
-    private _index = 0;
-
-    private readonly _isDouble;
+    private _searchString: string = '';
+    private _lastIndex: number = 0;
 
     constructor(opener:string, closer:string, escape?:string[]) {
         super()
-        this._opener = opener;
-        this._closer = closer;
-        this._escape = escape;
-        this._isDouble = opener === closer;
+        this._opener = new RegExp(opener, 'g');
+        this._closer = new RegExp(closer, 'g');
+        if (escape) {
+            let array = new Array<RegExp>();
+            for (const e of escape) {
+                array.push(new RegExp(e, 'g'))
+            }
+            if (array.length > 0) {
+                this._escape = array;
+            }
+        }
     }
 
-    public exec(text: string, index?: number): SkriptPatternResult | undefined {
-        console.log('[SkPatternBracket]')
-
-        if (!index) index = this._index;
+    public exec(text: string, index?:number): SkriptPatternResult | undefined {
+        console.log(`[SkriptPatternBracket] (${this._opener}, ${this._closer})`)
         
-        let start = text.indexOf(this._opener, index);
-        if (start < 0) {
+        let start = (index) ? index : this.lastIndex;
+        let end = start;
+
+        // Opener
+        this._opener.lastIndex = start;
+        let matchOpener = this._opener.exec(text);
+        if (!matchOpener) {
             return
         } else {
-            index = start + 1;
+            start = matchOpener.index;
+            end = this._opener.lastIndex;
         }
 
-        let end = text.indexOf(this._closer, index);
-        console.log(`this._opener=[${this._opener}], start=[${start}], index=[${index}], end=[${end}]`);
-
-        if (this._escape) for (const escape of this._escape) {
-            let pos = text.indexOf(escape, index);
-            console.log(`escape=[${escape}], pos=[${pos}], end=[${end}]`)
-            if (0 <= pos && pos <= end) {
-                index = pos + escape.length + 1;
-                end = text.indexOf(this._closer, index);
-            }
+        // Closer
+        this._closer.lastIndex = end;
+        let matchCloser = this._closer.exec(text);
+        if (!matchCloser) {
+            return
+        } else {
+            end = this._closer.lastIndex;
         }
+        
+        /** 보조 시작 위치 */
+        let subStart = start;
+        let subEnd = end;
+        let existEscape = true
+        let existInclude = true;
+        sub: while (existEscape || existInclude) {
+            
+            // Escape
+            existEscape = false;
+            if (this._escape) for (const escape of this._escape) {
+                escape.lastIndex = subStart;
+                let matchEscape
+                while(matchEscape = escape.exec(text)) {
 
-        for (const name of this._include) {
-            let pattern = REPOSITORY.get(name);
-            if (pattern) {
-                console.log(`inner pattern=[${pattern.name}]`)
-                let raw_pattern = pattern.getPattern();
-                if (raw_pattern instanceof SkriptPatternBracket) {
-                    while (text.substring(index, end).indexOf(raw_pattern._opener) >= 0) {
-                        console.log(`inner string=[${text.substring(index, end)}], index=[${index}]`)
-                        let result = raw_pattern.exec(text, index);
-                        if (!result) break;
-                        index = result.index + result.search.length;
-                        end = text.indexOf(this._closer, index );
-                        console.log(`end=[${end}], index=${index}`)
+                    if (matchEscape.index >= this._closer.lastIndex) {
+                        break;
+                    }
+
+                    subStart = escape.lastIndex;
+                    
+                    this._closer.lastIndex = subStart;
+                    let matchCloser = this._closer.exec(text);
+                    if (!matchCloser) {
+                        return;
+                    } else {
+                        end = this._closer.lastIndex;
+                        existEscape = true;
                     }
                 }
-
             }
+    
+            // Include
+            existInclude = false;
+            for (const name of this._include) {
+                let pattern = REPOSITORY.get(name);
+                if (!pattern) continue
+    
+                let include = pattern.getPattern();
+    
+                if (include instanceof SkriptPatternBracket) {
+    
+                    // Include Opener
+                    include._opener.lastIndex = subStart;
+                    let matchIncludeOpener
+                    while (matchIncludeOpener = include._opener.exec(text)) {
+
+                        if (matchIncludeOpener.index >= this._closer.lastIndex) {
+                            break;
+                        }
+
+                        include.lastIndex = matchIncludeOpener.index;
+                        let search = include.exec(text);
+                        subStart = include.lastIndex;
+                        console.log(search)
+
+                        // This Closer
+                        this._closer.lastIndex = subStart;
+                        let matchCloser = this._closer.exec(text);
+                        if (!matchCloser) {
+                            return;
+                        } else {
+                            end = this._closer.lastIndex;
+                            existInclude = true;
+                        }
+                        
+                        // Include Opener
+                        include._opener.lastIndex = subStart;
+    
+                    } 
+                }
+            }
+
+            console.log(existEscape, existInclude, `subStart=${subStart}, end=${end}`)
+
         }
 
-        console.log(`this._closer=[${this._closer}], end=[${end}], index=[${index}]`);
-        if (end < 0) {
-            index = text.length;
-        } else {
-            index = end + 1;
-        }
+        this._lastIndex = end;
+        return { index: start, search: text.substring(start, end) };
 
-        this._index = index;
+    }
 
-        console.log(`   > ${text.substring(start, index)}`)
-        return { index: start, search: text.substring(start, index) };
-
+    public get lastIndex(): number {
+        return this._lastIndex;
+    }
+    public set lastIndex(i:number) {
+        this._lastIndex = i;
     }
 
 

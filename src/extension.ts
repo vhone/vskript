@@ -23,29 +23,26 @@ export function activate(_context:ExtensionContext) {
 	console.log(regexp.exec(line))
 	*/
 
-
-
-	/* 변수, 글자 찾기
-	*/
-	// let line = 'set {_a::%{_c}%::%{_d}%} to {_b}';
-	let line = 'set {_a::%{_c}%::%{_d}%} to "text""in %length of "Test"%"';
+	/* 변수, 글자 찾기 */
 	
-	let text = new SkriptPattern('text', '"', '"', ['""']);
+	// let line = 'set {_a::%{_c}%::%{_d}%} to {_b}';
+	let line = 'set {_a::%{_c}%::%{_d}%} to "text in ""a"" at %world "over"% to ""good job""."';
+	// let line = '"text in %world "over"%"';
+
+	let text = new SkriptPattern('text', '"', '"', ['""', '%%']);
 	let variable = new SkriptPattern('normal_variable', '{', '}');
 	let nested = new SkriptPattern('nested_expression', '%', '%');
 
-	// text.addInclude('text');
 	text.addInclude('nested_expression');
 	variable.addInclude('nested_expression');
-	
-	nested.addInclude('normal_variable');
 	nested.addInclude('text');
-
-	// console.log(variable.exec(line));
-	// console.log(variable.exec(line));
+	nested.addInclude('normal_variable');
 	
+	// console.log(variable.exec(line));
+	// console.log(nested.exec(line));
 	console.log(text.exec(line));
-	// console.log(text.exec(line));
+	
+
 
 
 
