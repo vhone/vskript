@@ -1,7 +1,7 @@
 import { SkriptComponent } from "./SkriptComponent";
 import { Range } from "vscode";
-import { SkriptVariable } from "./language/SkriptExpressions";
 import { SkriptDocument } from "./SkriptDocument";
+import { SkriptVariable } from "./element/SkriptExpressions";
 
 export class SkriptParagraph {
 

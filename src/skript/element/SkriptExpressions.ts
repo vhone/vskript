@@ -21,62 +21,58 @@ export abstract class SkriptExpression {
 
 }
 
-
-export enum SkriptVariableKind {
-    GLOVAL,
-    LOCAL,
-    RUNTIME,
-    OPTION
-}
-
-export enum SkriptVariableType {
-    NORMAL,
-    LIST
-}
-
 export class SkriptVariable extends SkriptExpression {
 
     private readonly _raw: string;
-    private readonly _kind: SkriptVariableKind;
-    private readonly _type: SkriptVariableType;
+    private readonly _type: number;
+    private readonly _isList: boolean;
     
     private _parent?: SkriptVariable;
     private _child?: SkriptVariable[];
 
-    /**
-     * 
-     * @param range 범위
-     * @param expr 적혀 있는 그대로
-     * @param raw 실제 사용되는
-     */
     constructor(range: Range, expr: string, raw: string) {
         super(range, expr);
         this._raw = raw
+
         if (raw.match(/^\{\_/)) {
-            this._kind = SkriptVariableKind.LOCAL;
+            this._type = 1;
         } else if (raw.match(/^\{\@/)) {
-            this._kind = SkriptVariableKind.OPTION;
+            this._type = 2;
         } else if (raw.match(/^\{\-/)) {
-            this._kind = SkriptVariableKind.RUNTIME;
+            this._type = 3;
         } else {
-            this._kind = SkriptVariableKind.GLOVAL;
+            this._type = 0;
         }
+        
         if (raw.match(/\*\}$/)) {
-            this._type = SkriptVariableType.LIST;
+            this._isList = true;
         } else {
-            this._type = SkriptVariableType.NORMAL;
+            this._isList = false;
         }
+        
     }
 
     public get raw(): string {
         return this._raw;
     }
-    public get kind(): SkriptVariableKind {
-        return this._kind;
+
+    public get isGlobal(): boolean {
+        return this._type === 0;
     }
-    public get type(): SkriptVariableType {
-        return this._type;
+    public get isLocal(): boolean {
+        return this._type === 1;
     }
+    public get isOption(): boolean {
+        return this._type === 2;
+    }
+    public get isRuntime(): boolean {
+        return this._type === 3;
+    }
+
+    public get isList(): boolean {
+        return this._isList;
+    }
+    
     public get parent(): SkriptVariable | undefined {
         return this._parent;
     }

@@ -1,5 +1,5 @@
 import { MarkdownString, Position, Range, SymbolKind } from "vscode";
-import { SkriptType } from "./language/SkriptType";
+import { SkriptType } from "./element/SkriptType";
 import { SkriptDocument, SkriptLine } from "./SkriptDocument";
 import { SkriptParagraph } from "./SkriptParagraph";
 
@@ -203,7 +203,7 @@ export abstract class SkriptComponent {
             while (search = parameter.match(/(?<parameter>(?<name>[^\,\:]*)\:(?<type>[^\,\=]*)(?:\=(?<default>[^\,]*))?\,?)/)?.groups) {
                 parameters.push({
                     name: search.name.trim(),
-                    type: SkriptType.create(search.type.trim()),
+                    type: SkriptType.value(search.type.trim()),
                     default: (search.default) ? search.default.trim() : undefined
                 })
                 parameter = parameter.replace(search.parameter, '');
@@ -212,7 +212,7 @@ export abstract class SkriptComponent {
             let info: SkriptFunctionInfomation = {
                 name: headGroup.name.trim(),
                 parameters: parameters,
-                type: (headGroup.type) ? SkriptType.create(headGroup.type.trim()) : undefined
+                type: (headGroup.type) ? SkriptType.value(headGroup.type.trim()) : undefined
             };
 
             skFunction =  new SkriptFunction(_skDocument, _range, info);
@@ -274,7 +274,7 @@ export class SkriptAliases extends SkriptMapComponent {
         return SymbolKind.Constant;
     }
 
-    public get aliases(){
+    public get aliases(): SkriptKeyValue<string[]>[]{
         return this._aliases
     }
     

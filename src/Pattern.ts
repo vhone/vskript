@@ -10,12 +10,14 @@ export class SkriptPattern implements ISkriptPattern{
 
     private readonly _name: string;
     private readonly _pattern: ISkriptPattern;
+    
+    private _lastIndex: number = 0;
 
     constructor(name:string, opener:string, closer:string, escape?:string[])
-    constructor(name:string, regexp:RegExp)
+    constructor(name:string, regexp:string)
     constructor(name:string, arg1:any, arg2?:any, arg3?:any) {
-        if (arg1 instanceof RegExp) {
-            this._pattern = new SkriptPatternRegexp(arg1);
+        if (!arg2) {
+            this._pattern = new SkriptPatternRegexp(new RegExp(arg1, 'g'));
         } else if (typeof arg1 === 'string' && typeof arg2 === 'string') {
             this._pattern = new SkriptPatternBracket(arg1, arg2, arg3);
         } else {
@@ -23,11 +25,16 @@ export class SkriptPattern implements ISkriptPattern{
         }
         this._name = name;
         REPOSITORY.set(name, this);
-        console.log(REPOSITORY)
     }
 
     get name(): string {
         return this._name;
+    }
+    public getLastIndex(): number {
+        return this._pattern.getLastIndex();
+    }
+    public setLastIndex(i: number) {
+        this._pattern.setLastIndex(i) ;
     }
 
     public addInclude(...names:string[]) {
@@ -35,14 +42,15 @@ export class SkriptPattern implements ISkriptPattern{
     }
 
     public exec(text:string): SkriptPatternResult | undefined {
-        return this._pattern.exec(text);
+        let result = this._pattern.exec(text, this._lastIndex);
+        return result;
     }
     
-    public isBracket(): boolean {
+    public get isBracket(): boolean {
         return this._pattern instanceof SkriptPatternBracket
     }
-    public isRegexp(): boolean {
-        return this._pattern instanceof SkriptPatternRegexp
+    public get isRegexp(): boolean {
+        return this._pattern instanceof SkriptPatternRegexp;
     }
 
     public getPattern(): ISkriptPattern {
@@ -52,13 +60,15 @@ export class SkriptPattern implements ISkriptPattern{
 }
 
 interface ISkriptPattern {
-    exec(text:string): SkriptPatternResult | undefined
-    addInclude(...names:string[]): void
+    exec(text:string, index?:number): SkriptPatternResult | undefined;
+    addInclude(...names:string[]): void;
+    getLastIndex(): number;
+    setLastIndex(i:number): void;
 }
 
 interface SkriptPatternResult {
     index: number,
-    search: string
+    text: string
 }
 
 
@@ -74,6 +84,8 @@ abstract class SkriptPatternAbstract implements ISkriptPattern {
     }
 
     abstract exec(text: string): SkriptPatternResult | undefined
+    abstract getLastIndex(): number;
+    abstract setLastIndex(i: number): void;
 
 }
 
@@ -86,10 +98,16 @@ class SkriptPatternRegexp extends SkriptPatternAbstract {
         this._regexp = regexp;
     }
     
+    public getLastIndex(): number {
+        return this._regexp.lastIndex;
+    }
+    public setLastIndex(i: number) {
+        this._regexp.lastIndex = i;
+    }
+    
     public exec(text: string): SkriptPatternResult | undefined {
-        console.log('[SkPatternRegexp]')
         let match = this._regexp.exec(text);
-        return ( match ) ? { index: match.index, search: match[0] } : undefined;
+        return ( match ) ? { index: match.index, text: match[0] } : undefined;
     }
 
 }
@@ -118,10 +136,15 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
         }
     }
 
+    public getLastIndex(): number {
+        return this._lastIndex;
+    }
+    public setLastIndex(i:number) {
+        this._lastIndex = i;
+    }
+
     public exec(text: string, index?:number): SkriptPatternResult | undefined {
-        console.log(`[SkriptPatternBracket] (${this._opener}, ${this._closer})`)
-        
-        let start = (index) ? index : this.lastIndex;
+        let start = (index) ? index : this._lastIndex;
         let end = start;
 
         // Opener
@@ -144,7 +167,7 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
         }
         
         /** 보조 시작 위치 */
-        let subStart = start;
+        let subStart = start + 1;
         let subEnd = end;
         let existEscape = true
         let existInclude = true;
@@ -193,10 +216,9 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
                             break;
                         }
 
-                        include.lastIndex = matchIncludeOpener.index;
+                        include._lastIndex = matchIncludeOpener.index;
                         let search = include.exec(text);
-                        subStart = include.lastIndex;
-                        console.log(search)
+                        subStart = include._lastIndex;
 
                         // This Closer
                         this._closer.lastIndex = subStart;
@@ -215,20 +237,11 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
                 }
             }
 
-            console.log(existEscape, existInclude, `subStart=${subStart}, end=${end}`)
-
         }
 
         this._lastIndex = end;
-        return { index: start, search: text.substring(start, end) };
+        return { index: start, text: text.substring(start, end) };
 
-    }
-
-    public get lastIndex(): number {
-        return this._lastIndex;
-    }
-    public set lastIndex(i:number) {
-        this._lastIndex = i;
     }
 
 

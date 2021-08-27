@@ -1,6 +1,6 @@
 import { CancellationToken, DocumentSemanticTokensProvider, Position, ProviderResult, Range, SemanticTokens, SemanticTokensBuilder, SemanticTokensLegend, TextDocument } from "vscode";
 import * as Skript from '../Skript'
-import { SkriptVariable } from "../skript/language/SkriptExpressions";
+import { SkriptVariable } from "../skript/element/SkriptExpressions";
 import { SkriptAliases, SkriptEvent, SkriptFunction, SkriptParagraphComponent } from "../skript/SkriptComponent";
 
 export const LEGEND = new SemanticTokensLegend(['aliases','parameter']);

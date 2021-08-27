@@ -1,6 +1,6 @@
 import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
 import * as Skript from '../Skript';
-import { SkriptVariable, SkriptVariableKind } from '../skript/language/SkriptExpressions';
+import { SkriptVariable } from '../skript/element/SkriptExpressions';
 import { SkriptAliases, SkriptOptions, SkriptCommand, SkriptEvent, SkriptFunction } from '../skript/SkriptComponent';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
@@ -95,7 +95,7 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
 
         for (const variables of skVariables)
             for (const skVariable of this._getAllVariable(variables))
-                if (skVariable.kind === SkriptVariableKind.LOCAL) {
+                if (skVariable.isLocal) {
             let value
             if (value = maps.get(skVariable.raw)) {
                 value.amount += 1;
