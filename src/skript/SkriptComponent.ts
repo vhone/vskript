@@ -387,12 +387,12 @@ export class SkriptFunction extends SkriptParagraphComponent {
     constructor(skDocument:SkriptDocument, range:Range, info:SkriptFunctionInfomation) {
         let parameters = new Array<string>();
         for (const parameter of info.parameters!) {
-            let text = `${parameter.name}:${parameter.type.text}`;
+            let text = `${parameter.name}:${parameter.type.name}`;
             if (parameter.default)
                 text += `=${parameter.default}`
             parameters.push(text);
         }
-        let title = `${info.name}(${parameters.join(', ')})${(info.type) ? ` :: ${info.type.text}:` : `:`}`;
+        let title = `${info.name}(${parameters.join(', ')})${(info.type) ? ` :: ${info.type.name}:` : `:`}`;
         super(skDocument, range, title);
         this._info = info;
 

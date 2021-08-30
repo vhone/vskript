@@ -76,6 +76,9 @@ export class SkriptLangType {
     public get name(): string {
         return this._name;
     }
+    public get pattern(): RegExp | undefined {
+        return this._pattern;
+    }
 
     public static value(name:string) {
         for (const value of this.values()) if (value._pattern) {
@@ -145,8 +148,8 @@ export class SkriptLangType {
             this.TIMESPAN,
             this.TREE_TYPE,
             this.TYPE,
-            this.VECTOR,
-            this.UNDEFINED
+            this.VECTOR
+            // this.UNDEFINED
         ]
     }
 }

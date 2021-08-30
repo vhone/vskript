@@ -1,16 +1,17 @@
 import { SkriptType } from "../element/SkriptType";
+import { SkriptLangType } from "./SkriptLangType";
 
 
 export abstract class SkriptLangExpression {
 
-    protected readonly _expr: string;
+    protected readonly _legacy: string;
 
-    constructor(expr: string) {
-        this._expr = expr;
+    constructor(legacy: string) {
+        this._legacy = legacy;
     }
 
-    public get expr(): string {
-        return this._expr;
+    public get legacy(): string {
+        return this._legacy;
     }
 
     abstract get skType(): SkriptType;
@@ -19,25 +20,25 @@ export abstract class SkriptLangExpression {
 
 export class SkriptLangVariable extends SkriptLangExpression {
 
-    private readonly _raw: string;
+    private readonly _expr: string;
     private readonly _type: number;
     private readonly _isList: boolean;
 
-    constructor(expr: string, raw: string) {
-        super(expr);
-        this._raw = raw
+    constructor(legacy: string, expr: string) {
+        super(legacy);
+        this._expr = expr
 
-        if (raw.match(/^\{\_/)) {
+        if (expr.match(/^\{\_/)) {
             this._type = 1;
-        } else if (raw.match(/^\{\@/)) {
+        } else if (expr.match(/^\{\@/)) {
             this._type = 2;
-        } else if (raw.match(/^\{\-/)) {
+        } else if (expr.match(/^\{\-/)) {
             this._type = 3;
         } else {
             this._type = 0;
         }
         
-        if (raw.match(/\*\}$/)) {
+        if (expr.match(/\*\}$/)) {
             this._isList = true;
         } else {
             this._isList = false;
@@ -45,8 +46,8 @@ export class SkriptLangVariable extends SkriptLangExpression {
         
     }
 
-    public get raw(): string {
-        return this._raw;
+    public get expr(): string {
+        return this._expr;
     }
 
     public get isGlobal(): boolean {
@@ -67,7 +68,7 @@ export class SkriptLangVariable extends SkriptLangExpression {
     }
 
     public get skType(): SkriptType {
-        
+        return SkriptType.value(SkriptLangType.OBJECT, this._isList);
     }
 
 }
