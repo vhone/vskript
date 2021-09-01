@@ -1,12 +1,10 @@
-import { Position } from "vscode";
-
-const REPOSITORY = new Map<string,SkriptPattern>();
-
 export class SkriptPattern implements ISkriptPattern{
 
     public static getPattern(name:string): SkriptPattern | undefined {
         return REPOSITORY.get(name);
     }
+
+
 
     private readonly _name: string;
     private readonly _pattern: ISkriptPattern;
@@ -19,12 +17,11 @@ export class SkriptPattern implements ISkriptPattern{
         if (!arg2) {
             this._pattern = new SkriptPatternRegexp(new RegExp(arg1, 'g'));
         } else if (typeof arg1 === 'string' && typeof arg2 === 'string') {
-            this._pattern = new SkriptPatternBracket(arg1, arg2, arg3);
+            this._pattern = new SkriptPatternBracket(new RegExp(arg1, 'g'), new RegExp(arg2, 'g'), arg3);
         } else {
             throw new Error("invalid Arguments.")
         }
         this._name = name;
-        REPOSITORY.set(name, this);
     }
 
     get name(): string {
@@ -121,10 +118,10 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
     private _searchString: string = '';
     private _lastIndex: number = 0;
 
-    constructor(opener:string, closer:string, escape?:string[]) {
+    constructor(opener:RegExp, closer:RegExp, escape?:string[]) {
         super()
-        this._opener = new RegExp(opener, 'g');
-        this._closer = new RegExp(closer, 'g');
+        this._opener = opener;
+        this._closer = closer;
         if (escape) {
             let array = new Array<RegExp>();
             for (const e of escape) {
@@ -246,3 +243,26 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
 
 
 }
+
+
+
+const REPOSITORY = (() => {
+
+    let repository = new Map<string,SkriptPattern>();
+    
+	let text = new SkriptPattern('text', '"', '"', ['""', '%%']);
+	text.addInclude('nested_expr');
+	repository.set(text.name, text);
+
+	let variable = new SkriptPattern('variable', '{', '}');
+	variable.addInclude('nested_expr');
+	repository.set(variable.name, variable);
+
+	let nested = new SkriptPattern('nested_expr', '%', '%');
+	nested.addInclude('text');
+	nested.addInclude('variable');
+	repository.set(nested.name, nested);
+
+    return repository
+
+})()

@@ -1,7 +1,9 @@
-import { workspace, window } from 'vscode'
+import { workspace, window, ExtensionContext } from 'vscode'
 import * as FileSystem from 'fs'
 import * as Path from 'path'
 import { SkriptDocument, SkriptPath } from './skript/SkriptDocument';
+import { SkriptPattern } from './skript/language/SkriptPattern';
+import { LangParser } from './lang/LangParser';
 
 
 
@@ -12,7 +14,13 @@ export const DOCUMENTS = new Array<SkriptDocument>();
 
 
 /** 스크립트 실행 */
-export async function onSkriptEnable() {
+export async function onSkriptEnable(context:ExtensionContext) {
+
+	/** 리소스 읽기 */
+	console.log(context.asAbsolutePath('./resource/english.lang'))
+	workspace.openTextDocument(context.asAbsolutePath('./resource/english.lang')).then((document) => {
+		let lang = LangParser.parse(document);
+	})
 
 	if (WORKSAPCE_FATH) {
 		// let amtFunc: number = 0;
@@ -31,18 +39,6 @@ export async function onSkriptEnable() {
 	
 }
 
-
-
-/** 경로와 같은 SkriptFile이 있으면 반환 */
-export function find(fsPath:string): SkriptDocument | undefined {
-	for (const document of DOCUMENTS) if (document.skPath.fsPath === fsPath) {
-		return document;
-	}
-	return;
-}
-
-
-
 /** 하위경로 받아오기 */
 async function _getSkriptPaths(loopPath: SkriptPath): Promise<SkriptPath[]> {
 	let skPathArray = new Array<SkriptPath>();
@@ -60,4 +56,15 @@ async function _getSkriptPaths(loopPath: SkriptPath): Promise<SkriptPath[]> {
 	return new Promise((resolve) => {
 		resolve(skPathArray);
 	})
+}
+
+
+
+
+/** 경로와 같은 SkriptFile이 있으면 반환 */
+export function find(fsPath:string): SkriptDocument | undefined {
+	for (const document of DOCUMENTS) if (document.skPath.fsPath === fsPath) {
+		return document;
+	}
+	return;
 }

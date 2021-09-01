@@ -1,6 +1,38 @@
 
 export class SkriptLangType {
 
+
+    
+    private readonly _name: string;
+    private readonly _pattern: RegExp | undefined;
+    private readonly _parent: string | undefined;
+    private readonly _child: string[] | undefined;
+
+    private constructor(type:string, pattern?: RegExp, inheritance?:{parent?:string, child?:string[]}) {
+        this._name = type;
+        this._pattern = pattern;
+        this._parent = inheritance?.parent;
+        this._child = inheritance?.child;
+    }
+
+    public get name(): string {
+        return this._name;
+    }
+    public get pattern(): RegExp | undefined {
+        return this._pattern;
+    }
+
+    public static value(name:string) {
+        for (const value of this.values()) if (value._pattern) {
+            if (value._pattern.exec(name)) {
+                return value
+            }
+        }
+        return this.UNDEFINED
+    }
+
+
+    
     public static ATTRIBUTE_TYPE        = new SkriptLangType("attribute type",    /^attribute\s?types?$/i);
     public static BIOME                 = new SkriptLangType("biome",             /^biomes?$/i);
     public static BLOCK                 = new SkriptLangType("block",             /^blocks?$/i);
@@ -60,34 +92,6 @@ export class SkriptLangType {
     public static TYPE                  = new SkriptLangType("type",              /^types?$/i);
     public static VECTOR                = new SkriptLangType("vector",            /^vectors?$/i);
     public static UNDEFINED             = new SkriptLangType("undefined");
-
-    private readonly _name: string;
-    private readonly _pattern: RegExp | undefined;
-    private readonly _parent: string | undefined;
-    private readonly _child: string[] | undefined;
-
-    private constructor(type:string, pattern?: RegExp, inheritance?:{parent?:string, child?:string[]}) {
-        this._name = type;
-        this._pattern = pattern;
-        this._parent = inheritance?.parent;
-        this._child = inheritance?.child;
-    }
-
-    public get name(): string {
-        return this._name;
-    }
-    public get pattern(): RegExp | undefined {
-        return this._pattern;
-    }
-
-    public static value(name:string) {
-        for (const value of this.values()) if (value._pattern) {
-            if (value._pattern.exec(name)) {
-                return value
-            }
-        }
-        return this.UNDEFINED
-    }
 
     public static values() {
         return [

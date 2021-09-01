@@ -1,10 +1,38 @@
 import { SkriptLangType } from "../language/SkriptLangType";
 
 export class SkriptType {
+    
+
+
+    private readonly _type: SkriptLangType;
+    private readonly _isList: boolean;
+
+    private constructor(skLangType:SkriptLangType)
+    private constructor(skLangType:SkriptLangType, isList:boolean)
+    private constructor(skLangType:SkriptLangType, isList?:boolean) {
+        this._type = skLangType;
+        this._isList = (isList) ? isList : false;
+    }
+
+    public get type(): SkriptLangType {
+        return this._type;
+    }
+    public get isList(): boolean {
+        return this._isList;
+    }
+    public get name(): string {
+        let name = this._type.name;
+        if (this._isList) {
+            name = name.replace(/y$/i, 'ie');
+            name += 's';
+        }
+        return name;
+    }
+
+
 
     private static UNDEFIEND = new SkriptType(SkriptLangType.UNDEFINED, false);
     private static types = (() => {
-        // let map = new Map<{type:string, isList:boolean}, SkriptType>();
         let types = new Array<SkriptType>();
         for (const type of SkriptLangType.values()) {
             types.push( new SkriptType(type, true) );
@@ -35,30 +63,7 @@ export class SkriptType {
 
         return SkriptType.UNDEFIEND;
     }
-    
-    private readonly _type: SkriptLangType;
-    private readonly _isList: boolean;
 
-    private constructor(skLangType:SkriptLangType)
-    private constructor(skLangType:SkriptLangType, isList:boolean)
-    private constructor(skLangType:SkriptLangType, isList?:boolean) {
-        this._type = skLangType;
-        this._isList = (isList) ? isList : false;
-    }
 
-    public get type(): SkriptLangType {
-        return this._type;
-    }
-    public get isList(): boolean {
-        return this._isList;
-    }
-    public get name(): string {
-        let name = this._type.name;
-        if (this._isList) {
-            name = name.replace(/y$/i, 'ie');
-            name += 's';
-        }
-        return name;
-    }
 
 }

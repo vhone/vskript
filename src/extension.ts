@@ -1,11 +1,12 @@
-import { ExtensionContext, IndentAction, languages, workspace } from 'vscode';
+import { env, ExtensionContext, IndentAction, languages, workspace } from 'vscode';
 import { onSkriptEnable } from './Skript';
 import * as Provider from './provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
 import { LEGEND } from './provider/SkriptDocumentSemanticTokensProvider';
-import { SkriptPattern } from './Pattern';
+import { SkriptPattern } from './skript/language/SkriptPattern';
 import { SkriptType } from './skript/element/SkriptType';
-import { TextDecoder } from 'node:util';
+import * as FileSystem from 'fs';
+import { LangNode, LangParser } from './lang/LangParser';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -17,16 +18,10 @@ languages.setLanguageConfiguration('vskript', {
 	comments: {lineComment: '#'}
 });
 
-export function activate(_context:ExtensionContext) {
-
-
-
-
-
-	
+export function activate(context:ExtensionContext) {
 
 	/* 변수, 글자 찾기 */
-	
+	/*
 	// let line = 'set {_a::%{_c}%::%{_d}%} to {_b}';
 	// let line = 'set {_a::%{_c}%::%{_d}%} to "text in ""a"" at %world "over"% to ""good job""."';
 	// let line = '"text in %world "over"%"';
@@ -157,13 +152,15 @@ export function activate(_context:ExtensionContext) {
 				continue;
 			}
 
-		} else if (skWord.isType) {
+		} else if (skWord.isType && skWord instanceof SkriptParserType) {
+			let skLangType = skWord.skType.type;
 			let search
-			if (skWord.word === 'text') {
+			if (skLangType.name === 'text') {
 				text.setLastIndex(line_index)
 				search = text.exec(line);
-			} else if (skWord.word === 'player') {
+			} else if (skLangType.name === 'player') {
 				console.log( `익스프레션 처리 - player`)
+				search = {index: line.indexOf('player'), text: 'player'}
 			}
 			if (search && search.index === line_index) {
 				line_index += search.text.length;
@@ -178,6 +175,8 @@ export function activate(_context:ExtensionContext) {
 			}
 		}
 	}
+	*/
+
 
 
 	// let search
@@ -205,7 +204,7 @@ export function activate(_context:ExtensionContext) {
 	하이픈- - 나열형 타입
 	*/
 
-	onSkriptEnable();
+	onSkriptEnable(context);
 
 	// Provider
 	languages.registerDocumentSymbolProvider('vskript', new Provider.SkriptDocumentSymbolProvider());
@@ -253,7 +252,6 @@ class SkriptParserNormal extends SkriptParserWord {
 		super(word);
 
 	}
-
 }
 
 class SkriptParserOption extends SkriptParserWord {
@@ -273,6 +271,10 @@ class SkriptParserType extends SkriptParserWord {
 		super(word);
 		this._skType = SkriptType.value(word);
 		console.log(this._skType)
+	}
+
+	public get skType(): SkriptType {
+		return this._skType;
 	}
 
 }
