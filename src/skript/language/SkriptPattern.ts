@@ -1,98 +1,75 @@
-export class SkriptPattern implements ISkriptPattern{
+import { ParameterInformation } from "vscode";
+import { SkriptType } from "../element/SkriptType";
 
-    public static getPattern(name:string): SkriptPattern | undefined {
-        return REPOSITORY.get(name);
-    }
-
-
-
-    private readonly _name: string;
-    private readonly _pattern: ISkriptPattern;
-    
-    private _lastIndex: number = 0;
-
-    constructor(name:string, opener:string, closer:string, escape?:string[])
-    constructor(name:string, regexp:string)
-    constructor(name:string, arg1:any, arg2?:any, arg3?:any) {
-        if (!arg2) {
-            this._pattern = new SkriptPatternRegexp(new RegExp(arg1, 'g'));
-        } else if (typeof arg1 === 'string' && typeof arg2 === 'string') {
-            this._pattern = new SkriptPatternBracket(new RegExp(arg1, 'g'), new RegExp(arg2, 'g'), arg3);
-        } else {
-            throw new Error("invalid Arguments.")
-        }
-        this._name = name;
-    }
-
-    get name(): string {
-        return this._name;
-    }
-    public getLastIndex(): number {
-        return this._pattern.getLastIndex();
-    }
-    public setLastIndex(i: number) {
-        this._pattern.setLastIndex(i) ;
-    }
-
-    public addInclude(...names:string[]) {
-        this._pattern.addInclude(...names)
-    }
-
-    public exec(text:string): SkriptPatternResult | undefined {
-        let result = this._pattern.exec(text, this._lastIndex);
-        return result;
-    }
-    
-    public get isBracket(): boolean {
-        return this._pattern instanceof SkriptPatternBracket
-    }
-    public get isRegexp(): boolean {
-        return this._pattern instanceof SkriptPatternRegexp;
-    }
-
-    public getPattern(): ISkriptPattern {
-        return this._pattern;
-    }
-
-}
-
-interface ISkriptPattern {
-    exec(text:string, index?:number): SkriptPatternResult | undefined;
-    addInclude(...names:string[]): void;
-    getLastIndex(): number;
-    setLastIndex(i:number): void;
-}
 
 interface SkriptPatternResult {
     index: number,
     text: string
 }
 
+class SkriptPatternRepository {
 
 
-abstract class SkriptPatternAbstract implements ISkriptPattern {
 
+}
+
+export abstract class SkriptPattern {
+
+    protected readonly _name: string;
     protected readonly _include = new Set<string>();
 
-    public addInclude(...names: string[]) {
+    protected constructor(name:string) {
+        this._name = name;
+    }
+
+    get name(): string {
+        return this._name;
+    }
+
+    public addInclude(...names: string[]): SkriptPattern {
         for(const name of names) {
             this._include.add(name);
         }
+        return this;
     }
 
     abstract exec(text: string): SkriptPatternResult | undefined
     abstract getLastIndex(): number;
     abstract setLastIndex(i: number): void;
 
+
+
+    private static readonly _repository = new Map<string,SkriptPattern>();
+    
+    public static create(name:string, opener:string, closer:string, escape?:string[]): SkriptPattern;
+    public static create(name:string, rexexp:string): SkriptPattern;
+    public static create(name:string, arg1:string, arg2?:string, arg3?:string[]): SkriptPattern {
+        if (!arg2) {
+            return new SkriptPatternRegexp(name, arg1);
+        } else {
+            return new SkriptPatternBracket(name, arg1, arg2, arg3);
+        }
+    }
+
+    public static register(...patterns:SkriptPattern[]) {
+        for (const pattern of patterns) {
+            SkriptPattern._repository.set(pattern.name, pattern);
+        }
+    }
+
+    public static find(name:string): SkriptPattern | undefined {
+        return this._repository.get(name);
+    }
+
 }
 
-class SkriptPatternRegexp extends SkriptPatternAbstract {
+class SkriptPatternRegexp extends SkriptPattern {
     
     private readonly _regexp;
 
-    constructor(regexp:RegExp) {
-        super()
-        this._regexp = regexp;
+    constructor(name: string, regexp: string) {
+        super(name)
+        this._regexp = new RegExp(regexp, 'g');
     }
     
     public getLastIndex(): number {
@@ -109,19 +86,18 @@ class SkriptPatternRegexp extends SkriptPatternAbstract {
 
 }
 
-class SkriptPatternBracket extends SkriptPatternAbstract {
+class SkriptPatternBracket extends SkriptPattern {
 
     private readonly _opener: RegExp;
     private readonly _closer: RegExp;
     private readonly _escape: RegExp[] | undefined;
 
-    private _searchString: string = '';
     private _lastIndex: number = 0;
 
-    constructor(opener:RegExp, closer:RegExp, escape?:string[]) {
-        super()
-        this._opener = opener;
-        this._closer = closer;
+    constructor(name: string, opener:string, closer:string, escape?:string[]) {
+        super(name)
+        this._opener = new RegExp(opener, 'g');
+        this._closer = new RegExp(closer, 'g');
         if (escape) {
             let array = new Array<RegExp>();
             for (const e of escape) {
@@ -165,10 +141,9 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
         
         /** 보조 시작 위치 */
         let subStart = start + 1;
-        let subEnd = end;
         let existEscape = true
         let existInclude = true;
-        sub: while (existEscape || existInclude) {
+        while (existEscape || existInclude) {
             
             // Escape
             existEscape = false;
@@ -197,12 +172,13 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
             // Include
             existInclude = false;
             for (const name of this._include) {
-                let pattern = REPOSITORY.get(name);
-                if (!pattern) continue
-    
-                let include = pattern.getPattern();
-    
-                if (include instanceof SkriptPatternBracket) {
+                let include = SkriptPattern.find(name);
+                if (!include) continue
+                
+                if (include instanceof SkriptPatternRegexp) {
+                    include.setLastIndex(subStart);
+
+                } else if (include instanceof SkriptPatternBracket) {
     
                     // Include Opener
                     include._opener.lastIndex = subStart;
@@ -233,7 +209,6 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
                     } 
                 }
             }
-
         }
 
         this._lastIndex = end;
@@ -245,24 +220,14 @@ class SkriptPatternBracket extends SkriptPatternAbstract {
 }
 
 
+const text = SkriptPattern.create('text', '"', '"', ['""', '%%'])
+    .addInclude('nested_expression');
 
-const REPOSITORY = (() => {
+const variable = SkriptPattern.create('normal_variable', '{', '}')
+    .addInclude('nested_expression');
 
-    let repository = new Map<string,SkriptPattern>();
-    
-	let text = new SkriptPattern('text', '"', '"', ['""', '%%']);
-	text.addInclude('nested_expr');
-	repository.set(text.name, text);
+const nested = SkriptPattern.create('nested_expression', '%', '%')
+    .addInclude('text')
+    .addInclude('normal_variable');
 
-	let variable = new SkriptPattern('variable', '{', '}');
-	variable.addInclude('nested_expr');
-	repository.set(variable.name, variable);
-
-	let nested = new SkriptPattern('nested_expr', '%', '%');
-	nested.addInclude('text');
-	nested.addInclude('variable');
-	repository.set(nested.name, nested);
-
-    return repository
-
-})()
+SkriptPattern.register(text, variable, nested);

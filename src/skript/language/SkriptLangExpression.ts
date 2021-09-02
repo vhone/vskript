@@ -1,6 +1,5 @@
-import { SkriptPattern } from "./SkriptPattern";
-import { SkriptType } from "../element/SkriptType";
 import { SkriptLangType } from "./SkriptLangType";
+import { SkriptPattern } from "./SkriptPattern";
 
 
 export class SkriptLangExpression {
@@ -30,8 +29,8 @@ export class SkriptLangExpression {
 
 
 
-    public static VARIABLE = new SkriptLangExpression('variable', SkriptLangType.OBJECT, SkriptPattern.getPattern('variable')!);
-    public static TEXT = new SkriptLangExpression('text', SkriptLangType.TEXT, SkriptPattern.getPattern('text')!);
+    public static VARIABLE = new SkriptLangExpression('variable', SkriptLangType.OBJECT, SkriptPattern.find('variable')!);
+    public static TEXT = new SkriptLangExpression('text', SkriptLangType.TEXT, SkriptPattern.find('text')!);
     // public static EVENT_ENTITY = new SkriptLangExpression('player', SkriptLangType.PLAYER, new SkriptPattern('player', "player"))
 
 
@@ -47,7 +46,7 @@ export class SkriptLangVariable extends SkriptLangExpression {
         super(
             expr,
             SkriptLangType.OBJECT,
-            SkriptPattern.getPattern('variable')!
+            SkriptPattern.find('variable')!
             );
         this._expr = expr;
 

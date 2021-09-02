@@ -1,5 +1,5 @@
 import { CancellationToken, DocumentSemanticTokensProvider, Position, ProviderResult, Range, SemanticTokens, SemanticTokensBuilder, SemanticTokensLegend, TextDocument } from "vscode";
-import * as Skript from '../Skript'
+import { SkriptManager } from "../Skript";
 import { SkriptVariable } from "../skript/element/SkriptExpressions";
 import { SkriptAliases, SkriptEvent, SkriptFunction, SkriptParagraphComponent } from "../skript/SkriptComponent";
 
@@ -8,7 +8,7 @@ export const LEGEND = new SemanticTokensLegend(['aliases','parameter']);
 export class SkriptDocumentSemanticTokensProvider implements DocumentSemanticTokensProvider {
     provideDocumentSemanticTokens(document: TextDocument, _token: CancellationToken): ProviderResult<SemanticTokens> {
 
-        let skDocument = Skript.find(document.uri.fsPath);
+        let skDocument = SkriptManager.find(document.uri.fsPath);
         if (!skDocument) {
             return;
         }

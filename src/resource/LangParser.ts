@@ -1,29 +1,18 @@
 import { ParameterInformation, TextDocument } from "vscode";
 
+export class Lang {
 
-export class LangParser {
-
-    public static parse(document: TextDocument): Lang {
-        return new Lang(document);
-    }
-
-}
-
-class Lang {
-
-    private readonly _document: TextDocument;
     private readonly _root: LangNode;
 
-    constructor(document: TextDocument) {
-        this._document = document;
-
-        let root = new LangNode(document.fileName);
+    constructor(document: string) {
+        let root = new LangNode();
+        let lines = document.split(/\r\n|\r|\n/);
         this._root = root;
-        for (var i=0; i<this._document.lineCount; i++) {
-            let line = this._document.lineAt(i)
+        for (var i=0; i<lines.length; i++) {
+            let line = lines[i]
 
             let data = /^(?<space>\t*)((?<key>[^:#]+):(?<value>[^\#]*)?)?(?<command>\#.*)?$/i
-            let groups = line.text.match(data)?.groups
+            let groups = line.match(data)?.groups
             if (groups) {
                 let i = 0;
                 if (groups.key) i += 1;
@@ -51,13 +40,10 @@ class Lang {
         root.goto(0);
     }
 
-    public get document(): TextDocument {
-        return this._document;
-    }
-    public getNode(dir?:string): LangNode {
-        if (!dir || dir === '')
+    public getNode(key?:string): LangNode {
+        if (!key || key === '')
             return this._root;
-        let keys = dir.split('.');
+        let keys = key.split('.');
         let node = this._root;
         let i = 0;
         let childs
@@ -75,16 +61,15 @@ class Lang {
 
 }
 
-
-export class LangNode {
+class LangNode {
 
     private readonly _key: string;
     private readonly _value: string | undefined;
     private _parent: LangNode | undefined;
     private _child: LangNode[] | undefined;
 
-    constructor(key: string, value?: string, parent?: LangNode, child?: LangNode[]) {
-        this._key = key;
+    constructor(key?: string, value?: string, parent?: LangNode, child?: LangNode[]) {
+        this._key = (key) ? key : 'root';
         this._value = value;
         this._child = child;
         this._parent = parent;

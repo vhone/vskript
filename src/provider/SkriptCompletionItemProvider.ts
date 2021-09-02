@@ -1,8 +1,7 @@
 import { CompletionItemProvider, CompletionItem, TextDocument, CompletionItemKind, SnippetString, CancellationToken, CompletionContext, Position, IndentAction } from 'vscode'
-import * as Skript from '../Skript'
 import { SkriptCommand, SkriptFunction, SkriptParagraphComponent } from '../skript/SkriptComponent';
 import { Materials as SkriptMaterials } from '../skript/language/Materials';
-import { resourceLimits } from 'node:worker_threads';
+import { SkriptManager } from '../Skript';
 
 const ITEMS_MAP = new Map<string,CompletionItem[]>();
 
@@ -62,7 +61,7 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
         let range = document.getWordRangeAtPosition(position);
         let word: string | undefined = (range) ? document.getText(range) : undefined;
 
-        let skDocument = Skript.find(document.uri.fsPath)!;
+        let skDocument = SkriptManager.find(document.uri.fsPath)!;
 
         // 첫 입력 (keyword)
         if (!skDocument.componentOf(position) && (line.text === '' || line.text.indexOf(word!) === 0)) {
@@ -97,7 +96,7 @@ export class SkriptCompletionItemProvider implements CompletionItemProvider<Comp
 
             // Grobal Functions
             if (skComponent instanceof SkriptParagraphComponent && skComponent.paragraph.range.contains(position)) {
-                for (const skDocs of Skript.DOCUMENTS) {
+                for (const skDocs of SkriptManager.DOCUMENTS) {
                     let isThis = skDocs === skDocument;
                     for (const skFunc of skDocs.getComponents(SkriptFunction)) if (!skFunc.isInvisible || isThis) {
                         let item = new CompletionItem(skFunc.name, CompletionItemKind.Function);

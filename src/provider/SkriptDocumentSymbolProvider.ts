@@ -1,5 +1,5 @@
 import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
-import * as Skript from '../Skript';
+import { SkriptManager } from '../Skript';
 import { SkriptVariable } from '../skript/element/SkriptExpressions';
 import { SkriptAliases, SkriptOptions, SkriptCommand, SkriptEvent, SkriptFunction } from '../skript/SkriptComponent';
 
@@ -22,7 +22,7 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
             let symbols: DocumentSymbol[] = [];
             SYMBOLS_MAP.set(fsPath, symbols);
         
-            let skDocument = Skript.find(fsPath);
+            let skDocument = SkriptManager.find(fsPath);
             if (!skDocument)
                 return
             
