@@ -1,3 +1,4 @@
+import { SkriptExpression } from "../element/SkriptExpressions";
 import { SkriptType } from "../element/SkriptType";
 import { SkriptPattern } from "./SkriptPattern";
 
@@ -14,7 +15,8 @@ SkriptPattern.register(option, type, normal);
  *  - 필요 요소에 따른 추천 단어
  */
 interface SkriptParserResult {
-    nextWords?: string[]
+    expr: SkriptExpression[]
+    // nextWords?: string[]
 }
 
 export class SkriptParser {
@@ -64,55 +66,61 @@ export class SkriptParser {
 
     public exec(line:string) {
         
-        let line_index = 0;
-        for (const skWord of this._words) {
-            console.log(`[${skWord.word}] ${skWord.isNormal} ${skWord.isOption} ${skWord.isType}`);
+        let expr: SkriptExpression[] = [];
+        let index = 0;
+        for (const word of this._words) {
+            console.log(`[${word.text}] ${word.text}`);
 
-            if (skWord.isNormal) {
-                if (line.indexOf(skWord.word, line_index) === line_index) {
-                    line_index += skWord.word.length;
-                    while (line_index === line.indexOf( ' ', line_index)) {
-                        line_index++;
-                    }
+            if (word instanceof SkriptParserNormal) {
+                if (line.indexOf(word.text, index) === index) {
+                    index = this._jumpIndex(line, index + word.text.length);
                 } else {
-                    console.log(`Invailed Normal Word - word: ${skWord.word}, char: ${line_index}`)
+                    console.log(`Invailed Normal Word - word: ${word.text}, char: ${index}`)
                     break;
                 }
 
-            } else if (skWord.isOption) {
-                if (line.indexOf(skWord.word, line_index) === line_index) {
-                    line_index += skWord.word.length;
-                    while (line_index === line.indexOf( ' ', line_index)) {
-                        line_index++;
-                    }
+            } else if (word instanceof SkriptParserOption) {
+                if (line.indexOf(word.text, index) === index) {
+                    index = this._jumpIndex(line, index + word.text.length);
                 } else {
                     continue;
                 }
 
-            } else if (skWord.isType && skWord instanceof SkriptParserType) {
-                let skLangType = skWord.skType.type;
+            } else if (word instanceof SkriptParserType) {
+                let langType = word.type.langType;
                 let search
+                console.log(`langType = ${langType.name}`)
 
-                if (skLangType.name === 'text') {
-                    let text = SkriptPattern.find('text');
-                    if (text) {
-                        text.setLastIndex(line_index)
-                        search = text.exec(line);
-                    }
+                // 타입인 경우
+                let pattern
+                if (pattern = SkriptPattern.find(langType)) {
+                    pattern.setLastIndex(index);
+                    search = pattern.exec(line);
+                    console.log('일반패턴', search)
 
-                } else if (skLangType.name === 'player') {
-                    console.log( `익스프레션 처리 - player`)
-                    search = {index: line.indexOf('player'), text: 'player'}
+                // 변수인 경우
+                } else if (pattern = SkriptPattern.find('variable')) {
+                    pattern.setLastIndex(index);
+                    search = pattern.exec(line);
+                    console.log('변수', search)
+                
+                /*// 함수인 경우
+                } else if () {
+
+                */
+
+                // 정의되지 않은 타입
+                } else {
+                    console.log(`정의되지 않은 타입 - ${langType.name}`)
                 }
 
-                if (search && search.index === line_index) {
-                    line_index += search.text.length;
-                    while (line_index === line.indexOf( ' ', line_index)) {
-                        line_index++;
-                    }
-
+                if (search && search.index === index) {
+                    // expr.push(SkriptExpression.create(type, search.text))
+                    console.log(search.pattern_name)
+                    SkriptExpression.create(langType, search.text)
+                    index = this._jumpIndex(line, index + search.text.length);
                 } else {
-                    console.log(`Invailed Normal Word - word: ${skWord.word}, char: ${line_index}`)
+                    console.log(`Invailed Normal Word - word: ${word.text}, char: ${index}`)
                     break;
                 }
             }
@@ -132,24 +140,14 @@ export class SkriptParser {
 
 abstract class SkriptParserWord {
 
-	private readonly _word: string;
+	private readonly _text: string;
 
 	constructor(word:string) {
-		this._word = word;
+		this._text = word;
 	}
 
-	public get word(): string {
-		return this._word;
-	}
-
-	public get isNormal(): boolean {
-		return this instanceof SkriptParserNormal
-	}
-	public get isOption(): boolean {
-		return this instanceof SkriptParserOption
-	}
-	public get isType(): boolean {
-		return this instanceof SkriptParserType
+	public get text(): string {
+		return this._text;
 	}
 	
 }
@@ -172,15 +170,15 @@ class SkriptParserOption extends SkriptParserWord {
 
 class SkriptParserType extends SkriptParserWord {
 
-	private readonly _skType: SkriptType;
+	private readonly _type: SkriptType;
 
 	constructor(word:string) {
 		super(word);
-		this._skType = SkriptType.value(word);
+		this._type = SkriptType.value(word);
 	}
 
-	public get skType(): SkriptType {
-		return this._skType;
+	public get type(): SkriptType {
+		return this._type;
 	}
 
 }

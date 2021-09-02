@@ -1,5 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { Range } from "vscode";
+import { SkriptLangType } from "../language/SkriptLangType";
+import { SkriptType } from "./SkriptType";
 
 
 
@@ -18,6 +20,12 @@ export abstract class SkriptExpression {
     }
     public get expr(): string {
         return this._expr;
+    }
+
+
+    public static create(type:SkriptLangType, text:string) {
+        console.log(type, text);
+        // if (type is )
     }
 
 }

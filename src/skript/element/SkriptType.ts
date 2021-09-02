@@ -14,7 +14,7 @@ export class SkriptType {
         this._isList = (isList) ? isList : false;
     }
 
-    public get type(): SkriptLangType {
+    public get langType(): SkriptLangType {
         return this._type;
     }
     public get isList(): boolean {
@@ -56,7 +56,7 @@ export class SkriptType {
             isList = arg2;
         }
         if (skLangType) for (const type of SkriptType.types) {
-            if (type.type === skLangType && isList === type._isList) {
+            if (type.langType === skLangType && isList === type._isList) {
                 return type
             }
         }

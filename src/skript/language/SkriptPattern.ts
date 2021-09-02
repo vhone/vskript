@@ -1,8 +1,10 @@
 import { ParameterInformation } from "vscode";
 import { SkriptType } from "../element/SkriptType";
+import { SkriptLangType } from "./SkriptLangType";
 
 
 interface SkriptPatternResult {
+    pattern_name: string,
     index: number,
     text: string
 }
@@ -57,9 +59,16 @@ export abstract class SkriptPattern {
         }
     }
 
-    public static find(name:string): SkriptPattern | undefined {
-        return this._repository.get(name);
-    }
+    public static find(type:SkriptLangType): SkriptPattern | undefined
+    public static find(name:string): SkriptPattern | undefined
+    public static find(arg:any): SkriptPattern | undefined {
+        if (arg instanceof SkriptLangType)
+            return this._repository.get(arg.name);
+        else if (typeof arg === 'string')
+            return this._repository.get(arg);
+        else
+            return
+    }   
 
 }
 
@@ -81,7 +90,7 @@ class SkriptPatternRegexp extends SkriptPattern {
     
     public exec(text: string): SkriptPatternResult | undefined {
         let match = this._regexp.exec(text);
-        return ( match ) ? { index: match.index, text: match[0] } : undefined;
+        return ( match ) ? { pattern_name:this._name, index: match.index, text: match[0] } : undefined;
     }
 
 }
@@ -212,7 +221,7 @@ class SkriptPatternBracket extends SkriptPattern {
         }
 
         this._lastIndex = end;
-        return { index: start, text: text.substring(start, end) };
+        return { pattern_name:this._name, index: start, text: text.substring(start, end) };
 
     }
 
