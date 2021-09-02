@@ -17,7 +17,15 @@ export class SkriptManager {
 		console.log(context.asAbsolutePath('./resource/english.lang'))
 		workspace.openTextDocument(context.asAbsolutePath('./resource/english.lang')).then((document) => {
 			SkriptManager.LANG = new Lang(document.getText());
+			let nodeEntities = SkriptManager.LANG.getNode('entities');
+			console.log(nodeEntities);
 		})
+
+		// let childs = nodeEntities.getChild();
+		// if (childs) for (const child of childs) {
+			// console.log(child.key);
+		// }
+
 	
 		if (SkriptManager.WORKSAPCE_FATH) {
 			// let amtFunc: number = 0;
