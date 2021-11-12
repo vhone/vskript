@@ -1,6 +1,6 @@
 import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
 import { SkriptManager } from '../Skript';
-import { SkriptVariable } from '../skript/element/SkriptExpressions';
+import { SkriptExprVariable } from '../skript/element/SkriptExpressions';
 import { SkriptAliases, SkriptOptions, SkriptCommand, SkriptEvent, SkriptFunction } from '../skript/SkriptComponent';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
@@ -89,9 +89,9 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
         }
     }
 
-    private _createVariableSymbols(skVariables:SkriptVariable[]): DocumentSymbol[] {
+    private _createVariableSymbols(skVariables:SkriptExprVariable[]): DocumentSymbol[] {
         let result: DocumentSymbol[] = [];
-        let maps = new Map<string, {variable:SkriptVariable, amount: number}>();
+        let maps = new Map<string, {variable:SkriptExprVariable, amount: number}>();
 
         for (const variables of skVariables)
             for (const skVariable of this._getAllVariable(variables))
@@ -115,11 +115,11 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
         return result;
     }
 
-    private _getAllVariable(skVariable:SkriptVariable): SkriptVariable[] {
+    private _getAllVariable(skVariable:SkriptExprVariable): SkriptExprVariable[] {
         if (skVariable.child.length === 0) {
             return [skVariable]
         } else {
-            let array: SkriptVariable[] = [];
+            let array: SkriptExprVariable[] = [];
             for (const child of skVariable.child) {
                 array.push(skVariable, ...this._getAllVariable(child));
             }

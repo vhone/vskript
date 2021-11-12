@@ -7,13 +7,13 @@ export class SkriptLangExpression {
 
 
     protected readonly _name: string;
+    protected readonly _returnType: SkriptLangType;
     protected readonly _pattern: SkriptPattern;
-    protected readonly _type: SkriptLangType
 
-    constructor(name: string, type: SkriptLangType, pattern: SkriptPattern) {
+    constructor(name: string, returnType: SkriptLangType, pattern: SkriptPattern) {
         this._name = name;
         this._pattern = pattern;
-        this._type = type
+        this._returnType = returnType;
     }
 
     public get name(): string {
@@ -23,14 +23,15 @@ export class SkriptLangExpression {
         return this._pattern;
     }
     public get type(): SkriptLangType {
-        return this._type;
+        return this._returnType;
     }
     // public abstract get type(): SkriptType;
 
 
 
-    public static VARIABLE = new SkriptLangExpression('variable', SkriptLangType.OBJECT, SkriptPattern.find('variable')!);
-    public static TEXT = new SkriptLangExpression('text', SkriptLangType.TEXT, SkriptPattern.find('text')!);
+    // public static VARIABLE = new SkriptLangExpression('variable', SkriptLangType.OBJECT, SkriptPattern.find('variable')!);
+    // public static TEXT = new SkriptLangExpression('text', SkriptLangType.TEXT, SkriptPattern.find('text')!);
+    // public static ENTITY = new SkriptLangExpression('entity', SkriptLangType.ENTITY, '[event-]<.+>')
     // public static EVENT_ENTITY = new SkriptLangExpression('player', SkriptLangType.PLAYER, new SkriptPattern('player', "player"))
 
 

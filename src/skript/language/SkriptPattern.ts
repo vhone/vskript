@@ -1,18 +1,13 @@
 import { ParameterInformation } from "vscode";
 import { SkriptType } from "../element/SkriptType";
 import { SkriptLangType } from "./SkriptLangType";
+import { SkriptParser } from "./SkriptParser";
 
 
 interface SkriptPatternResult {
     pattern_name: string,
     index: number,
     text: string
-}
-
-class SkriptPatternRepository {
-
-
-
 }
 
 export abstract class SkriptPattern {
@@ -43,9 +38,11 @@ export abstract class SkriptPattern {
 
     private static readonly _repository = new Map<string,SkriptPattern>();
     
+    public static create(name:SkriptLangType, opener:string, closer:string, escape?:string[]): SkriptPattern;
     public static create(name:string, opener:string, closer:string, escape?:string[]): SkriptPattern;
+    public static create(name:SkriptLangType, rexexp:string): SkriptPattern;
     public static create(name:string, rexexp:string): SkriptPattern;
-    public static create(name:string, arg1:string, arg2?:string, arg3?:string[]): SkriptPattern {
+    public static create(name:any, arg1:string, arg2?:string, arg3?:string[]): SkriptPattern {
         if (!arg2) {
             return new SkriptPatternRegexp(name, arg1);
         } else {
@@ -72,11 +69,16 @@ export abstract class SkriptPattern {
 
 }
 
+/**
+ * 하나의 정규식으로 일치하는 글자를 찾는 패턴
+ */
 class SkriptPatternRegexp extends SkriptPattern {
     
     private readonly _regexp;
 
-    constructor(name: string, regexp: string) {
+    constructor(name: string | SkriptLangType, regexp: string) {
+        if (name instanceof SkriptLangType)
+            name = name.name;
         super(name)
         this._regexp = new RegExp(regexp, 'g');
     }
@@ -95,6 +97,9 @@ class SkriptPatternRegexp extends SkriptPattern {
 
 }
 
+/**
+ * 여는/닫는 브라켓으로 일치하는 글자를 찾는 패턴
+ */
 class SkriptPatternBracket extends SkriptPattern {
 
     private readonly _opener: RegExp;
@@ -148,7 +153,6 @@ class SkriptPatternBracket extends SkriptPattern {
             end = this._closer.lastIndex;
         }
         
-        /** 보조 시작 위치 */
         let subStart = start + 1;
         let existEscape = true
         let existInclude = true;
@@ -228,15 +232,39 @@ class SkriptPatternBracket extends SkriptPattern {
 
 }
 
+class SkriptPatternExpression extends SkriptPattern {
+    
+    private _lastIndex = 0;
 
-const text = SkriptPattern.create('text', '"', '"', ['""', '%%'])
-    .addInclude('nested_expression');
+    constructor(name: string, patterns:string[]) {
+        super(name)
+    }
 
-const variable = SkriptPattern.create('normal_variable', '{', '}')
-    .addInclude('nested_expression');
+    public getLastIndex(): number {
+        return this._lastIndex;
+    }
+    public setLastIndex(i: number): void {
+        this._lastIndex = i;
+    }
 
-const nested = SkriptPattern.create('nested_expression', '%', '%')
-    .addInclude('text')
-    .addInclude('normal_variable');
+    public exec(text: string): SkriptPatternResult | undefined {
+        throw new Error("Method not implemented.");
+    }
+
+}
+
+
+const text = SkriptPattern.create('expr.text', '"', '"', ['""', '%%'])
+    .addInclude('expr.nested_expression');
+
+const variable = SkriptPattern.create('expr.variable', '{', '}')
+    .addInclude('expr.nested_expression');
+
+const nested = SkriptPattern.create('expr.nested_expression', '%', '%')
+    .addInclude('expr.text')
+    .addInclude('expr.variable');
+    
+// const exprEntity = SkriptPattern.create('expr.entity',
+//     new SkriptParser('[event-]entity'));
 
 SkriptPattern.register(text, variable, nested);

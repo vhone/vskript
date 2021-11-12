@@ -84,7 +84,7 @@ export class SkriptLangType {
     public static SOUND_CATEGORY        = new SkriptLangType("sound category",    /^sound\s?categor(?:y|ys|ies)$/i);
     public static SPAWN_REASON          = new SkriptLangType("spawn reason",      /^spawn\s?reasons?$/i);
     public static TELEPORT_CAUSE        = new SkriptLangType("teleport cause",    /^teleport\s?causes?$/i);
-    public static TEXT                  = new SkriptLangType("text",              /^texts?$/i);
+    public static TEXT                  = new SkriptLangType("text",              /^(text|string)s?$/i);
     public static TIME                  = new SkriptLangType("time",              /^times?$/i);
     public static TIMEPERIOD            = new SkriptLangType("timeperiod",        /^timeperiods?$/i);
     public static TIMESPAN              = new SkriptLangType("timespan",          /^timespans?$/i);

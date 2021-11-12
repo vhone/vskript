@@ -1,6 +1,6 @@
 import { CancellationToken, DocumentSemanticTokensProvider, Position, ProviderResult, Range, SemanticTokens, SemanticTokensBuilder, SemanticTokensLegend, TextDocument } from "vscode";
 import { SkriptManager } from "../Skript";
-import { SkriptVariable } from "../skript/element/SkriptExpressions";
+import { SkriptExprVariable } from "../skript/element/SkriptExpressions";
 import { SkriptAliases, SkriptEvent, SkriptFunction, SkriptParagraphComponent } from "../skript/SkriptComponent";
 
 export const LEGEND = new SemanticTokensLegend(['aliases','parameter']);
@@ -123,8 +123,8 @@ export class SkriptDocumentSemanticTokensProvider implements DocumentSemanticTok
         return build;
     }
 
-    private _getAllChildVariables(variable:SkriptVariable): SkriptVariable[] {
-        let array: SkriptVariable[] = [];
+    private _getAllChildVariables(variable:SkriptExprVariable): SkriptExprVariable[] {
+        let array: SkriptExprVariable[] = [];
         array.push(variable);
         for (const child of variable.child) {
             array.push(...this._getAllChildVariables(child));

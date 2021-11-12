@@ -1,4 +1,17 @@
-# v0.0.6
+# Update v0.0.7
+1. Syntax Highlight
+   - 문자 표현에서 모든 종류 컬러 표시 (&7, §7, \<grey\> 등) (참조 : https://skriptlang.github.io/Skript/text.html)
+   - 문자 표현에서 \{\@option\} 변수 강조
+   - Option의 값 영역에 글로벌 스타일 적용
+   - Exit, Continue 이펙트에 제어문 스타일 적용
+   - boolean에 숫자 스타일 적용
+2. Fixed
+   - 함수 파타메터의 타입에서 'string'이 강조되지 않던 문제
+   - 'loop-' 접두사가 제어문 스타일로 표시되던 문제
+
+
+
+# Update v0.0.6
 1. Syntax Highlight
    - 색상 변경
     - 변수와 글자에 중첩 익스프레션 패턴 추가
@@ -13,12 +26,11 @@
      - 사용 횟수 표기
    - Command 옵션 표기
    - At Time, Periodical Event 표기
-4. Docs Keyword
-   - 커서 위치 = "|"
-   - 변경 전: "#>| DOCS" + Enter
-   - 변경 후: "#>>|" + Enter
+4. Docs Trigger Key
+   - 변경 전: "#> DOCS" + Enter
+   - 변경 후: "#>>" + Enter
 5. Docs Annotation
-   - @invisible : 외부 파일에서 자동완성에 표시되지 않음.
+   - @invisible : 심볼 검색 차단
      ```vskript
      #> @invisible
      function fxTest():
@@ -26,4 +38,3 @@
      ```
 6. Fixed
     - 띄어쓰기로 들여쓰기 한 경우 인식이 안되던 문제
-  

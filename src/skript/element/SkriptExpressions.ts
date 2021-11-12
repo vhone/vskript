@@ -8,18 +8,18 @@ import { SkriptType } from "./SkriptType";
 export abstract class SkriptExpression {
 
     protected readonly _range: Range;
-    protected readonly _expr: string;
+    protected readonly _text: string;
 
-    constructor(range: Range, expr: string) {
+    constructor(range: Range, text: string) {
         this._range = range;
-        this._expr = expr;
+        this._text = text;
     }
 
     public get range(): Range {
         return this._range;
     }
-    public get expr(): string {
-        return this._expr;
+    public get text(): string {
+        return this._text;
     }
 
 
@@ -30,17 +30,23 @@ export abstract class SkriptExpression {
 
 }
 
-export class SkriptVariable extends SkriptExpression {
+class SkriptExprText extends SkriptExpression {
+
+    
+
+}
+
+export class SkriptExprVariable extends SkriptExpression {
 
     private readonly _raw: string;
     private readonly _type: number;
     private readonly _isList: boolean;
     
-    private _parent?: SkriptVariable;
-    private _child?: SkriptVariable[];
+    private _parent?: SkriptExprVariable;
+    private _child?: SkriptExprVariable[];
 
-    constructor(range: Range, expr: string, raw: string) {
-        super(range, expr);
+    constructor(range: Range, text: string, raw: string) {
+        super(range, text);
         this._raw = raw
 
         if (raw.match(/^\{\_/)) {
@@ -82,12 +88,12 @@ export class SkriptVariable extends SkriptExpression {
         return this._isList;
     }
     
-    public get parent(): SkriptVariable | undefined {
+    public get parent(): SkriptExprVariable | undefined {
         return this._parent;
     }
-    public get child(): SkriptVariable[] {
+    public get child(): SkriptExprVariable[] {
         if (!this._child)
-            this._child = new Array<SkriptVariable>();
+            this._child = new Array<SkriptExprVariable>();
         return this._child;
     }
 

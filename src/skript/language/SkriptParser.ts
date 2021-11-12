@@ -58,7 +58,7 @@ export class SkriptParser {
                 }
             }
     
-            console.log(`invaild - [${index}]`)
+            // console.log(`invaild - [${index}]`)
             break;
             
         }
@@ -69,13 +69,13 @@ export class SkriptParser {
         let expr: SkriptExpression[] = [];
         let index = 0;
         for (const word of this._words) {
-            console.log(`[${word.text}] ${word.text}`);
+            // console.log(`[${word.text}] ${word.text}`);
 
             if (word instanceof SkriptParserNormal) {
                 if (line.indexOf(word.text, index) === index) {
                     index = this._jumpIndex(line, index + word.text.length);
                 } else {
-                    console.log(`Invailed Normal Word - word: ${word.text}, char: ${index}`)
+                    // console.log(`Invailed Normal Word - index: ${index}, word: ${word.text}`)
                     break;
                 }
 
@@ -87,22 +87,25 @@ export class SkriptParser {
                 }
 
             } else if (word instanceof SkriptParserType) {
-                let langType = word.type.langType;
+                let type = word.type
+                let isList = type.isList;
+                let langType = type.langType;
+
                 let search
-                console.log(`langType = ${langType.name}`)
+                // console.log(`langType = ${langType.name}`)
 
                 // 타입인 경우
                 let pattern
                 if (pattern = SkriptPattern.find(langType)) {
                     pattern.setLastIndex(index);
                     search = pattern.exec(line);
-                    console.log('일반패턴', search)
+                    // console.log('일반패턴', search)
 
                 // 변수인 경우
                 } else if (pattern = SkriptPattern.find('variable')) {
                     pattern.setLastIndex(index);
                     search = pattern.exec(line);
-                    console.log('변수', search)
+                    // console.log('변수', search)
                 
                 /*// 함수인 경우
                 } else if () {
@@ -111,16 +114,15 @@ export class SkriptParser {
 
                 // 정의되지 않은 타입
                 } else {
-                    console.log(`정의되지 않은 타입 - ${langType.name}`)
+                    // console.log(`정의되지 않은 타입 - ${langType.name}`)
                 }
 
                 if (search && search.index === index) {
                     // expr.push(SkriptExpression.create(type, search.text))
-                    console.log(search.pattern_name)
                     SkriptExpression.create(langType, search.text)
                     index = this._jumpIndex(line, index + search.text.length);
                 } else {
-                    console.log(`Invailed Normal Word - word: ${word.text}, char: ${index}`)
+                    // console.log(`Invailed Normal Word - word: ${word.text}, char: ${index}`)
                     break;
                 }
             }

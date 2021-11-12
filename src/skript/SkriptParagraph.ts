@@ -1,7 +1,7 @@
 import { SkriptComponent } from "./SkriptComponent";
 import { Range } from "vscode";
 import { SkriptDocument } from "./SkriptDocument";
-import { SkriptVariable } from "./element/SkriptExpressions";
+import { SkriptExprVariable } from "./element/SkriptExpressions";
 
 export class SkriptParagraph {
 
@@ -10,7 +10,7 @@ export class SkriptParagraph {
     private readonly _range: Range;
     private readonly _paragraph: string;
 
-    private readonly _variables: SkriptVariable[] = [];
+    private readonly _variables: SkriptExprVariable[] = [];
 
     constructor(skComponent:SkriptComponent, range:Range, paragraph:string) {
         this._skComponent = skComponent;
@@ -24,7 +24,7 @@ export class SkriptParagraph {
     public get range(): Range {
         return this._range;
     }
-    public get variables(): SkriptVariable[] {
+    public get variables(): SkriptExprVariable[] {
         return this._variables;
     }
     public get legacy(): string {
@@ -50,13 +50,13 @@ export class SkriptParagraph {
                     break;
                 this._variables.push(variable);
     
-                position = index + variable.expr.length + 1;
+                position = index + variable.text.length + 1;
             }
         }
         while (index > 0);
     }
 
-    private _findVariable(paragraph:string, index:number, local_index:number): SkriptVariable | undefined {
+    private _findVariable(paragraph:string, index:number, local_index:number): SkriptExprVariable | undefined {
         if (index > 0) {
             paragraph = paragraph.substr(index);
         }
@@ -68,7 +68,7 @@ export class SkriptParagraph {
             start = -1,
             isNested = false,
             regexp = new RegExp(`${opener}|${nest}|${closer}`, 'g'),
-            child: SkriptVariable[] = [];
+            child: SkriptExprVariable[] = [];
     
         let search;
         while (search = regexp.exec(paragraph)) {
@@ -87,7 +87,7 @@ export class SkriptParagraph {
                     isNested = true;
                     let v = this._findVariable(paragraph, search.index + 1, local_index + index);
                     if (v) {
-                        regexp.lastIndex = search.index + v.expr.length + 1;
+                        regexp.lastIndex = search.index + v.text.length + 1;
                         child.push(v);
                     }
                 }
@@ -100,7 +100,7 @@ export class SkriptParagraph {
                 if (stack === 0) {
                     let expr = paragraph.substring(start, search.index + 1);
                     let ragne = new Range(this._skDocument.positionAt(local_index + index + start)!, this._skDocument.positionAt(local_index + index + start + expr.length)!);
-                    let variable = new SkriptVariable(ragne, expr, expr);
+                    let variable = new SkriptExprVariable(ragne, expr, expr);
                     variable.child.push(...child);
                     return variable;
                 }
