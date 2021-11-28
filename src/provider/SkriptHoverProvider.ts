@@ -1,5 +1,6 @@
+import { create } from 'node:domain';
 import { Hover, HoverProvider, MarkdownString, Position, Range, TextDocument, Uri } from 'vscode'
-import { SkriptManager } from '../Skript';
+import * as Skript from "../Skript"
 import { SkriptFunction, SkriptOptions, SkriptAliases } from '../skript/SkriptComponent';
 
 export class SkriptHoverProvider implements HoverProvider {
@@ -10,7 +11,7 @@ export class SkriptHoverProvider implements HoverProvider {
 
         // Function
         let skFunctions: SkriptFunction[] = [];
-        SkriptManager.DOCUMENTS.forEach(skDocument => skFunctions.push(...skDocument.getComponents(SkriptFunction)));
+        Skript.DOCUMENTS.forEach(skDocument => skFunctions.push(...skDocument.getComponents(SkriptFunction)));
         for (const skFunction of skFunctions) {
             let markdown = (skFunction.tooltip) ? skFunction.tooltip.markdown : new MarkdownString();
             let hover = this._createHover(lineText, position, skFunction.name, markdown);
@@ -18,7 +19,7 @@ export class SkriptHoverProvider implements HoverProvider {
         }
 
         // Options
-        let skDocument = SkriptManager.find(document.uri.fsPath)!;
+        let skDocument = Skript.find(document.uri.fsPath)!;
         for (const skOptions of skDocument.getComponents(SkriptOptions)) {
             for (const option of skOptions.options) {
                 let hover = this._createHover(lineText, position, `{@${option.key}}`,

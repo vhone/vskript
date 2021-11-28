@@ -1,5 +1,5 @@
 import { Position, Range, SnippetString, TextDocument, TextDocumentChangeEvent, TextDocumentContentChangeEvent, window } from 'vscode'
-import { SkriptManager } from '../Skript';
+import * as Skript from '../Skript';
 import { SkriptFunction } from '../skript/SkriptComponent';
 
 let pass:boolean = false;
@@ -14,7 +14,7 @@ export default function TextDocumentChangeEvent(event:TextDocumentChangeEvent) {
         return;
 
     // 입력 후 파일 업데이트
-    let skDocument = SkriptManager.find(document.uri.fsPath)!;
+    let skDocument = Skript.find(document.uri.fsPath)!;
     skDocument.update(document.getText());
     
     for (const context of changes) {
@@ -48,7 +48,7 @@ function inputEnter(context: TextDocumentContentChangeEvent, document: TextDocum
             // remove input
             editor.edit(builder => { builder.delete(new Range(document.lineAt(i).range.start, document.lineAt(i+1).range.end)) });
 
-            let skDocument = SkriptManager.find(document.uri.fsPath)!;
+            let skDocument = Skript.find(document.uri.fsPath)!;
             let skFunction = skDocument.componentOf(context.range.start, {isAfter:true});
             if (!skFunction || !(skFunction instanceof SkriptFunction))
                 return;

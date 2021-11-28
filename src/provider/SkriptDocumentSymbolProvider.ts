@@ -1,6 +1,6 @@
 import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
-import { SkriptManager } from '../Skript';
-import { SkriptExprVariable } from '../skript/element/SkriptExpressions';
+import * as Skript from '../Skript';
+import { SkriptVariable, SkriptVariableKind } from '../skript/language/SkriptExpressions';
 import { SkriptAliases, SkriptOptions, SkriptCommand, SkriptEvent, SkriptFunction } from '../skript/SkriptComponent';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
@@ -22,7 +22,7 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
             let symbols: DocumentSymbol[] = [];
             SYMBOLS_MAP.set(fsPath, symbols);
         
-            let skDocument = SkriptManager.find(fsPath);
+            let skDocument = Skript.find(fsPath);
             if (!skDocument)
                 return
             
@@ -89,13 +89,13 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
         }
     }
 
-    private _createVariableSymbols(skVariables:SkriptExprVariable[]): DocumentSymbol[] {
+    private _createVariableSymbols(skVariables:SkriptVariable[]): DocumentSymbol[] {
         let result: DocumentSymbol[] = [];
-        let maps = new Map<string, {variable:SkriptExprVariable, amount: number}>();
+        let maps = new Map<string, {variable:SkriptVariable, amount: number}>();
 
         for (const variables of skVariables)
             for (const skVariable of this._getAllVariable(variables))
-                if (skVariable.isLocal) {
+                if (skVariable.kind === SkriptVariableKind.LOCAL) {
             let value
             if (value = maps.get(skVariable.raw)) {
                 value.amount += 1;
@@ -115,11 +115,11 @@ export class SkriptDocumentSymbolProvider implements DocumentSymbolProvider {
         return result;
     }
 
-    private _getAllVariable(skVariable:SkriptExprVariable): SkriptExprVariable[] {
+    private _getAllVariable(skVariable:SkriptVariable): SkriptVariable[] {
         if (skVariable.child.length === 0) {
             return [skVariable]
         } else {
-            let array: SkriptExprVariable[] = [];
+            let array: SkriptVariable[] = [];
             for (const child of skVariable.child) {
                 array.push(skVariable, ...this._getAllVariable(child));
             }

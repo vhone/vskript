@@ -1,6 +1,5 @@
 import { CancellationToken, DocumentSymbol, Location, Position, Range, SymbolInformation, SymbolKind, Uri, WorkspaceSymbolProvider } from 'vscode';
-import { SkriptManager } from '../Skript';
-
+import * as Skript from '../Skript';
 
 /**
  * ```Ctrl + T``` 단축키로 바로 갈 수 있는 기능
@@ -10,7 +9,7 @@ export class SkriptWorkspaceSymbolProvider implements WorkspaceSymbolProvider {
 
         let results = new Array<SymbolInformation>();
 
-        SkriptManager.DOCUMENTS.forEach(skDocument => {
+        Skript.DOCUMENTS.forEach(skDocument => {
             for (const component of skDocument.components) if (!component.isInvisible && component.title.includes(query)) {
                 let uri = Uri.file(skDocument.skPath.fsPath);
                 let location = new Location(uri, component.range);
