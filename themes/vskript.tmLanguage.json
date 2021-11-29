@@ -194,7 +194,7 @@
 		},
 		"grammar.segment": {
 			"name": "vskript.grammar",
-			"match": "^(\\t|\\s)*(if|else if|else|while|loop[^-]|continue( loop)?)\\b"
+			"match": "^(\\t|\\s)*((parse )?if|else (parse )?if|else|(do )?while|loop[^-]|continue( loop)?)\\b"
 		},
 		"grammar.effect": {
 			"name": "vskript.grammar",

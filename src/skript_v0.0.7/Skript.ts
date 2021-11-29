@@ -1,7 +1,7 @@
 import { workspace, window } from 'vscode'
 import * as FileSystem from 'fs'
 import * as Path from 'path'
-import { SkriptDocument, SkriptPath } from './skript/SkriptDocument';
+import { SkriptDocument, SkriptPath } from './SkriptDocument';
 
 
 

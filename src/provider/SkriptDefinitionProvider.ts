@@ -1,6 +1,6 @@
 import { CancellationToken, Definition, DefinitionProvider, Location, Position, TextDocument, Uri } from "vscode";
-import * as Skript from "../Skript";
-import { SkriptFunction } from "../skript/SkriptComponent";
+import * as Skript from "../skript_v0.0.7/Skript";
+import { SkriptFunction } from "../skript_v0.0.7/SkriptComponent";
 
 /** 바로가기 */
 export class SkriptDefinitionProvider implements DefinitionProvider {

@@ -1,7 +1,7 @@
 import { CompletionItemProvider, CompletionItem, TextDocument, CompletionItemKind, SnippetString, CancellationToken, CompletionContext, Position, IndentAction } from 'vscode'
-import * as Skript from '../Skript'
-import { SkriptCommand, SkriptFunction, SkriptParagraphComponent } from '../skript/SkriptComponent';
-import { Materials as SkriptMaterials } from '../skript/language/Materials';
+import * as Skript from '../skript_v0.0.7/Skript'
+import { SkriptCommand, SkriptFunction, SkriptParagraphComponent } from '../skript_v0.0.7/SkriptComponent';
+import { Materials as SkriptMaterials } from '../skript_v0.0.7/language/Materials';
 import { resourceLimits } from 'node:worker_threads';
 
 const ITEMS_MAP = new Map<string,CompletionItem[]>();

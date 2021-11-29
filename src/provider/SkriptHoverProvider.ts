@@ -1,7 +1,7 @@
 import { create } from 'node:domain';
 import { Hover, HoverProvider, MarkdownString, Position, Range, TextDocument, Uri } from 'vscode'
-import * as Skript from "../Skript"
-import { SkriptFunction, SkriptOptions, SkriptAliases } from '../skript/SkriptComponent';
+import * as Skript from "../skript_v0.0.7/Skript"
+import { SkriptFunction, SkriptOptions, SkriptAliases } from '../skript_v0.0.7/SkriptComponent';
 
 export class SkriptHoverProvider implements HoverProvider {
 

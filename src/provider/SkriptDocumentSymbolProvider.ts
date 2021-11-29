@@ -1,7 +1,7 @@
 import { DocumentSymbol, DocumentSymbolProvider, SymbolKind, TextDocument } from 'vscode';
-import * as Skript from '../Skript';
-import { SkriptVariable, SkriptVariableKind } from '../skript/language/SkriptExpressions';
-import { SkriptAliases, SkriptOptions, SkriptCommand, SkriptEvent, SkriptFunction } from '../skript/SkriptComponent';
+import * as Skript from '../skript_v0.0.7/Skript';
+import { SkriptVariable, SkriptVariableKind } from '../skript_v0.0.7/language/SkriptExpressions';
+import { SkriptAliases, SkriptOptions, SkriptCommand, SkriptEvent, SkriptFunction } from '../skript_v0.0.7/SkriptComponent';
 
 const SYMBOLS_MAP = new Map<string,DocumentSymbol[]>();
 

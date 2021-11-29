@@ -2,13 +2,12 @@
 1. Syntax Highlight
    - 문자 표현에서 모든 종류 컬러 표시 (&7, §7, \<grey\> 등) (참조 : https://skriptlang.github.io/Skript/text.html)
    - 문자 표현에서 \{\@option\} 변수 강조
-   - Option의 값 영역에 글로벌 스타일 적용
+   - Option의 값 영역에 하이라이트 적용
    - Exit, Continue 이펙트에 제어문 스타일 적용
-   - boolean에 숫자 스타일 적용
+   - boolean에 숫자 스타일(흰색) 적용
+   - skript 2.6의 새로운 문법 'parse if'와 'do while'에 문법 스타일(주황색, 볼드) 적용
 2. Fixed
-   - 함수 파타메터의 타입에서 'string'이 강조되지 않던 문제
-   - 'loop-' 접두사가 제어문 스타일로 표시되던 문제
-
+   - 함수 파타메터의 타입에서 'string' 강조
 
 
 # Update v0.0.6
