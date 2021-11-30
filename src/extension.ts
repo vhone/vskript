@@ -3,7 +3,8 @@ import { onSkriptEnable } from './skript_v0.0.7/Skript';
 import * as Provider from './provider/Provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
 import { LEGEND } from './provider/SkriptDocumentSemanticTokensProvider';
-import { VisualSkript } from './skript_v0.0.8/Skript';
+import { VisualSkript } from './skript_v0.0.8/skript/Skript';
+import { PatternType, Type } from './skript_v0.0.8/skript/parser/type/LangType';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -33,6 +34,8 @@ export function activate(_context:ExtensionContext) {
 	
 	VisualSkript.onEnable()
 
+	let type = new PatternType(Type.ENTITY, false);
+	console.log(type.name);
 }
 
 export function deactivate() {}

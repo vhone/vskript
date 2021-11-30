@@ -4,6 +4,7 @@ import * as FileSystem from 'fs'
 import * as Path from 'path'
 
 
+
 class SkriptDocument {
 
 	private readonly _textDocument: TextDocument;
@@ -19,6 +20,7 @@ class SkriptDocument {
 }
 
 
+
 class SkriptProject {
 
 	public static create(workspaceUri: Uri, scriptsUri: Uri): SkriptProject | undefined {
@@ -27,12 +29,14 @@ class SkriptProject {
 
 	private readonly _workspaceUri: Uri;
 	private readonly _scriptsUri: Uri;
+	private _skDocument: SkriptDocument[] | undefined;
 
 	private constructor(workspaceUri: Uri, scriptsUri: Uri) {
 		this._workspaceUri = workspaceUri;
-		this._scriptsUri = scriptsUri;
+			this._scriptsUri = scriptsUri;
 
 		this._findSkriptDocuments(this._scriptsUri.fsPath)
+			.then(skDocumnets => { if (skDocumnets) this._skDocument = skDocumnets; } )
 	}
 
 	public get relativePath(): string {
@@ -45,8 +49,8 @@ class SkriptProject {
 	 * @param uri WorkSpaceFolder Uri
 	 * @returns array of found 'scripts' folders
 	 */
-	private async _findSkriptDocuments(fsPath: string) {
-		console.log(fsPath);
+	private async _findSkriptDocuments(fsPath: string): Promise<SkriptDocument[]> {
+		let result: SkriptDocument[] = [];
 		for (const dirent of FileSystem.readdirSync(fsPath, {withFileTypes: true})) {
 			let name = dirent.name;
 			if (name.charAt(0).match(/[-\.]/))
@@ -56,14 +60,18 @@ class SkriptProject {
 			} else if (dirent.isFile()) {
 				if (Path.extname(name) !== '.sk')
 					continue;
-				let textDocument = await workspace.openTextDocument(Uri.file(Path.join(fsPath, dirent.name))).then((u) => console.log(u));
+				let textDocument = await workspace.openTextDocument(Uri.file(Path.join(fsPath, dirent.name)));
+				let skDocument = new SkriptDocument(textDocument);
+				result.push(skDocument);
 			}
 		}
-		// return result;
+		return result;
 	}
 
 
 }
+
+
 
 export class VisualSkript {
 
