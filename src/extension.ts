@@ -4,7 +4,8 @@ import * as Provider from './provider/Provider';
 import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
 import { LEGEND } from './provider/SkriptDocumentSemanticTokensProvider';
 import { VisualSkript } from './skript_v0.0.8/skript/Skript';
-import { PatternType, Type } from './skript_v0.0.8/skript/parser/type/LangType';
+import { SkriptType, Type } from './skript_v0.0.8/skript/parser/Type';
+import { Pattern, SkriptExpression } from './skript_v0.0.8/skript/parser/Expression';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -34,8 +35,8 @@ export function activate(_context:ExtensionContext) {
 	
 	VisualSkript.onEnable()
 
-	let type = new PatternType(Type.ENTITY, false);
-	console.log(type.name);
+	
+	let pattern = new Pattern('[all [of the]] scripts [(without ([subdirectory] paths|parents))]');
 }
 
 export function deactivate() {}
