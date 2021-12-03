@@ -1,4 +1,4 @@
-import * as StringUtil from '../Util/StringUtil';
+import * as StringUtil from '../Util/StringUtils';
 
 class PatternParser {
 

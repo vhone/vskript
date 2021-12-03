@@ -56,6 +56,18 @@ export function splitVerticalBars(pattern: string): string[] | undefined {
 	return split;
 }
 
+
+
+export function count(s: string, ...toFind: string[]): number {
+	let count = 0;
+	for (const sequence of toFind) {
+		let occurrence = s.length - s.replace(sequence, '').length;
+		count += occurrence / sequence.length;
+	}
+	return count;
+}
+
+
 export class TextBuilder {
 
 	private readonly _chars = new Array<string>();
@@ -70,7 +82,11 @@ export class TextBuilder {
 		return this._chars.length;
 	}
 
-	public append(string: string): TextBuilder {
+	public append(string: string): TextBuilder
+	public append(string: string, start: number, length: number): TextBuilder
+	public append(string: string, start?: number, length?: number): TextBuilder {
+		if (start && length)
+			string = string.substr(start, length);
 		this._chars.push(...string.split(''))
 		return this;
 	}
@@ -81,6 +97,10 @@ export class TextBuilder {
 
 	public setLength(length: number) {
 		this._chars.length = length;
+	}
+
+	public toString(): string {
+		return this._chars.join('')
 	}
 
 }
