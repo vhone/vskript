@@ -44,3 +44,6 @@ export function activate(_context:ExtensionContext) {
 }
 
 export function deactivate() {}
+
+
+export type Class<T> = { new (...args: any[]): T };

@@ -1,10 +1,7 @@
 import { Position, Range } from "vscode";
 import { SkriptComponent, SkriptToolTip } from "./SkriptComponent";
 import * as Path from 'path';
-
-
-type Class<T> = { new (...args: any[]): T };
-
+import { Class } from "../extension";
 
 
 export class SkriptPath {

@@ -1,3 +1,5 @@
+import { Class } from '../../../extension';
+import * as StringUtils from '../Util/StringUtils';
 
 
 export class Type {
@@ -139,7 +141,75 @@ export class SkriptType {
 			if (name.match(/(s|ss|ch|sh|x)$/i))
 				return name + 'es';
 			return name + 's';
+			Object
 		}
 	}
 	
+}
+
+
+interface Function<T, R> {
+	apply(t: T): R;
+}
+
+
+class TypeN<T> {
+	private readonly typeClass: Class<T>;
+	private readonly baseName: string;
+	private readonly pluralForms: string[];
+	private readonly literalParser: Function<string, T>;
+	private readonly toStringFunction: Function<Object, string> | undefined;
+	private readonly defaultCharger: Changer<T> | undefined;
+	private readonly arithmetic: Arithmetic<T, any> | undefined;
+
+	constructor(typeClass: Class<T>, baseName: string, pattern: string)
+	constructor(typeClass: Class<T>, baseName: string, pattern: string,
+		literalParser: Function<String, T>)
+	constructor(typeClass: Class<T>, baseName: string, pattern: string,
+		literalParser: Function<String, T>,
+		toStringFunction:Function<T, string>)
+	constructor(typeClass: Class<T>, baseName: string, pattern: string,
+		literalParser?: Function<String, T>,
+		toStringFunction?:Function<T, string>,
+		defaultCharger?: Changer<T>)
+	constructor(typeClass: Class<T>, baseName: string, pattern: string,
+		literalParser?: Function<String, T>,
+		toStringFunction?:Function<T, string>,
+		defaultCharger?: Changer<T>,
+		arithmetic? : Arithmetic<T, any>) {
+			this.typeClass = typeClass;
+			this.baseName = baseName;
+			this.pluralForms = StringUtils.getForms(pattern.trim());
+			this.literalParser = literalParser ? literalParser : (o:any): string => { return `${o}`}
+			this.toStringFunction = toStringFunction ? toStringFunction : undefined;
+			this.defaultCharger = defaultCharger ? defaultCharger : undefined;
+			this.arithmetic = arithmetic ? arithmetic : undefined; 
+		}
+}
+
+
+
+
+
+
+
+interface Changer<T> {
+	acceptsChange(mode: ChangeMode): Class<any>[];
+	change(thChange: T[], changeWith: any[], mode: ChangeMode): void;
+}
+
+enum ChangeMode{
+	SET,
+	ADD,
+	REMOVE,
+	DELETE,
+	RESET,
+	REMOVE_ALL
+}
+
+interface Arithmetic<A, R> {
+	difference(first: A, second: A): R;
+	add(value: A, defference: R): A;
+	subtract(value: A, difference: R): A;
+	getRelativeType(): Class<R>;
 }

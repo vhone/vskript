@@ -104,3 +104,7 @@ export class TextBuilder {
 	}
 
 }
+
+export function getForms(string: string): string[] {
+	
+}
