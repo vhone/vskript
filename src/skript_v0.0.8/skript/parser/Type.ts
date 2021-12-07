@@ -148,19 +148,15 @@ export class SkriptType {
 }
 
 
-interface Function<T, R> {
-	apply(t: T): R;
-}
-
-
 class TypeN<T> {
-	private readonly typeClass: Class<T>;
-	private readonly baseName: string;
-	private readonly pluralForms: string[];
-	private readonly literalParser: Function<string, T>;
-	private readonly toStringFunction: Function<Object, string> | undefined;
-	private readonly defaultCharger: Changer<T> | undefined;
-	private readonly arithmetic: Arithmetic<T, any> | undefined;
+
+	private readonly _typeClass: Class<T>;
+	private readonly _baseName: string;
+	private readonly _pluralForms: string[];
+	private readonly _literalParser: Function<string, T>;
+	private readonly _toStringFunction: Function<Object, string> | undefined;
+	private readonly _defaultCharger: Changer<T> | undefined;
+	private readonly _arithmetic: Arithmetic<T, any> | undefined;
 
 	constructor(typeClass: Class<T>, baseName: string, pattern: string)
 	constructor(typeClass: Class<T>, baseName: string, pattern: string,
@@ -177,21 +173,52 @@ class TypeN<T> {
 		toStringFunction?:Function<T, string>,
 		defaultCharger?: Changer<T>,
 		arithmetic? : Arithmetic<T, any>) {
-			this.typeClass = typeClass;
-			this.baseName = baseName;
-			this.pluralForms = StringUtils.getForms(pattern.trim());
-			this.literalParser = literalParser ? literalParser : (o:any): string => { return `${o}`}
-			this.toStringFunction = toStringFunction ? toStringFunction : undefined;
-			this.defaultCharger = defaultCharger ? defaultCharger : undefined;
-			this.arithmetic = arithmetic ? arithmetic : undefined; 
+			this._typeClass = typeClass;
+			this._baseName = baseName;
+			this._pluralForms = StringUtils.getForms(pattern.trim());
+			this._literalParser = literalParser ? literalParser : (o:any): string => { return `${o}`}
+			this._toStringFunction = toStringFunction ? toStringFunction : undefined;
+			this._defaultCharger = defaultCharger ? defaultCharger : undefined;
+			this._arithmetic = arithmetic ? arithmetic : undefined; 
 		}
+
+	public get typeClass(): Class<T> {
+		return this._typeClass;
+	}
+	public get baseName(): string {
+		return this._baseName;
+	}
+	public get pluralForms(): string[] {
+		return this._pluralForms;
+	}
+	public get toStringFunction(): Function<Object, string> | undefined {
+		return this._toStringFunction;
+	}
+	public get literalParser(): Function<string, T> | undefined {
+		return this._literalParser;
+	}
+	public get defaultChanger(): Changer<T> | undefined {
+		return this._defaultCharger;
+	}
+	public get arithmetic(): Arithmetic<T, any> | undefined {
+		return this._arithmetic;
+	}
+
+	public withIndefiniteArticle(plural: boolean): string {
+		return StringUtils.withIndefiniteArticle(this._pluralForms[plural ? 1 : 0], plural);
+	}
+
+	public toString(): string {
+		return this._pluralForms[0];
+	}
+
 }
 
 
 
-
-
-
+interface Function<T, R> {
+	apply(t: T): R;
+}
 
 interface Changer<T> {
 	acceptsChange(mode: ChangeMode): Class<any>[];

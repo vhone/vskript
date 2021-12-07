@@ -117,4 +117,22 @@ export class VisualSkript {
 		return result
 	}
 
-}	
+}
+
+
+
+abstract class SkriptAddon {
+
+	private static readonly addons = new Array<SkriptAddon>();
+
+	private _name: string;
+	private readonly handledEvents = new Array<Class<SkriptEvent>>();
+
+}
+
+class Skript extends SkriptAddon {
+
+}
+
+
+
