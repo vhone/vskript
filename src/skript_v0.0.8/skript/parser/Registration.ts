@@ -11,3 +11,20 @@ class DefaultRegistration {
 	}
 
 }
+
+
+interface SkriptAddon {
+
+}
+
+interface SkriptLogger {
+
+}
+
+class SkriptRegistration {
+
+	private readonly registerer: SkriptAddon;
+	private readonly logger: SkriptLogger;
+	private readonly expression = new Map<Class<Object>,Expression<Object, Object>>
+
+}

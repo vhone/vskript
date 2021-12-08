@@ -100,7 +100,5 @@ export class ParserState {
 			new Set<Class<SyntaxElement>>(), false
 		));
 	}
-
-	public
-
+	
 }

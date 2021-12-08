@@ -2,6 +2,8 @@
 import { TextDocument, Uri, workspace, WorkspaceFolder } from 'vscode'
 import * as FileSystem from 'fs'
 import * as Path from 'path'
+import { Class } from '../../extension';
+import { SkriptEvent, Trigger } from './parser/lang';
 
 
 
@@ -126,12 +128,55 @@ abstract class SkriptAddon {
 	private static readonly addons = new Array<SkriptAddon>();
 
 	private _name: string;
-	private readonly handledEvents = new Array<Class<SkriptEvent>>();
+	private readonly _handledEvents = new Array<Class<SkriptEvent>>();
 
+	constructor() {
+		SkriptAddon.addons.push(this);
+	}
+
+	public static getAddons(): SkriptAddon[] {
+		return this.addons;
+	}
+
+	public abstract handleTrigger(trigger: Trigger): void;
+	
+	public fishingedLoading(): void {}
+
+	public canHandleEvent(event: SkriptEvent): boolean {
+		return this._handledEvents.includes(event.constructor()) ;
+	}
+
+	addHandledEvent(event: Class<SkriptEvent>) {
+		this._handledEvents.push(event);
+	}
 }
 
 class Skript extends SkriptAddon {
 
+	private readonly _mainArgs: string[];
+
+	private readonly _mainTriggers = new Array<Trigger>();
+	private readonly _priodicalTriggers = new Array<Trigger>();
+	private readonly _whenTriggers = new Array<Trigger>();
+	private readonly _atTimeTriggers = new Array<Trigger>();
+
+	constructor(mainArgs: string[]) {
+		super();
+		this._mainArgs = mainArgs;
+	}
+
+	public handleTrigger(trigger: Trigger): void {
+		let event = trigger.getEvent();
+
+		if (!this.canHandleEvent(event)){
+			return;
+		}
+
+		if (event instanceof EvtSkriptLoad) {
+			
+		}
+	}
+	
 }
 
 

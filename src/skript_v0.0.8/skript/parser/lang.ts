@@ -81,9 +81,9 @@ export interface TriggerContext {
 	protected _parent: CodeSection | undefined;
 	protected _next: Statement | undefined;
 
-	abstract init(expressions: Expression<any>[], matchedPattern: number, parseContext: any): boolean;
-	abstract toString(ctx: TriggerContext, debug: boolean): string;
-	abstract checkIsSection(parseContext: any, isStrict: boolean, ...requiredSections: any): boolean;
+	public abstract init(expressions: Expression<any>[], matchedPattern: number, parseContext: any): boolean;
+	public abstract toString(ctx: TriggerContext, debug: boolean): string;
+	// public abstract checkIsInSection(parseContext: any, isStrict: boolean, ...requiredSections: any): boolean;
 
 	abstract run(ctx: TriggerContext): boolean;
 
@@ -143,12 +143,88 @@ export interface TriggerContext {
  */
 export abstract class CodeSection extends Statement {
 
-	protected items: Statement[];
-	protected first: Statement;
-	protected last: Statement;
+	protected _items!: Statement[];
+	protected _first: Statement | undefined;
+	protected _last: Statement | undefined;
 
 	public loadSection(section: FileSection, parserState:ParserState) {
 		
 	}
 
+	public run(ctx: TriggerContext): boolean {
+		throw new Error("UnsupportedOperationException");
+		
+	}
+
+	public abstract walk(ctx: TriggerContext): Statement | undefined;
+
+	public setItem(items: Statement[]) {
+		this._items = items;
+		for (const item of items) {
+			item.setParent(this);
+		}
+		this._first = items ? items[0] : undefined;
+		this._last = items ? items[items.length - 1] : undefined;
+	}
+
+	public getItem(): Statement[] {
+		return this._items;
+	}
+
+	public getFirst(): Statement | undefined {
+		return this._first ? this._first : this.getNext();
+	}
+
+	protected getLast(): Statement | undefined {
+		return this._last ? this._last : this.getNext();
+	}
+
+	protected getAllowedSyntaxes(): Set<Class<SyntaxElement>> | undefined {
+		return new Set<Class<SyntaxElement>>();
+	}
+
+	protected isRestrictingExpressions(): boolean {
+		return false;
+	}
+
+
+
+}
+
+
+
+/**
+ * A top-level section, that is not contained in code.
+ * Usually declares an event.
+ */
+export class Trigger extends CodeSection {
+	private readonly _event: SkriptEvent;
+
+	constructor(event: SkriptEvent) {
+		super();
+		this._event = event;
+	}
+
+	public init(_expressions: Expression<any>[], _matchedPattern: number, _parseContext: any): boolean {
+		return true;
+	}
+
+	public walk(ctx: TriggerContext): Statement | undefined {
+		return this.getFirst()
+	}
+	public toString(ctx: TriggerContext, debug: boolean): string {
+		throw this._event.toString(ctx, debug);
+	}
+
+	public getEvent(): SkriptEvent {
+		return this._event;
+	}
+
+
+	
+	
+}
+
+interface Predicate<T> {
+	test(t: T) : boolean;
 }
