@@ -1,3 +1,4 @@
+import { StringBuilder } from '../../../Java';
 import * as StringUtil from '../Util/StringUtils';
 
 class PatternParser {
@@ -17,7 +18,7 @@ class PatternParser {
 			return new TextElement('');
 		
 		let elements = new Array<PatternElement>();
-		let textBuilder = new StringUtil.TextBuilder();
+		let textBuilder = new StringBuilder();
 
 		let chars = pattern.split('')
 		for (let i = 0; i < chars.length; i++) {

@@ -2,8 +2,7 @@
 
 // https://github.com/SkriptLang/skript-parser/tree/master/src/main/java/io/github/syst3ms/skriptparser/file
 
-import { assert, count } from "console";
-import { TextBuilder } from "../Util/StringUtils";
+import { StringBuilder } from "../../../Java";
 import * as FileUtils from "../Util/FileUtils";
 
 
@@ -96,20 +95,15 @@ export class FileParser {
 		for (let i = 0; i < lines.length; i++) {
 			let line = lines[i];
 			let content = this.removeComments(line);
-			console.log('>', content, content === '')
 
 			if (content === undefined) {
-				console.log('A');
 				content = line.replace('##', '#').trim();
 			} else if (content === '') {
-				console.log('B');
 				elements.push(new VoidElement(fileName, lastLine + i, exepectedIndentation));
 				continue;
 			}
-			console.log('>', content);
 
 			let lineIndentation = FileUtils.getIndentationLevel(line, false);
-			console.log('>', lineIndentation)
 			if (lineIndentation > exepectedIndentation) {
 				console.log(
 					"The line is indented too much (line " + (lastLine + i) + ": \"" + content + "\")",
@@ -140,8 +134,8 @@ export class FileParser {
 			} else {
 				elements.push(new FileElement(fileName, lastLine + i, content, exepectedIndentation));
 			}
-			console.log(elements);
 		}
+		console.log(elements);
 		return elements;
 	}
 
@@ -158,11 +152,11 @@ export class FileParser {
 	}
 
 	public static removeComments(string: string): string | undefined {
-		if (string.match(/^[\s\t]*\#[^#]+/) || string.startsWith('#')) {
+		if (string === '' || string.match(/^[\s\t]*\#[^#]+/) || string.startsWith('#')) {
 			return '';
 		}
 
-		let builder = new TextBuilder();
+		let builder = new StringBuilder();
 
 		outer:
 		for (let i = 0; i < string.length; i++) {

@@ -1,7 +1,7 @@
 import { Position, Range } from "vscode";
 import { SkriptComponent, SkriptToolTip } from "./SkriptComponent";
 import * as Path from 'path';
-import { Class } from "../extension";
+import { Class } from "../Java";
 
 
 export class SkriptPath {

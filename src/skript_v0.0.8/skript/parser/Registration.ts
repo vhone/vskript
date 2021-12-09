@@ -7,7 +7,7 @@ class DefaultRegistration {
 	private static readonly DECIMAL_PATTERN = /-?[0-9]+\.[0-9]+/;
 
 	public static register() {
-		SkriptRegistration registration = Parser
+		// SkriptRegistration registration = Parser
 	}
 
 }
@@ -21,10 +21,10 @@ interface SkriptLogger {
 
 }
 
-class SkriptRegistration {
+// class SkriptRegistration {
 
-	private readonly registerer: SkriptAddon;
-	private readonly logger: SkriptLogger;
-	private readonly expression = new Map<Class<Object>,Expression<Object, Object>>
+// 	private readonly registerer: SkriptAddon;
+// 	private readonly logger: SkriptLogger;
+// 	private readonly expression = new Map<Class<Object>,Expression<Object, Object>>
 
-}
+// }

@@ -1,4 +1,4 @@
-import { Class } from "../../../extension";
+import { Class } from "../../../Java";
 import { Pair } from "../Util/Pair";
 import { CodeSection, Statement, SyntaxElement, TriggerContext } from "./lang";
 import { PatternElement } from "./Pattern";

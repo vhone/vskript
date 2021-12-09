@@ -1,4 +1,4 @@
-import { Class } from "../../../extension";
+import { Class } from "../../../Java";
 import { FileSection } from "./File";
 import { ParseContext, ParserState } from "./Parsing";
 
@@ -9,7 +9,7 @@ export abstract class SyntaxElement {
 
 	abstract toString(ctx: TriggerContext, debug: boolean): string;
 
-	public static checkIsSection(parseContext: ParseContext, isStrict: boolean, ...requiredSections: Class<CodeSection>[]): boolean {
+	public static checkIsSection(parseContext: ParseContext, _isStrict: boolean, ..._requiredSections: Class<CodeSection>[]): boolean {
 		let currentSections = parseContext.parserState
 		return true;
 	}
@@ -147,11 +147,11 @@ export abstract class CodeSection extends Statement {
 	protected _first: Statement | undefined;
 	protected _last: Statement | undefined;
 
-	public loadSection(section: FileSection, parserState:ParserState) {
+	public loadSection(_section: FileSection, _parserState:ParserState) {
 		
 	}
 
-	public run(ctx: TriggerContext): boolean {
+	public run(_ctx: TriggerContext): boolean {
 		throw new Error("UnsupportedOperationException");
 		
 	}
@@ -209,7 +209,7 @@ export class Trigger extends CodeSection {
 		return true;
 	}
 
-	public walk(ctx: TriggerContext): Statement | undefined {
+	public walk(_ctx: TriggerContext): Statement | undefined {
 		return this.getFirst()
 	}
 	public toString(ctx: TriggerContext, debug: boolean): string {

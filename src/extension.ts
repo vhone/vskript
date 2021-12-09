@@ -5,6 +5,8 @@ import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
 import { LEGEND } from './provider/SkriptDocumentSemanticTokensProvider';
 import { VisualSkript } from './skript_v0.0.8/skript/Skript';
 import { FileParser } from './skript_v0.0.8/skript/parser/File';
+import * as FileSystem from 'fs';
+import * as VSCode from 'vscode';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -16,7 +18,7 @@ languages.setLanguageConfiguration('vskript', {
 	comments: {lineComment: '#'}
 });
 
-export function activate(_context:ExtensionContext) {
+export function activate(context:ExtensionContext) {
 
 	onSkriptEnable();
 
@@ -33,17 +35,19 @@ export function activate(_context:ExtensionContext) {
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
 	
 	VisualSkript.onEnable()
+	
+	// let text = ['#test',
+	// 			'command /test:',
+	// 			'	trigger:',
+	// 			'	set {_a} to true']
+	// console.log(FileParser.parseFileLines('text', text, 0, 0));
 
-	let text = ['#test',
-				'command /test:',
-				'	trigger:',
-				'	set {_a} to true']
-	console.log(FileParser.parseFileLines('text', text, 0, 0));
-
+	let lang = FileSystem.readFileSync(`${context.extensionUri.fsPath}/src/resource/lang/default.lang`, 'utf-8');
+	let lines: string[] = lang.split(/\r\n|\r|\n/);
+	// console.log(lines);
+	console.log(FileParser.parseFileLines('alias', lines, 0, 0))
+	
 
 }
 
 export function deactivate() {}
-
-
-export type Class<T> = { new (...args: any[]): T };

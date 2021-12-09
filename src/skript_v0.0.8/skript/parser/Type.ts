@@ -1,4 +1,4 @@
-import { Class } from '../../../extension';
+import { Class } from '../../../Java';
 import * as StringUtils from '../Util/StringUtils';
 
 

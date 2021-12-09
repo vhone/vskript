@@ -2,7 +2,7 @@
 import { TextDocument, Uri, workspace, WorkspaceFolder } from 'vscode'
 import * as FileSystem from 'fs'
 import * as Path from 'path'
-import { Class } from '../../extension';
+import { Class } from '../../Java';
 import { SkriptEvent, Trigger } from './parser/lang';
 
 
@@ -127,7 +127,7 @@ abstract class SkriptAddon {
 
 	private static readonly addons = new Array<SkriptAddon>();
 
-	private _name: string;
+	// private _name: string;
 	private readonly _handledEvents = new Array<Class<SkriptEvent>>();
 
 	constructor() {
@@ -172,9 +172,9 @@ class Skript extends SkriptAddon {
 			return;
 		}
 
-		if (event instanceof EvtSkriptLoad) {
+		//if (event instanceof EvtSkriptLoad) {
 			
-		}
+		//}
 	}
 	
 }
