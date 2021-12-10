@@ -63,7 +63,7 @@ export function splitVerticalBars(pattern: string): string[] | undefined {
 export function count(s: string, ...toFind: string[]): number {
 	let count = 0;
 	for (const sequence of toFind) {
-		let occurrence = s.length - s.replace(sequence, '').length;
+		let occurrence = s.length - s.replace(new RegExp(sequence, 'g'), '').length;
 		count += occurrence / sequence.length;
 	}
 	return count;

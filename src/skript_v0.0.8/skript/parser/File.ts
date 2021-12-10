@@ -2,6 +2,7 @@
 
 // https://github.com/SkriptLang/skript-parser/tree/master/src/main/java/io/github/syst3ms/skriptparser/file
 
+import { Console } from "node:console";
 import { StringBuilder } from "../../../Java";
 import * as FileUtils from "../Util/FileUtils";
 
@@ -117,25 +118,27 @@ export class FileParser {
 
 			if (content.endsWith(':')) {
 				if (i + 1 === line.length) {
-					elements.push(new FileSection(fileName, lastLine + 1, content.substring(0, content.length - 1),
-						new Array<FileElement>(), exepectedIndentation)
-					);
+					elements.push(new FileSection(fileName, lastLine + i, content.substring(0, content.length - 1),
+							new Array<FileElement>(), exepectedIndentation)
+						);
 				} else {
 					let subLines = new Array<string>();
 					lines.forEach((line, index) => {
 						if (index > i)
 							subLines.push(line);
 					});
-					let sectionElements = this.parseFileLines(fileName, subLines, exepectedIndentation + 1, lastLine + 1);
-					if (sectionElements)
-					elements.push(new FileSection(fileName, lastLine + 1, content.substring(0, content.length - 1), sectionElements, exepectedIndentation))
-					i += this._count(sectionElements);
+					let sectionElements = this.parseFileLines(fileName, subLines, exepectedIndentation + 1, lastLine + i + 1);
+					if (sectionElements) {
+						elements.push(new FileSection(fileName, lastLine + i, content.substring(0, content.length - 1),
+								sectionElements, exepectedIndentation)
+							);
+						i += this._count(sectionElements);
+					}
 				}
 			} else {
 				elements.push(new FileElement(fileName, lastLine + i, content, exepectedIndentation));
 			}
 		}
-		console.log(elements);
 		return elements;
 	}
 
