@@ -4,6 +4,8 @@ import * as FileSystem from 'fs'
 import * as Path from 'path'
 import { Class } from '../../Java';
 import { SkriptEvent, Trigger } from './parser/lang';
+import * as FileUtils from './Util/FileUtils'
+import { FileParser, FileSection, VoidElement } from './parser/File';
 
 
 
@@ -13,6 +15,20 @@ class SkriptDocument {
 
 	constructor(textDocument: TextDocument) {
 		this._textDocument = textDocument;
+		
+		/* 스크립트 로드 테스트 */
+		let lines = FileUtils.readAllLines(textDocument.uri.fsPath);
+		let skName = Path.basename(textDocument.uri.fsPath).replace(/(.+)\..+/, "$1");
+		let elements = FileParser.parseFileLines(skName, lines, 0 , 1);
+		
+		for (const element of elements) {
+			if (element instanceof VoidElement) {
+				continue;
+			} else if (element instanceof FileSection) {
+				// let trig = SyntaxParser.parseTrigger(element);
+			}
+		}
+		
 	}
 
 	public get textDocument(): TextDocument {
@@ -38,7 +54,12 @@ class SkriptProject {
 			this._scriptsUri = scriptsUri;
 
 		this._findSkriptDocuments(this._scriptsUri.fsPath)
-			.then(skDocumnets => { if (skDocumnets) this._skDocument = skDocumnets; } )
+			.then(skDocumnets => {
+				if (skDocumnets) {
+					this._skDocument = skDocumnets;
+				}
+			}
+		);
 	}
 
 	public get relativePath(): string {
@@ -93,6 +114,8 @@ export class VisualSkript {
 				}
 			});
 		}
+		
+	// let lines = FileUtils.readAllLines(`${context.extensionUri.fsPath}/src/resource/lang/default.lang`)
 
 	}
 

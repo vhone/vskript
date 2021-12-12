@@ -1,5 +1,5 @@
 import { CancellationToken, DocumentSymbol, Location, Position, Range, SymbolInformation, SymbolKind, Uri, WorkspaceSymbolProvider } from 'vscode';
-import * as Skript from '../skript_v0.0.7/Skript';
+import * as Skript from '../Skript';
 
 /**
  * ```Ctrl + T``` 단축키로 바로 갈 수 있는 기능

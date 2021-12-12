@@ -1,4 +1,5 @@
 import * as StringUtils from './StringUtils'
+import * as FileSystem from 'fs';
 
 
 const LEADING_WHITESPACE_PATTERN = /^(\s+)\S.*/;
@@ -14,5 +15,14 @@ export function getIndentationLevel(line: string, countAllSpace: boolean): numbe
 		}
 	} else {
 		return 0;
+	}
+}
+
+export function readAllLines(filePath: string): string[] {
+	let lang = FileSystem.readFileSync(filePath, 'utf-8');
+	if (lang) {
+		return lang.split(/\r\n|\r|\n/);
+	} else {
+		throw new Error("파일 없음");
 	}
 }

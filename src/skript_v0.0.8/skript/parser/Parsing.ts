@@ -1,7 +1,9 @@
 import { Class } from "../../../Java";
 import { Pair } from "../Util/Pair";
-import { CodeSection, Statement, SyntaxElement, TriggerContext } from "./lang";
+import { FileSection } from "./File";
+import { CodeSection, Statement, SyntaxElement, Trigger, TriggerContext } from "./lang";
 import { PatternElement } from "./Pattern";
+import { SkriptEventInfo } from "./Registration";
 
 
 // export class MatchContext {
@@ -101,4 +103,67 @@ export class ParserState {
 		));
 	}
 	
+}
+
+
+
+// export class SyntaxParser {
+
+// 	private static readonly recentEvents: RecentElementList<SkriptEventInfo<any>> = new RecentElementList<>();
+
+// 	public static parseTrigger(section: FileSection): UnloadedTrigger | undefined {
+// 		if (section.content.length === 0) {
+// 			return;
+// 		}
+// 		for (let recentEvent of recentEvents.mergeWith(SyntaxManager.getEvents())) {
+// 			let trigger = SyntaxParser._matchEventInfo(section. recentEvent);
+// 			if (trigger) {
+// 				recentEvents.acknowledge(recentEvent);
+// 				return trigger;
+// 			}
+// 		}
+
+// 		console.log("No trigger matching '" + section.getLineContent() + "' was found");
+// 		return;
+
+// 	}
+
+// }
+
+
+
+class UnloadedTrigger {
+
+	private readonly _trigger: Trigger;
+	private readonly _section: FileSection;
+	private readonly _line: number;
+	private readonly _eventinfo: SkriptEventInfo<any>;
+	private readonly _parserState: ParserState;
+
+	constructor(trigger: Trigger, section: FileSection, line: number, eventInfo:SkriptEventInfo<any>, parserState: ParserState) {
+		this._trigger = trigger;
+		this._section = section;
+		this._line = line;
+		this._eventinfo = eventInfo;
+		this._parserState = parserState;
+	}
+
+	
+	public get trigger() : Trigger {
+		return this._trigger;
+	}
+	public get section() : FileSection {
+		return this._section;
+	}
+	public get line() : number {
+		return this._line;
+	}
+	public get eventInfo() : SkriptEventInfo<any> {
+		return this._eventinfo;
+	}
+	public get parserState() : ParserState {
+		return this._parserState;
+	}
+	
+
 }

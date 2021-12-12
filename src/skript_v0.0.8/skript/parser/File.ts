@@ -99,7 +99,7 @@ export class FileParser {
 
 			if (content === undefined) {
 				content = line.replace('##', '#').trim();
-			} else if (content === '') {
+			} else if (content.length === 0) {
 				elements.push(new VoidElement(fileName, lastLine + i, exepectedIndentation));
 				continue;
 			}
@@ -117,10 +117,10 @@ export class FileParser {
 			}
 
 			if (content.endsWith(':')) {
-				if (i + 1 === line.length) {
+				if (i + 1 === lines.length) {
 					elements.push(new FileSection(fileName, lastLine + i, content.substring(0, content.length - 1),
-							new Array<FileElement>(), exepectedIndentation)
-						);
+						new Array<FileElement>(), exepectedIndentation)
+					);
 				} else {
 					let subLines = new Array<string>();
 					lines.forEach((line, index) => {
@@ -130,8 +130,8 @@ export class FileParser {
 					let sectionElements = this.parseFileLines(fileName, subLines, exepectedIndentation + 1, lastLine + i + 1);
 					if (sectionElements) {
 						elements.push(new FileSection(fileName, lastLine + i, content.substring(0, content.length - 1),
-								sectionElements, exepectedIndentation)
-							);
+							sectionElements, exepectedIndentation)
+						);
 						i += this._count(sectionElements);
 					}
 				}
