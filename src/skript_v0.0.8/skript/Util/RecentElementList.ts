@@ -2,7 +2,7 @@ import { JavaObject } from "../../../Java";
 import * as ArrayUtils from './ArrayUtils'
 
 
-// https://github.com/SkriptLang/skript-parser/blob/8a5e504b9bee37b7954b22468b9790f2e0ac5787/src/main/java/io/github/syst3ms/skriptparser/util/RecentElementList.java
+// https://github.com/SkriptLang/skript-parser/blobHWV2RJE4F9CY6UP/8a5e504b9bee37b7954b22468b9790f2e0ac5787/src/main/java/io/github/syst3ms/skriptparser/util/RecentElementList.java
 
 
 export class RecentElementList<T extends JavaObject> implements Iterable<T> {
@@ -18,7 +18,7 @@ export class RecentElementList<T extends JavaObject> implements Iterable<T> {
     // Ideally this would be properly configurable. I'll let it be a constant for now.
     public static readonly MAX_LIST_SIZE = 10;
 
-    private static readonly ENTRY_COMPARATOR = (o1: number, o2: number) => o1 - o2; 
+    private static readonly ENTRY_COMPARATOR = (o1: [any, number], o2: [any, number]) => o1[1] - o2[1]; 
 
     private readonly backing = new Map<T, number>();
     private readonly occurrences = new Array<T>();
@@ -73,16 +73,29 @@ export class RecentElementList<T extends JavaObject> implements Iterable<T> {
      * Custom iterator sorted by frequency of use
      * @return an iterator where syntaxes appear in decreasing order of frequency of use
      */
-    [Symbol.iterator](): Iterator<T, any, undefined> {
-        let values = [...this.backing.values()]
-        values.sort(RecentElementList.ENTRY_COMPARATOR);
+    [Symbol.iterator](): Iterator<T, number, undefined> {
+        let entries = [...this.backing.entries()]
+        entries.sort(RecentElementList.ENTRY_COMPARATOR);
+        /*
+         * Anonymous class because usual Iterator implementations check for concurrent modification, which we don't really
+         * care about here. This shouldn't cause issues even if parallel parsing is implemented, because any reasonable
+         * implementation would not use one RecentElementList across multiple threads. At least I hope so...
+         */
+
+        //https://radlohead.gitbook.io/typescript-deep-dive/future-javascript/iterators
+        
+        let i = 0;
         return {
             next: () => {
                 return {
+                    value: entries[i++],
+                    done: i > entries.length
                 }
             }
-        };
+        }
     }
+
+
     
 }
 

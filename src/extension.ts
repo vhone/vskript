@@ -31,7 +31,7 @@ export function activate(_context:ExtensionContext) {
 	// Event;
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
 	
-	VisualSkript.onEnable()
+	// VisualSkript.onEnable()
 	
 	// let text = ['#test',
 	// 			'command /test:',
@@ -48,3 +48,32 @@ export function activate(_context:ExtensionContext) {
 }
 
 export function deactivate() {}
+
+class IteratorTest<T> implements Iterable<T> {
+
+	constructor(
+		private readonly values: T[]
+	) {}
+
+	[Symbol.iterator](): Iterator<T, any, undefined> {
+		let i = 0;
+		return {
+			next: () => {
+				return {
+					value: this.values[i++],
+					done: i > this.values.length
+				}
+			}
+		}
+	}
+	
+}
+
+
+let a = new IteratorTest<string>(['a', 'd', 'c', 't']);
+
+console.log('start')
+for (let b of a) {
+	console.log(b);
+}
+console.log('end')
