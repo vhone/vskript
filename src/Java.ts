@@ -1,3 +1,9 @@
+export interface JavaObject {
+	toString(): string;
+	equals(obj: any): boolean;
+};
+
+
 
 export type Class<T> = { new (...args: any[]): T };
 

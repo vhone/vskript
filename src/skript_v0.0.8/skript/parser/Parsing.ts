@@ -1,5 +1,6 @@
 import { Class } from "../../../Java";
 import { Pair } from "../Util/Pair";
+import { RecentElementList } from "../Util/RecentElementList";
 import { FileSection } from "./File";
 import { CodeSection, Statement, SyntaxElement, Trigger, TriggerContext } from "./lang";
 import { PatternElement } from "./Pattern";
@@ -107,28 +108,28 @@ export class ParserState {
 
 
 
-// export class SyntaxParser {
+export class SyntaxParser {
 
-// 	private static readonly recentEvents: RecentElementList<SkriptEventInfo<any>> = new RecentElementList<>();
+	private static readonly recentEvents: RecentElementList<SkriptEventInfo<any>> = new RecentElementList<SkriptEventInfo<any>>();
 
-// 	public static parseTrigger(section: FileSection): UnloadedTrigger | undefined {
-// 		if (section.content.length === 0) {
-// 			return;
-// 		}
-// 		for (let recentEvent of recentEvents.mergeWith(SyntaxManager.getEvents())) {
-// 			let trigger = SyntaxParser._matchEventInfo(section. recentEvent);
-// 			if (trigger) {
-// 				recentEvents.acknowledge(recentEvent);
-// 				return trigger;
-// 			}
-// 		}
+	public static parseTrigger(section: FileSection): UnloadedTrigger | undefined {
+		if (section.content.length === 0) {
+			return;
+		}
+		for (let recentEvent of recentEvents.mergeWith(SyntaxManager.getEvents())) {
+			let trigger = SyntaxParser._matchEventInfo(section. recentEvent);
+			if (trigger) {
+				recentEvents.acknowledge(recentEvent);
+				return trigger;
+			}
+		}
 
-// 		console.log("No trigger matching '" + section.getLineContent() + "' was found");
-// 		return;
+		console.log("No trigger matching '" + section.getLineContent() + "' was found");
+		return;
 
-// 	}
+	}
 
-// }
+}
 
 
 
