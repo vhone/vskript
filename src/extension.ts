@@ -4,6 +4,7 @@ import * as Provider from './skript_v0.0.7/provider/Provider';
 import TextDocumentChangeEvent from './skript_v0.0.7/event/TextDocumentChangeEvent';
 import { LEGEND } from './skript_v0.0.7/provider/SkriptDocumentSemanticTokensProvider';
 import { VisualSkript } from './skript_v0.0.8/skript/Skript';
+import { Class, StringBuilder } from './Java';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -49,31 +50,12 @@ export function activate(_context:ExtensionContext) {
 
 export function deactivate() {}
 
-class IteratorTest<T> implements Iterable<T> {
 
-	constructor(
-		private readonly values: T[]
-	) {}
-
-	[Symbol.iterator](): Iterator<T, any, undefined> {
-		let i = 0;
-		return {
-			next: () => {
-				return {
-					value: this.values[i++],
-					done: i > this.values.length
-				}
-			}
-		}
+class Test {
+	constructor(public msg: string) {
+		console.log(msg)
 	}
-	
 }
 
-
-let a = new IteratorTest<string>(['a', 'd', 'c', 't']);
-
-console.log('start')
-for (let b of a) {
-	console.log(b);
-}
-console.log('end')
+let a: Class<Test> = Test;
+console.log(new a())

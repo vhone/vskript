@@ -48,13 +48,13 @@ export function splitVerticalBars(pattern: string): string[] | undefined {
 				return;
 			}
 		} else if (ch === '|') {
-			split.push(textBuilder.build());
+			split.push(textBuilder.toString());
 			textBuilder.setLength(0);
 		} else {
 			textBuilder.append(ch);
 		}
 	}
-	split.push(textBuilder.build());
+	split.push(textBuilder.toString());
 	return split;
 }
 

@@ -1,10 +1,10 @@
-import { Class } from '../../../Java';
+import { Class, JavaObject } from '../../../Java';
 import * as StringUtils from '../Util/StringUtils';
 
 
-export class Type {
+export class LegacyType {
 
-	private static TYPES = new Set<Type>();
+	private static TYPES = new Set<LegacyType>();
 
 	private readonly _name: string;
 	private readonly _regexp: RegExp | undefined;
@@ -17,7 +17,7 @@ export class Type {
 		this._name = name;
 		this._regexp = regexp;
 		this._parent = parent;
-		Type.TYPES.add(this);
+		LegacyType.TYPES.add(this);
 	}
 
 	public get name() : string {
@@ -30,75 +30,75 @@ export class Type {
 		return this._regexp && this._regexp.exec(string) ? true : false;
 	}
 
-	public static ATTRIBUTE_TYPE 		= new Type('ATTRIBUTE_TYPE', /^attribute\s?types?/i);
-    public static BIOME 				= new Type('BIOME', /^biomes?/i);
-    public static BLOCK 				= new Type('BLOCK', /^blocks?/i);
-    public static BLOCK_DATA 			= new Type('BLOCK_DATA', /^block\s?datas?/i);
-    public static BOOLEAN 				= new Type('BOOLEAN', /^booleans?/i);
-    public static CAT_TYPE 				= new Type('CAT_TYPE', /^cat\s?types?/i);
-    public static CHUNK 				= new Type('CHUNK', /^chunks?/i);
-    public static CLICK_TYPE 			= new Type('CLICK_TYPE', /^click\s?types?/i);
-    public static COLOUR 				= new Type('COLOUR', /^colou?rs?/i);
-    public static COMMAND_SENDER 		= new Type('COMMAND_SENDER', /^(?:command\\s?)?senders?/i);
-    public static DAMAGE_CAUSE 			= new Type('DAMAGE_CAUSE', /^damage\scauses?/i);
-    public static DATE 					= new Type('DATE', /^dates?/i);
-    public static DIFFICULTY 			= new Type('DIFFICULTY', /^difficult(?:y|ys|ies)$/i);
-    public static DIRECTION 			= new Type('DIRECTION', /^directions?/i);
-    public static ENCHANTMENT 			= new Type('ENCHANTMENT', /^enchantments?/i);
-    public static ENCHANTMENT_TYPE 		= new Type('ENCHANTMENT_TYPE', /^enchantment\s?types?/i);
-    public static ENTITY 				= new Type('ENTITY', /^entit(?:y|ys|ies)$/i);
-    public static ENTITY_TYPE 			= new Type('ENTITY_TYPE', /^entity\s?types?/i);
-    public static EXPERIENCE 			= new Type('EXPERIENCE', /^experiences?/i);
-    public static FIREWORK_EFFECT 		= new Type('FIREWORK_EFFECT', /^firework\s?effects?/i);
-    public static FIREWORK_TYPE 		= new Type('FIREWORK_TYPE', /^firework\s?types?/i);
-    public static GAME_MODE 			= new Type('GAME_MODE', /^game\s?modes?/i);
-    public static GAMERULE 				= new Type('GAMERULE', /^gamerules?/i);
-    public static GAMERULE_VALUE 		= new Type('GAMERULE_VALUE', /^gamerule\s?values?/i);
-    public static GENE 					= new Type('GENE', /^gene$/i);
-    public static HEAL_REASON 			= new Type('HEAL_REASON', /^heal\s?reasons?/i);
-    public static INVENTORY 			= new Type('INVENTORY', /^inventor(?:y|ys|ies)$/i);
-    public static INVENTORY_ACTION 		= new Type('INVENTORY_ACTION', /^inventory\s?actions?/i);
-    public static INVENTORY_SLOT 		= new Type('INVENTORY_SLOT', /^inventory\s?slots?/i);
-    public static INVENTORY_TYPE 		= new Type('INVENTORY_TYPE', /^inventory\s?types?/i);
-    public static ITEM 					= new Type('ITEM', /^items?/i);
-    public static ITEM_TYPE 			= new Type('ITEM_TYPE', /^item\s?types?/i);
-    public static LIVING_ENTITY 		= new Type('LIVING_ENTITY', /^living\s?entit(?:y|ys|ies)$/i);
-    public static LOCATION 				= new Type('LOCATION', /^locations?/i);
-    public static METADATA_HOLDER 		= new Type('METADATA_HOLDER', /^metadata\s?holders?/i);
-    public static MONEY 				= new Type('MONEY', /^mone(?:y|ys|ies)$/i);
-    public static NUMBER 				= new Type('NUMBER', /^numbers?/i);
-    public static OBJECT 				= new Type('OBJECT', /^objects?/i);
-    public static OFFLINE_PLAYER 		= new Type('OFFLINE_PLAYER', /^offline\s?players?/i);
-    public static PLAYER 				= new Type('PLAYER', /^players?/i);
-    public static POTION_EFFECT 		= new Type('POTION_EFFECT', /^potion\s?effects?/i);
-    public static POTION_EFFECT_TYPE 	= new Type('POTION_EFFECT_TYPE', /^potion\s?effect\s?types?/i);
-    public static PROJECTILE 			= new Type('PROJECTILE', /^projectiles?/i);
-    public static REGION 				= new Type('REGION', /^regions?/i);
-    public static RESOURCE_PACK_STATE 	= new Type('RESOURCE_PACK_STATE', /^resource\s?pack\s?states?/i);
-    public static SERVER_ICON 			= new Type('SERVER_ICON', /^server\s?icons?/i);
-    public static SOUND_CATEGORY 		= new Type('SOUND_CATEGORY', /^sound\s?categor(?:y|ys|ies)$/i);
-    public static SPAWN_REASON 			= new Type('SPAWN_REASON', /^spawn\s?reasons?/i);
-    public static TELEPORT_CAUSE 		= new Type('TELEPORT_CAUSE', /^teleport\s?causes?/i);
-    public static TEXT 					= new Type('TEXT', /^texts?/i);
-    public static TIME 					= new Type('TIME', /^times?/i);
-    public static TIMEPERIOD 			= new Type('TIMEPERIOD', /^timeperiods?/i);
-    public static TIMESPAN 				= new Type('TIMESPAN', /^timespans?/i);
-    public static TREE_TYPE 			= new Type('TREE_TYPE', /^tree\s?types?/i);
-    public static TYPE 					= new Type('TYPE', /^types?/i);
-    public static VECTOR 				= new Type('VECTOR', /^vectors?/i);
+	public static ATTRIBUTE_TYPE 		= new LegacyType('ATTRIBUTE_TYPE', /^attribute\s?types?/i);
+    public static BIOME 				= new LegacyType('BIOME', /^biomes?/i);
+    public static BLOCK 				= new LegacyType('BLOCK', /^blocks?/i);
+    public static BLOCK_DATA 			= new LegacyType('BLOCK_DATA', /^block\s?datas?/i);
+    public static BOOLEAN 				= new LegacyType('BOOLEAN', /^booleans?/i);
+    public static CAT_TYPE 				= new LegacyType('CAT_TYPE', /^cat\s?types?/i);
+    public static CHUNK 				= new LegacyType('CHUNK', /^chunks?/i);
+    public static CLICK_TYPE 			= new LegacyType('CLICK_TYPE', /^click\s?types?/i);
+    public static COLOUR 				= new LegacyType('COLOUR', /^colou?rs?/i);
+    public static COMMAND_SENDER 		= new LegacyType('COMMAND_SENDER', /^(?:command\\s?)?senders?/i);
+    public static DAMAGE_CAUSE 			= new LegacyType('DAMAGE_CAUSE', /^damage\scauses?/i);
+    public static DATE 					= new LegacyType('DATE', /^dates?/i);
+    public static DIFFICULTY 			= new LegacyType('DIFFICULTY', /^difficult(?:y|ys|ies)$/i);
+    public static DIRECTION 			= new LegacyType('DIRECTION', /^directions?/i);
+    public static ENCHANTMENT 			= new LegacyType('ENCHANTMENT', /^enchantments?/i);
+    public static ENCHANTMENT_TYPE 		= new LegacyType('ENCHANTMENT_TYPE', /^enchantment\s?types?/i);
+    public static ENTITY 				= new LegacyType('ENTITY', /^entit(?:y|ys|ies)$/i);
+    public static ENTITY_TYPE 			= new LegacyType('ENTITY_TYPE', /^entity\s?types?/i);
+    public static EXPERIENCE 			= new LegacyType('EXPERIENCE', /^experiences?/i);
+    public static FIREWORK_EFFECT 		= new LegacyType('FIREWORK_EFFECT', /^firework\s?effects?/i);
+    public static FIREWORK_TYPE 		= new LegacyType('FIREWORK_TYPE', /^firework\s?types?/i);
+    public static GAME_MODE 			= new LegacyType('GAME_MODE', /^game\s?modes?/i);
+    public static GAMERULE 				= new LegacyType('GAMERULE', /^gamerules?/i);
+    public static GAMERULE_VALUE 		= new LegacyType('GAMERULE_VALUE', /^gamerule\s?values?/i);
+    public static GENE 					= new LegacyType('GENE', /^gene$/i);
+    public static HEAL_REASON 			= new LegacyType('HEAL_REASON', /^heal\s?reasons?/i);
+    public static INVENTORY 			= new LegacyType('INVENTORY', /^inventor(?:y|ys|ies)$/i);
+    public static INVENTORY_ACTION 		= new LegacyType('INVENTORY_ACTION', /^inventory\s?actions?/i);
+    public static INVENTORY_SLOT 		= new LegacyType('INVENTORY_SLOT', /^inventory\s?slots?/i);
+    public static INVENTORY_TYPE 		= new LegacyType('INVENTORY_TYPE', /^inventory\s?types?/i);
+    public static ITEM 					= new LegacyType('ITEM', /^items?/i);
+    public static ITEM_TYPE 			= new LegacyType('ITEM_TYPE', /^item\s?types?/i);
+    public static LIVING_ENTITY 		= new LegacyType('LIVING_ENTITY', /^living\s?entit(?:y|ys|ies)$/i);
+    public static LOCATION 				= new LegacyType('LOCATION', /^locations?/i);
+    public static METADATA_HOLDER 		= new LegacyType('METADATA_HOLDER', /^metadata\s?holders?/i);
+    public static MONEY 				= new LegacyType('MONEY', /^mone(?:y|ys|ies)$/i);
+    public static NUMBER 				= new LegacyType('NUMBER', /^numbers?/i);
+    public static OBJECT 				= new LegacyType('OBJECT', /^objects?/i);
+    public static OFFLINE_PLAYER 		= new LegacyType('OFFLINE_PLAYER', /^offline\s?players?/i);
+    public static PLAYER 				= new LegacyType('PLAYER', /^players?/i);
+    public static POTION_EFFECT 		= new LegacyType('POTION_EFFECT', /^potion\s?effects?/i);
+    public static POTION_EFFECT_TYPE 	= new LegacyType('POTION_EFFECT_TYPE', /^potion\s?effect\s?types?/i);
+    public static PROJECTILE 			= new LegacyType('PROJECTILE', /^projectiles?/i);
+    public static REGION 				= new LegacyType('REGION', /^regions?/i);
+    public static RESOURCE_PACK_STATE 	= new LegacyType('RESOURCE_PACK_STATE', /^resource\s?pack\s?states?/i);
+    public static SERVER_ICON 			= new LegacyType('SERVER_ICON', /^server\s?icons?/i);
+    public static SOUND_CATEGORY 		= new LegacyType('SOUND_CATEGORY', /^sound\s?categor(?:y|ys|ies)$/i);
+    public static SPAWN_REASON 			= new LegacyType('SPAWN_REASON', /^spawn\s?reasons?/i);
+    public static TELEPORT_CAUSE 		= new LegacyType('TELEPORT_CAUSE', /^teleport\s?causes?/i);
+    public static TEXT 					= new LegacyType('TEXT', /^texts?/i);
+    public static TIME 					= new LegacyType('TIME', /^times?/i);
+    public static TIMEPERIOD 			= new LegacyType('TIMEPERIOD', /^timeperiods?/i);
+    public static TIMESPAN 				= new LegacyType('TIMESPAN', /^timespans?/i);
+    public static TREE_TYPE 			= new LegacyType('TREE_TYPE', /^tree\s?types?/i);
+    public static TYPE 					= new LegacyType('TYPE', /^types?/i);
+    public static VECTOR 				= new LegacyType('VECTOR', /^vectors?/i);
 
-	public static NONE = new Type('<none>');
+	public static NONE = new LegacyType('<none>');
 
-	public static values(): Type[] {
-		return Array.from(Type.TYPES)
+	public static values(): LegacyType[] {
+		return Array.from(LegacyType.TYPES)
 	}
 	
-	public static value(string: string) : Type {
-		for (const type of Type.values()) {
+	public static value(string: string) : LegacyType {
+		for (const type of LegacyType.values()) {
 			if (type.match(string))
 				return type;
 		}
-		return Type.NONE;
+		return LegacyType.NONE;
 	}
 		
 }
@@ -112,15 +112,15 @@ export class Type {
  */
 export class SkriptType {
 
-	private readonly _type: Type;
+	private readonly _type: LegacyType;
 	private readonly _isSingle: boolean;
 
-	constructor(type: Type, isSingle: boolean) {
+	constructor(type: LegacyType, isSingle: boolean) {
 		this._type = type;
 		this._isSingle = isSingle;
 	}
 
-	public get type() : Type {
+	public get type() : LegacyType {
 		return this._type;
 	}
 	
@@ -148,7 +148,7 @@ export class SkriptType {
 }
 
 
-class TypeN<T> {
+export class Type<T> extends JavaObject {
 
 	private readonly _typeClass: Class<T>;
 	private readonly _baseName: string;
@@ -173,6 +173,7 @@ class TypeN<T> {
 		toStringFunction?:Function<T, string>,
 		defaultCharger?: Changer<T>,
 		arithmetic? : Arithmetic<T, any>) {
+			super();
 			this._typeClass = typeClass;
 			this._baseName = baseName;
 			this._pluralForms = StringUtils.getForms(pattern.trim());
@@ -239,4 +240,41 @@ interface Arithmetic<A, R> {
 	add(value: A, defference: R): A;
 	subtract(value: A, difference: R): A;
 	getRelativeType(): Class<R>;
+}
+
+
+
+export class PatternType<T> extends JavaObject {
+	
+	private readonly _type: Type<T>;
+	private readonly _single: boolean;
+
+	constructor(type: Type<T>, single: boolean) {
+		super();
+		this._type = type;
+		this._single = single;
+	}
+
+	public get type(): Type<T> {
+		return this.type
+	}
+	public get isSingle(): boolean {
+		return this._single;
+	}
+
+	public equals(obj: any): boolean {
+		if (super.equals(obj)) {
+			return true;
+		}
+		if (!(obj instanceof PatternType)) {
+			return false;
+		} else {
+			return this._type.equals(obj._type) && this._single === obj._single;
+		}
+	}
+
+	public toString(): string {
+		return this._type.pluralForms[this._single ? 0 : 1];
+	}
+	
 }

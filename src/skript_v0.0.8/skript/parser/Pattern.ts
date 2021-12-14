@@ -1,5 +1,6 @@
 import { StringBuilder } from '../../../Java';
 import * as StringUtil from '../Util/StringUtils';
+import { MatchContext } from './Parsing';
 
 class PatternParser {
 
@@ -35,7 +36,7 @@ class PatternParser {
 				}
 
 				if (textBuilder.length > 0) {
-					elements.push(new TextElement(textBuilder.build()))
+					elements.push(new TextElement(textBuilder.toString()))
 					textBuilder.setLength(0);
 				}
 
@@ -54,7 +55,7 @@ class PatternParser {
 				}
 
 				if (textBuilder.length > 0) {
-					elements.push(new TextElement(textBuilder.build()))
+					elements.push(new TextElement(textBuilder.toString()))
 					textBuilder.setLength(0);
 				}
 
@@ -99,7 +100,7 @@ class PatternParser {
 				}
 
 				if (textBuilder.length > 0) {
-					elements.push(new TextElement(textBuilder.build()))
+					elements.push(new TextElement(textBuilder.toString()))
 					textBuilder.setLength(0);
 				}
 
@@ -148,7 +149,7 @@ class PatternParser {
 				}
 
 				if (textBuilder.length > 0) {
-					elements.push(new TextElement(textBuilder.build()))
+					elements.push(new TextElement(textBuilder.toString()))
 					textBuilder.setLength(0);
 				}
 
@@ -185,7 +186,7 @@ class PatternParser {
 		}
 	
 		if (textBuilder.length > 0) {
-			elements.push(new TextElement(textBuilder.build()))
+			elements.push(new TextElement(textBuilder.toString()))
 			textBuilder.setLength(0);
 		}
 	
@@ -198,9 +199,82 @@ class PatternParser {
 	}
 }
 
-/** 패턴요소 */
-export interface PatternElement {
-	match(): number;
+
+
+//https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/pattern/PatternElement.java
+/**
+ * The superclass of all elements of a pattern.
+ */
+export abstract class PatternElement {
+	
+	/**
+     * Attempts to match the {@link PatternElement} to a string at a specified index.
+     * About the index, make sure to never increment the index by some arbitrary value when returning
+     *
+     * @param s the string to match this PatternElement against
+     * @param index the index of the string at which this PatternElement should be matched
+     * @return the index at which the matching should continue afterwards if successful. Otherwise, {@literal -1}
+     */
+	public abstract match(s: string, index: number, context: MatchContext): number;
+
+	static flatten(element: PatternElement): PatternElement[] {
+		if (element instanceof CompoundElement) {
+			return element.elements;
+		} else {
+			return [element];
+		}
+	}
+
+	/**
+     * This method should return all text components that will always be present,
+     * no matter how the pattern is used.
+     * @param element the element
+     * @return the always-present text elements of this pattern
+     */
+	public static getKeywords(element: PatternElement): string[] {
+		let result: string[] = [];
+		for (const e of this.flatten(element)) {
+			if (e instanceof TextElement) {
+				result.push(e.text.trim().toLowerCase())
+			}
+		}
+		return result;
+	}
+
+	public static getPossibleInputs(elements: PatternElement[]): PatternElement[] {
+		let optionalPossibilities: PatternElement[] = [];
+		let possiblilities: PatternElement[] = [];
+		for (const element of elements) {
+			if (element instanceof TextElement || element instanceof RegExpGroup) {
+				if (element instanceof TextElement) {
+					let text = element.text;
+					if (text.length === 0 || text === '' || text.match(/\s*/) && elements.length === 1) {
+						return possiblilities;
+					} else if (text === '' || text.match(/\s*/)) {
+						continue;
+					}
+				}
+				possiblilities.push(element, ...optionalPossibilities);
+				return possiblilities;
+			} else if (element instanceof ChoiceGroup) {
+				for (const choice of element.choices) {
+					let possibleInputs = this.getPossibleInputs(this.flatten(choice.element));
+					possiblilities.push(...possibleInputs);
+				}
+				possiblilities.push(...optionalPossibilities);
+				return possiblilities;
+			} else if (element instanceof ExpressionElement) {
+				possiblilities.push(element, ...optionalPossibilities);
+				return possiblilities;
+			} else if (element instanceof OptionalGroup) {
+				optionalPossibilities.push(...this.getPossibleInputs(this.flatten(element.element)));
+			}
+		}
+		// new TextElement('\0') = EOL still goes at the very end
+		possiblilities.push(...optionalPossibilities, new TextElement('\0'));
+		return possiblilities;
+	}
+
 }
 
 /** 한개의 단어 */
@@ -216,7 +290,7 @@ class TextElement implements PatternElement {
 		return this._text;
 	}
 
-	public match(): number {
+	public match(s: string, index: number, context: MatchContext): number {
 		throw new Error('Method not implemented.');
 	}
 	

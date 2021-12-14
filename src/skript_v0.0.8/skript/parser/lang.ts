@@ -225,6 +225,14 @@ export class Trigger extends CodeSection {
 	
 }
 
-interface Predicate<T> {
-	test(t: T) : boolean;
+
+export abstract class Effect extends Statement {
+
+	protected abstract execute(ctx: TriggerContext): void;
+
+	public run(ctx: TriggerContext): boolean {
+		this.execute(ctx);
+		return true;
+	}
+
 }

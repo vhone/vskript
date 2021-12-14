@@ -2,7 +2,7 @@ import { JavaObject } from "../../../Java";
 import * as ArrayUtils from './ArrayUtils'
 
 
-// https://github.com/SkriptLang/skript-parser/blobHWV2RJE4F9CY6UP/8a5e504b9bee37b7954b22468b9790f2e0ac5787/src/main/java/io/github/syst3ms/skriptparser/util/RecentElementList.java
+// https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/util/RecentElementList.java
 
 
 export class RecentElementList<T extends JavaObject> implements Iterable<T> {
@@ -73,30 +73,26 @@ export class RecentElementList<T extends JavaObject> implements Iterable<T> {
      * Custom iterator sorted by frequency of use
      * @return an iterator where syntaxes appear in decreasing order of frequency of use
      */
-    [Symbol.iterator](): Iterator<T, number, undefined> {
+    [Symbol.iterator](): Iterator<T> {
         let entries = [...this.backing.entries()]
         entries.sort(RecentElementList.ENTRY_COMPARATOR);
+        
         /*
          * Anonymous class because usual Iterator implementations check for concurrent modification, which we don't really
          * care about here. This shouldn't cause issues even if parallel parsing is implemented, because any reasonable
          * implementation would not use one RecentElementList across multiple threads. At least I hope so...
-         */
-
-        //https://radlohead.gitbook.io/typescript-deep-dive/future-javascript/iterators
-        
+         */        
         let i = 0;
         return {
             next: () => {
                 return {
-                    value: entries[i++],
+                    value: entries[i++][0],
                     done: i > entries.length
                 }
             }
         }
     }
 
-
-    
 }
 
 

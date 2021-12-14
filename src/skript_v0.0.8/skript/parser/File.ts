@@ -178,15 +178,15 @@ export class FileParser {
 						}
 					}
 
-					return builder.build().trim();
+					return builder.toString().trim();
 				}
 			} else {
 				builder.append(ch);
 			}
 		}
-		if (builder.build() === string)
+		if (builder.toString() === string)
 			return;
-		return builder.build().trim();
+		return builder.toString().trim();
 	}
 
 }

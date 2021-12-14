@@ -2,9 +2,9 @@ import { Class } from "../../../Java";
 import { Pair } from "../Util/Pair";
 import { RecentElementList } from "../Util/RecentElementList";
 import { FileSection } from "./File";
-import { CodeSection, Statement, SyntaxElement, Trigger, TriggerContext } from "./lang";
+import { CodeSection, Expression, Statement, SyntaxElement, Trigger, TriggerContext } from "./lang";
 import { PatternElement } from "./Pattern";
-import { SkriptEventInfo } from "./Registration";
+import { SkriptEventInfo, SyntaxManager } from "./Registration";
 
 
 // export class MatchContext {
@@ -107,19 +107,22 @@ export class ParserState {
 }
 
 
-
+// https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/parsing/SyntaxParser.java
+/**
+ * Contains the logic for parsing and interpreting single statements, sections and expressions inside of a script.
+ */
 export class SyntaxParser {
 
-	private static readonly recentEvents: RecentElementList<SkriptEventInfo<any>> = new RecentElementList<SkriptEventInfo<any>>();
+	private static readonly _recentEvents: RecentElementList<SkriptEventInfo<any>> = new RecentElementList<SkriptEventInfo<any>>();
 
 	public static parseTrigger(section: FileSection): UnloadedTrigger | undefined {
 		if (section.content.length === 0) {
 			return;
 		}
-		for (let recentEvent of recentEvents.mergeWith(SyntaxManager.getEvents())) {
-			let trigger = SyntaxParser._matchEventInfo(section. recentEvent);
+		for (let recentEvent of this._recentEvents.mergeWith(SyntaxManager.getEvents())) {
+			let trigger = _matchEventInfo(section. recentEvent);
 			if (trigger) {
-				recentEvents.acknowledge(recentEvent);
+				this._recentEvents.acknowledge(recentEvent);
 				return trigger;
 			}
 		}
@@ -129,6 +132,21 @@ export class SyntaxParser {
 
 	}
 
+}
+
+function _matchEventInfo(section: FileSection, info: SkriptEventInfo<any>): UnloadedTrigger {
+	let patterns = info.patterns;
+	for (var i = 0; i < patterns.length; i++) {
+		let element = patterns[i];
+		let parserState = new ParserState();
+		let parser = new MatchContext(element, parserState);
+		if (element.match(section.content, 0, parser) != -1) {
+			try {
+				let sec = new info.syntaxClass;
+				if (sec)
+			}
+		}
+	}
 }
 
 
@@ -167,4 +185,74 @@ class UnloadedTrigger {
 	}
 	
 
+}
+
+
+
+// https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/parsing/MatchContext.java
+/**
+ * An object that provides contextual information during syntax matching.
+ */
+export class MatchContext {
+
+	private readonly _originalPattern: string;
+	private readonly _originalElement: PatternElement;
+	private readonly _parserState: ParserState;
+	private readonly _source: MatchContext | undefined ;
+	private readonly _parsedExpressions: Expression<any>[] = [];
+	private readonly _regexMatches: RegExpMatchArray[]= [];
+	private _patternIndex: number = 0;
+	private readonly _marks: string[] = [];
+
+	constructor(e: PatternElement, parserState: ParserState)
+	constructor(e: PatternElement, parserState: ParserState, source: MatchContext)
+	constructor(e: PatternElement, parserState: ParserState, source?: MatchContext) {
+		this._originalPattern = e.toString();
+		this._originalElement = e;
+		this._parserState = parserState;
+		this._source = source;
+	}
+
+	public get originalPattern() : string {
+		return this._originalPattern;
+	}
+	public get originalElement(): PatternElement {
+		return this._originalElement;
+	}
+	public get patternIndex() : number {
+		return this._patternIndex;
+	}
+	public get parsedExpression(): Expression<any>[] {
+		return this._parsedExpressions;
+	}
+	public get regexMatch(): RegExpMatchArray[] {
+		return this._regexMatches;
+	}
+	public get marks(): string[] {
+		return this._marks;
+	}
+	public get parserState(): ParserState {
+		return this._parserState;
+	}
+	
+	public branch(e: PatternElement): MatchContext {
+		return new MatchContext(e, this._parserState, this);
+	}
+
+	public merge(branch: MatchContext) {
+		this._parsedExpressions.push(...branch._parsedExpressions);
+		this._regexMatches.push(...branch._regexMatches);
+		this._marks.push(...branch._marks);
+	}
+
+	public toParseResult(): ParseContext {
+		return new ParseContext(
+			this._parserState,
+			this._originalElement,
+			this._regexMatches,
+			this._marks,
+			this._originalPattern
+		);
+	}
+	
 }
