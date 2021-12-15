@@ -1,6 +1,7 @@
 import { Class } from "../../../Java";
 import { FileSection } from "./File";
 import { ParseContext, ParserState } from "./Parsing";
+import { SkriptEventInfo } from "./Registration";
 
 
 export abstract class SyntaxElement {
@@ -133,7 +134,7 @@ export interface TriggerContext {
 }
 
 
-
+// https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/lang/CodeSection.java
 /**
  * Represents a section of runnable code.
  * @see SecConditional
@@ -235,4 +236,48 @@ export abstract class Effect extends Statement {
 		return true;
 	}
 
+}
+
+
+
+
+
+
+// https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/lang/UnloadedTrigger.java
+/**
+ * A {@link Trigger trigger}-to-be whose contents haven't been loaded yet. It will be loaded based on its event's
+ * {@link SkriptEvent#getLoadingPriority() loading priority}.
+ */
+export class UnloadedTrigger {
+
+	private readonly _trigger: Trigger;
+	private readonly _section: FileSection;
+	private readonly _line: number;
+	private readonly _eventinfo: SkriptEventInfo<any>;
+	private readonly _parserState: ParserState;
+
+	constructor(trigger: Trigger, section: FileSection, line: number, eventInfo:SkriptEventInfo<any>, parserState: ParserState) {
+		this._trigger = trigger;
+		this._section = section;
+		this._line = line;
+		this._eventinfo = eventInfo;
+		this._parserState = parserState;
+	}
+
+	public get trigger() : Trigger {
+		return this._trigger;
+	}
+	public get section() : FileSection {
+		return this._section;
+	}
+	public get line() : number {
+		return this._line;
+	}
+	public get eventInfo() : SkriptEventInfo<any> {
+		return this._eventinfo;
+	}
+	public get parserState() : ParserState {
+		return this._parserState;
+	}
+	
 }

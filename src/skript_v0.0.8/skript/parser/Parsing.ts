@@ -2,29 +2,9 @@ import { Class } from "../../../Java";
 import { Pair } from "../Util/Pair";
 import { RecentElementList } from "../Util/RecentElementList";
 import { FileSection } from "./File";
-import { CodeSection, Expression, Statement, SyntaxElement, Trigger, TriggerContext } from "./lang";
+import { CodeSection, Expression, SkriptEvent, Statement, SyntaxElement, Trigger, TriggerContext, UnloadedTrigger } from "./lang";
 import { PatternElement } from "./Pattern";
 import { SkriptEventInfo, SyntaxManager } from "./Registration";
-
-
-// export class MatchContext {
-
-// 	private readonly originalPattern: string;
-// 	private readonly originalElement: PatternElement;
-// 	// private readonly parserState: ParserState;
-// 	private readonly source: MatchContext;
-// 	// private readonly parsedExpressions: Expression<?>[] = [];
-// 	// private readonly regexMatches: MatchResult[] = [];
-// 	private readonly marks: string[] = [];
-// 	private patternIndex:number = 0;
-
-// 	constructor(element: PatternElement/*, parserState: ParserState*/)
-// 	constructor(element: PatternElement/*, parserState: ParserState*/, source: MatchContext)
-// 	constructor(element: PatternElement/*, parserState: ParserState*/, source?: MatchContext) {
-// 		this.originalPattern = element
-// 	}
-
-// }
 
 
 
@@ -87,6 +67,7 @@ export class ParseContext {
 
 
 
+// https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/parsing/ParserState.java
 /**
  * An object that stores data about the current parsing, on the scale of the entire trigger.
  */
@@ -104,6 +85,110 @@ export class ParserState {
 		));
 	}
 	
+	/**
+	 * @return the {@link TriggerContext}s handled by the currently parsed event
+	 */
+	public getCurrentContexts(): Set<Class<TriggerContext>> {
+		return this._currentContexts;
+	}
+
+	/**
+	 * Sets the {@link TriggerContext}s handled by the currently parsed event
+	 * @param currentContexts the handled {@link TriggerContext}s
+	 */
+	public setCurrentContexts(currentContexts: Set<Class<TriggerContext>>) {
+		this._currentContexts = currentContexts;
+	}
+
+	/**
+	 * @return a list of all enclosing {@linkplain CodeSection}s, with the closest one first
+	 */
+	public getCurrentSections(): CodeSection[] {
+		return new Array(...this._currentSections);
+	}
+
+	/**
+	 * Adds a new enclosing {@link CodeSection} to the hierarchy
+	 * @param section the enclosing {@link CodeSection}
+	 */
+	public addCurrentSection(section: CodeSection) {
+		this._currentSections.unshift(section);
+	}
+
+	/**
+     * Removes the current section from the hierarchy, after all parsing inside it has been completed.
+     */
+	public removeCurrentSection() {
+		this._currentSections.shift();
+	}
+
+    /**
+     * Returns a list of all consecutive, successfully parsed {@linkplain Statement}s
+     * in the enclosing section.
+     * This is essentially a list with all previously parsed items of this section.
+     * @return a list of all {@linkplain Statement}s in the enclosing section.
+     */
+	 public getCurrentStatements(): Statement[] {
+        return this._currentStatements[this._currentStatements.length - 1];
+    }
+
+    /**
+     * Adds a new {@link Statement} to the items of the enclosing section.
+     * @param statement the enclosing {@link Statement}
+     */
+    public addCurrentStatement(statement: Statement) {
+        this._currentStatements[this._currentStatements.length - 1].push(statement);
+    }
+
+    /**
+     * Uses recursion to allow items of a new enclosing section to be added, preserving
+     * the current items to be used when the {@linkplain #callbackCurrentStatements() callback}
+     * has been invoked.
+     */
+    public recurseCurrentStatements() {
+        this._currentStatements.push(new Array<Statement>());
+    }
+
+    /**
+     * Clears all stored items of this enclosing section,
+     * after all parsing inside it has been completed.
+     */
+    public callbackCurrentStatements() {
+        this._currentStatements.pop();
+    }
+
+    /**
+     * Define the syntax restrictions enforced by the current section
+     * @param allowedSyntaxes all allowed syntaxes
+     * @param restrictingExpressions whether expressions are also restricted
+     */
+    public setSyntaxRestrictions(allowedSyntaxes: Set<Class<SyntaxElement>>, restrictingExpressions: boolean) {
+        this._restrictions.push(new Pair<Set<Class<SyntaxElement>>, boolean>(allowedSyntaxes, restrictingExpressions));
+    }
+
+    /**
+     * Clears the previously enforced syntax restrictions
+     */
+    public clearSyntaxRestrictions() {
+        this._restrictions.pop();
+    }
+
+    /**
+     * @param c the class of the syntax
+     * @return whether the current syntax restrictions forbid a given syntax or not
+     */
+    public forbidsSyntax(c: Class<SyntaxElement>): boolean {
+        var allowedSyntaxes = this._restrictions[this._restrictions.length - 1].first;
+        return allowedSyntaxes.size > 0 && ![...allowedSyntaxes.values()].includes(c);
+    }
+
+    /**
+     * @return whether the current syntax restrictions also apply to expressions
+     */
+    public isRestrictingExpressions(): boolean {
+        return this._restrictions[this._restrictions.length - 1].second;
+    }
+
 }
 
 
@@ -120,21 +205,19 @@ export class SyntaxParser {
 			return;
 		}
 		for (let recentEvent of this._recentEvents.mergeWith(SyntaxManager.getEvents())) {
-			let trigger = _matchEventInfo(section. recentEvent);
+			let trigger = _matchEventInfo(section, recentEvent);
 			if (trigger) {
 				this._recentEvents.acknowledge(recentEvent);
 				return trigger;
 			}
 		}
-
-		console.log("No trigger matching '" + section.getLineContent() + "' was found");
+		console.log("No trigger matching '" + section.content + "' was found");
 		return;
-
 	}
 
 }
 
-function _matchEventInfo(section: FileSection, info: SkriptEventInfo<any>): UnloadedTrigger {
+function _matchEventInfo(section: FileSection, info: SkriptEventInfo<any>): UnloadedTrigger | undefined {
 	let patterns = info.patterns;
 	for (var i = 0; i < patterns.length; i++) {
 		let element = patterns[i];
@@ -142,49 +225,24 @@ function _matchEventInfo(section: FileSection, info: SkriptEventInfo<any>): Unlo
 		let parser = new MatchContext(element, parserState);
 		if (element.match(section.content, 0, parser) != -1) {
 			try {
-				let sec = new info.syntaxClass;
-				if (sec)
+				let event = new info.syntaxClass;
+				if (event instanceof SkriptEvent
+					&& event.init(parser.parsedExpression, i, parser.toParseResult())) {
+					continue;
+				}
+				let trig = new Trigger(event);
+				parserState.setCurrentContexts(info.contexts);
+				/*
+				* We don't actually load the trigger here, that will be left to the loading priority system
+				*/
+				var line = 0;
+				return new UnloadedTrigger(trig, section, line, info, parserState);
+			} catch (error) {
+				console.log("Couldn't instantiate class " + info.syntaxClass);
 			}
 		}
 	}
-}
-
-
-
-class UnloadedTrigger {
-
-	private readonly _trigger: Trigger;
-	private readonly _section: FileSection;
-	private readonly _line: number;
-	private readonly _eventinfo: SkriptEventInfo<any>;
-	private readonly _parserState: ParserState;
-
-	constructor(trigger: Trigger, section: FileSection, line: number, eventInfo:SkriptEventInfo<any>, parserState: ParserState) {
-		this._trigger = trigger;
-		this._section = section;
-		this._line = line;
-		this._eventinfo = eventInfo;
-		this._parserState = parserState;
-	}
-
-	
-	public get trigger() : Trigger {
-		return this._trigger;
-	}
-	public get section() : FileSection {
-		return this._section;
-	}
-	public get line() : number {
-		return this._line;
-	}
-	public get eventInfo() : SkriptEventInfo<any> {
-		return this._eventinfo;
-	}
-	public get parserState() : ParserState {
-		return this._parserState;
-	}
-	
-
+	return;
 }
 
 
