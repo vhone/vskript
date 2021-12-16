@@ -17,8 +17,35 @@ export abstract class SyntaxElement {
 
 }
 
+
+
+// https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/lang/SkriptEvent.java
+/**
+ * The entry point for all code in Skript. Once an event triggers, all of the code inside it may be run.
+ *
+ * Skript-parser's event system is composed of three interacting parts : {@link Trigger}, {@link SkriptEvent} and {@link TriggerContext}.
+ * This is directly parallel to Skript's event system, with Bukkit's own Event class replacing TriggerContext.
+ *
+ * Let's explain how this system works using a simple analogy : skript-parser is like a giant kitchen :
+ * <ul>
+ *   <li>The goal is to prepare food (write code).</li>
+ *   <li>There are many different types of food to prepare ({@link TriggerContext}s).</li>
+ *   <li>There are different means of actually preparing the food (different {@link SkriptEvent}s), each one being specific to one or more types of food</li>
+ *   <li>Finally, in order to make the recipe come together, one needs the physical, tangible tools to achieve that ({@link Trigger}s)</li>
+ * </ul>
+ */
 export abstract class SkriptEvent implements SyntaxElement {
 
+    /**
+     * Whether this event should trigger, given the {@link TriggerContext}
+     * @param ctx the TriggerContext to check
+     * @return whether the event should trigger
+     */
+	public abstract check(ctx: TriggerContext): boolean;
+
+	public loadSection(section: FileSection, parserState: ParserState) {
+		return ScriptLoader.
+	}
 	abstract init(expressions: Expression<any>[], matchedPattern: number, parseContext: any): boolean;
 	abstract toString(ctx: TriggerContext, debug: boolean): string;
 	abstract checkIsSection(parseContext: any, isStrict: boolean, ...requiredSections: any): boolean;
@@ -194,6 +221,7 @@ export abstract class CodeSection extends Statement {
 
 
 
+// https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/lang/Trigger.java
 /**
  * A top-level section, that is not contained in code.
  * Usually declares an event.

@@ -1,4 +1,4 @@
-import { StringBuilder } from "../../../Java";
+import { StringBuilder } from "../../Java";
 
 export function getEnclosedText(pattern: string, opening: string, closing: string, start: number): string | undefined {
 	let closingBracket = findClosingIndex(pattern, opening, closing, start);
@@ -133,4 +133,32 @@ function _stringAll(strings: string[]): string[] {
 		strings[i] = strings[i].trim();
 	}
 	return strings;
+}
+
+
+
+/**
+ * Java String.compareTo method
+ * @param s1 first string
+ * @param s2 second string
+ */
+export function compareTo(s1: string, s2: string): number {
+
+	if (s1 === '' && s2 === '') {
+		return 0;
+	} else if (s1 === '') {
+		return 1;
+	} else if (s2 === '') {
+		return -1;
+	}
+	
+	let c1 = s1.charCodeAt(0);
+	let c2 = s2.charCodeAt(0);
+	if (c1 < c2) {
+		return -1;
+	} else if (c1 > c2) {
+		return 1;
+	} else {
+		return compareTo(s1.substring(1, s1.length), s2.substring(1, s2.length));
+	}
 }

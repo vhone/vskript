@@ -1,10 +1,14 @@
+import { Uri } from "vscode";
 import { Class } from "../../../Java";
-import { Pair } from "../Util/Pair";
-import { RecentElementList } from "../Util/RecentElementList";
-import { FileSection } from "./File";
+import { MultiMap } from "../../util/MultyMap";
+import { Pair } from "../../util/Pair";
+import { RecentElementList } from "../../util/RecentElementList";
+import { FileElement, FileParser, FileSection, VoidElement } from "./File";
 import { CodeSection, Expression, SkriptEvent, Statement, SyntaxElement, Trigger, TriggerContext, UnloadedTrigger } from "./lang";
 import { PatternElement } from "./Pattern";
 import { SkriptEventInfo, SyntaxManager } from "./Registration";
+import * as FileUtils from '../../util/FileUtils';
+import * as Path from 'path'; 
 
 
 
@@ -313,4 +317,63 @@ export class MatchContext {
 		);
 	}
 	
+}
+
+
+
+// https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/parsing/ScriptLoader.java
+/**
+ * Contains the logic for loading, parsing and interpreting entire script files
+ */
+export class ScriptLoader {
+
+	private static readonly triggerMap = new  MultiMap<string, Trigger>();
+
+    /**
+     * Parses and loads the provided script in memory
+     * @param scriptPath the script file to load
+     * @param debug whether debug is enabled
+     */
+	public static loadScript(scriptPath: Uri, debug: boolean) {
+		// let logger = new SKriptLogger(debug);
+		let elements: FileElement[];
+		let scriptName: string;
+		try{ 
+			let lines = FileUtils.readAllLines(scriptPath.fsPath);
+			let skName = Path.basename(scriptPath.fsPath).replace(/(.+)\..+/, "$1");
+			let elements = FileParser.parseFileLines(skName, lines, 0 , 1);
+			
+			let unloadedTriggers: UnloadedTrigger[] = [];
+			for (const element of elements) {
+				if (element instanceof VoidElement) {
+					continue;
+				} else if (element instanceof FileSection) {
+					let trig = SyntaxParser.parseTrigger(element);
+					if (trig) {
+						unloadedTriggers.push(trig);
+					}
+				} else {
+					console.log(
+						"Can't have code outside of a trigger",
+						// ErrorType.STRUCTURE_ERROR,
+						"Code always starts with a trigger (or event). Refer to the documentation to see which event you need, or indent this line so it is part of a trigger"
+					);
+				}
+			}
+			unloadedTriggers.sort((a, b) => b.trigger.getEvent())
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+    /**
+     * Parses all items inside of a given section.
+     * @param section the section
+     * @param logger the logger
+     * @return a list of {@linkplain Statement effects} inside of the section
+     */
+	public loadItems(section: FileSection, parserState: ParserState) {
+
+	}
+
 }

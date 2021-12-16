@@ -4,7 +4,7 @@
 
 import { Console } from "node:console";
 import { StringBuilder } from "../../../Java";
-import * as FileUtils from "../Util/FileUtils";
+import * as FileUtils from "../../util/FileUtils";
 
 
 export class FileElement {

@@ -1,5 +1,5 @@
 import { StringBuilder } from '../../../Java';
-import * as StringUtil from '../Util/StringUtils';
+import * as StringUtil from '../../util/StringUtils';
 import { MatchContext } from './Parsing';
 
 class PatternParser {

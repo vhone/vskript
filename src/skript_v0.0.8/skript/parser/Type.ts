@@ -1,5 +1,5 @@
 import { Class, JavaObject } from '../../../Java';
-import * as StringUtils from '../Util/StringUtils';
+import * as StringUtils from '../../util/StringUtils';
 
 
 export class LegacyType {

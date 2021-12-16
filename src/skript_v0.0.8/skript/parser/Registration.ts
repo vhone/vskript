@@ -2,7 +2,7 @@
 // https://github.com/SkriptLang/skript-parser/tree/master/src/main/java/io/github/syst3ms/skriptparser/registration
 
 import { Class, Comparator, JavaObject, StringBuilder } from "../../../Java";
-import { MultiMap } from "../Util/MultyMap";
+import { MultiMap } from "../../util/MultyMap";
 import { CodeSection, Effect, SkriptEvent, TriggerContext } from "./lang";
 import { ParserState } from "./Parsing";
 import { PatternElement } from "./Pattern";

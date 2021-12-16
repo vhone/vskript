@@ -5,6 +5,7 @@ import TextDocumentChangeEvent from './skript_v0.0.7/event/TextDocumentChangeEve
 import { LEGEND } from './skript_v0.0.7/provider/SkriptDocumentSemanticTokensProvider';
 import { VisualSkript } from './skript_v0.0.8/skript/Skript';
 import { Class, StringBuilder } from './Java';
+import * as StringUtils from './skript_v0.0.8/util/StringUtils';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -45,17 +46,9 @@ export function activate(_context:ExtensionContext) {
 	// let lines: string[] = lang.split(/\r\n|\r|\n/);
 	// // console.log(lines);
 	// console.log(FileParser.parseFileLines('alias', lines, 0, 0))
+
+	// console.log(StringUtils.compareTo('aa', 'a'))
 	
 }
 
 export function deactivate() {}
-
-
-class Test {
-	constructor(public msg: string) {
-		console.log(msg)
-	}
-}
-
-let a: Class<Test> = Test;
-console.log(new a())

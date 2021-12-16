@@ -1,4 +1,4 @@
-import { JavaObject } from "../../../Java";
+import { JavaObject } from "../../Java";
 import * as ArrayUtils from './ArrayUtils'
 
 
