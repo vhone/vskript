@@ -162,3 +162,19 @@ export function compareTo(s1: string, s2: string): number {
 		return compareTo(s1.substring(1, s1.length), s2.substring(1, s2.length));
 	}
 }
+
+
+
+/**
+ * for Java.Util.String.formet Method
+ * @param format {/\d+/}
+ * @param arg values
+ */
+export function format(format: string, ...args: string[]) {
+	console.log(args.length);
+	for (let i = 0; i < args.length; i++) {
+		let arg = args[i];
+		format = format.replace(new RegExp(`\\{${i}\\}`), arg);
+	}
+	return format;
+}

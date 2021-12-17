@@ -1,6 +1,6 @@
 import { Class } from "../../../Java";
 import { FileSection } from "./File";
-import { ParseContext, ParserState } from "./Parsing";
+import { ParseContext, ParserState, ScriptLoader } from "./Parsing";
 import { SkriptEventInfo } from "./Registration";
 
 
@@ -44,8 +44,23 @@ export abstract class SkriptEvent implements SyntaxElement {
 	public abstract check(ctx: TriggerContext): boolean;
 
 	public loadSection(section: FileSection, parserState: ParserState) {
-		return ScriptLoader.
+		return ScriptLoader.loadItems(section, parserState);
 	}
+
+	/**
+     * For virtually all programming and scripting languages, the need exists to have functions in order to not repeat
+     * code too often. Skript is no exception, however, by default, every trigger is loaded in the order it appears in the file,
+     * This is undesirable if we don't want the restriction of having to declare functions before using them. This is especially
+     * counter-productive if we're dealing with multiple scripts.
+     *
+     * To solve this problem, {@link Trigger triggers} with with a higher loading priority number will be loaded first.
+     *
+     * @return the loading priority number. 0 by default
+     */
+	public getLoadingPriority(): number {
+		return 0;
+	}
+
 	abstract init(expressions: Expression<any>[], matchedPattern: number, parseContext: any): boolean;
 	abstract toString(ctx: TriggerContext, debug: boolean): string;
 	abstract checkIsSection(parseContext: any, isStrict: boolean, ...requiredSections: any): boolean;
@@ -245,7 +260,7 @@ export class Trigger extends CodeSection {
 		throw this._event.toString(ctx, debug);
 	}
 
-	public getEvent(): SkriptEvent {
+	public get event(): SkriptEvent {
 		return this._event;
 	}
 

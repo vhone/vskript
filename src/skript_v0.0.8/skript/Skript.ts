@@ -203,7 +203,7 @@ class Skript extends SkriptAddon {
 	}
 
 	public handleTrigger(trigger: Trigger): void {
-		let event = trigger.getEvent();
+		let event = trigger.get event();
 
 		if (!this.canHandleEvent(event)){
 			return;

@@ -48,7 +48,7 @@ export function activate(_context:ExtensionContext) {
 	// console.log(FileParser.parseFileLines('alias', lines, 0, 0))
 
 	// console.log(StringUtils.compareTo('aa', 'a'))
-	
+
 }
 
 export function deactivate() {}

@@ -43,9 +43,6 @@ export class FileElement {
 
 
 export class FileSection extends FileElement {
-	recentEvent(recentEvent: any) {
-		throw new Error("Method not implemented.");
-	}
 
 	private readonly _elements: FileElement[];
 	private _length = -1;

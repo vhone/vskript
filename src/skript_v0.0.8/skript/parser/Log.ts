@@ -11,7 +11,7 @@ import { FileElement, FileSection } from "./File";
  */
 export public class SkriptLogger {
 	
-	public static readonly LOG_FORMAT: string = '%s (line %d: \"%s\", %s)';
+	public static readonly LOG_FORMAT: string = '{1} (line {2}: "{3}", {4})';
 
 	/*
      * In decreasing order of priority :
@@ -63,6 +63,7 @@ export public class SkriptLogger {
 	private readonly _logged: LogEntry[] = [];
 
 	constructor()
+	constructor(debug: boolean)
 	constructor(debug?: boolean) {
 		this._debug = debug ? debug: false;
 		this._errorContext.push(ErrorContext.MATCHING);
@@ -101,56 +102,56 @@ export public class SkriptLogger {
      * @return the current line
      */
 	 public getLine(): number {
-        return line;
+        return this._line;
     }
 
     /**
      * Like {@link #getLine()}, is only used for the purposes of the trigger loading priority system.
      * @param line the new line number
      */
-    public void setLine(int line) {
-        this.line = line;
+    public setLine(line: number) {
+        this._line = line;
     }
 
     /**
      * Increments the recursion of the logger ; should be called before calling methods that may use SkriptLogger later
      * in execution.
      */
-    public void recurse() {
-        errorContext.addLast(ErrorContext.MATCHING);
+    public recurse() {
+        this._errorContext.push(ErrorContext.MATCHING);
     }
 
     /**
      * Decrements the recursion of the logger ; should be called after calling methods that may use SkriptLogger later
      * in execution.
      */
-    public void callback() {
-        errorContext.removeLast();
+    public callback() {
+        this._errorContext.pop();
     }
 
     /**
      * Updates the error context, which matters for establishing which errors are the most important
      * @param context the new error context
      */
-    public void setContext(ErrorContext context) {
-        errorContext.removeLast();
-        errorContext.addLast(context);
+    public setContext(context: ErrorContext) {
+        this._errorContext.pop();
+        this._errorContext.push(context);
     }
 
-    private void log(String message, LogType type, @Nullable ErrorType error, @Nullable String tip) {
-        if (open) {
-            List<ErrorContext> ctx = new ArrayList<>(errorContext);
-            if (line == -1) {
-                logEntries.add(new LogEntry(message, type, line, ctx, error, tip));
+    private log(message: string, type: LogType, error: ErrorType, tip: string) {
+        if (this._open) {
+            let ctx: ErrorContext[] = this._errorContext;
+            if (this._line == -1) {
+                this._logEntries.push(new LogEntry(message, type, this._line, ctx, error, tip));
             } else {
-                logEntries.add(new LogEntry(
-                        String.format(
-                                LOG_FORMAT,
+                this._logEntries.push(new LogEntry(
+                        StringUtils.format(
+                                SkriptLogger.LOG_FORMAT,
                                 message,
-                                line + 1,
-                                fileElements.get(line).getLineContent(),
-                                fileName),
-                        type, line, ctx, error, tip
+                                `${this._line + 1}`,
+                                this._fileElements[this._line].content,
+                                this._fileName),
+                        type, this._line, ctx, error, tip
                 ));
             }
         }
@@ -161,9 +162,7 @@ export public class SkriptLogger {
      * @param message the error message
      * @param errorType the error type
      */
-    public void error(String message, ErrorType errorType) {
-        error(message, errorType, null);
-    }
+    public error(message: string, errorType: ErrorType)
 
     /**
      * Logs an error message with a tip on how to solve it.
@@ -171,11 +170,13 @@ export public class SkriptLogger {
      * @param errorType the error type
      * @param tip the tip for solving the error
      */
-    public void error(String message, ErrorType errorType, @Nullable String tip) {
-        if (!hasError) {
-            clearNotError(); // Errors take priority over everything (except DEBUG), so we just delete all other logs
-            log(message, LogType.ERROR, errorType, tip);
-            hasError = true;
+    public error(message: string, errorType: ErrorType, tip: string)
+    
+    public error(message: string, errorType: ErrorType, tip?: string) {
+        if (!this._hasError) {
+            this.clearNotError(); // Errors take priority over everything (except DEBUG), so we just delete all other logs
+            this.log(message, LogType.ERROR, errorType, tip);
+            this._hasError = true;
         }
     }
 
@@ -183,40 +184,40 @@ export public class SkriptLogger {
      * Logs a warning message
      * @param message the warning message
      */
-    public void warn(String message) {
-        log(message, LogType.WARNING, null, null);
+    public warn(message: string) {
+        this.log(message, LogType.WARNING, null, null);
     }
 
     /**
      * Logs an info message
      * @param message the info message
      */
-    public void info(String message) {
-        log(message, LogType.INFO, null, null);
+    public info(message: string) {
+        this.log(message, LogType.INFO, null, null);
     }
 
     /**
      * Logs a debug message. Will only work if debug mode is enabled.
      * @param message the debug message
      */
-    public void debug(String message) {
-        if (debug)
-            log(message, LogType.DEBUG, null, null);
+    public debug(message: string) {
+        if (this._debug)
+            this.log(message, LogType.DEBUG, null, null);
     }
 
     /**
      * Used to "forget" about a previous error, in case it is desirable to take into account multiple errors.
      * Should only be called by the parser.
      */
-    public void forgetError() {
-        hasError = false;
+    public forgetError() {
+        this._hasError = false;
     }
 
     /**
      * Clears every log that is not an error or a debug message.
      */
-    public void clearNotError() {
-        logEntries.removeIf(entry -> entry.getErrorContext().size() >= errorContext.size() && entry.getType() != LogType.ERROR && entry.getType() != LogType.DEBUG);
+    public clearNotError() {
+        this._logEntries.removeIf(entry -> entry.getErrorContext().size() >= errorContext.size() && entry.getType() != LogType.ERROR && entry.getType() != LogType.DEBUG);
     }
 
     /**
@@ -305,6 +306,7 @@ export class LogEntry {
 	private readonly _tip: string | undefined;
 
 	constructor(message: string, verbosity: LogType, line: number, errorContext: ErrorContext[], errorType: ErrorType)
+	constructor(message: string, verbosity: LogType, line: number, errorContext: ErrorContext[], errorType: ErrorType, tip: string)
 	constructor(message: string, verbosity: LogType, line: number, errorContext: ErrorContext[], errorType: ErrorType, tip?: string) {
 		this._type = verbosity;
 		this._message = message;
