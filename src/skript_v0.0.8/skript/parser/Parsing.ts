@@ -7,7 +7,7 @@ import { FileElement, FileParser, FileSection, VoidElement } from "./File";
 import { CodeSection, Expression, SkriptEvent, Statement, SyntaxElement, Trigger, TriggerContext, UnloadedTrigger } from "./lang";
 import { PatternElement } from "./Pattern";
 import { SkriptEventInfo, SyntaxManager } from "./Registration";
-import * as FileUtils from '../../util/FileUtils';
+import { FileUtils } from '../../util/FileUtils';
 import * as Path from 'path'; 
 import { LogEntry, SkriptLogger } from "./Log";
 

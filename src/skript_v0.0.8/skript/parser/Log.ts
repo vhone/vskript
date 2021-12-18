@@ -1,6 +1,6 @@
-import { addListener } from "process";
-import { Comparator } from "../../../Java";
-import * as StringUtils from '../../util/StringUtils'
+import { Comparator, Stream } from "../../../Java";
+import { ArrayUtils } from "../../util/ArrayUtils";
+import { StringUtils }  from '../../util/StringUtils'
 import { FileElement, FileSection } from "./File";
 
 
@@ -9,7 +9,7 @@ import { FileElement, FileSection } from "./File";
  * An object through which Skript can keep track of errors, warnings and other useful information to the one that writes
  * Skript code.
  */
-export public class SkriptLogger {
+export class SkriptLogger {
 	
 	public static readonly LOG_FORMAT: string = '{1} (line {2}: "{3}", {4})';
 
@@ -32,8 +32,7 @@ export public class SkriptLogger {
      * ErrorContext.MATCHING + ErrorContext.NO_MATCH
      * ErrorContext.NO_MATCH
      */
-	private static readonly ERROR_COMPARATOR: Comparator<LogEntry> = {
-		compare: (e1: LogEntry, e2: LogEntry) => {
+	private static readonly ERROR_COMPARATOR = (e1: LogEntry, e2: LogEntry) => {
 		let c1 = e1.errorContext;
 		let c2 = e2.errorContext;
 		if (c1 !== c2) {
@@ -45,9 +44,11 @@ export public class SkriptLogger {
 				.join('');
 			return StringUtils.compareTo(s1, s2);
 		} else {
-			return e1.errorType.valueOf() - e2.errorType.valueOf();
+            let v1 = e1.errorType ? e1.errorType.valueOf() : 0;
+            let v2 = e2.errorType ? e2.errorType.valueOf() : 0;
+			return v1 - v2;
 		}
-	}};
+	};
 
 	// State
 	private readonly _debug: boolean;
@@ -55,8 +56,8 @@ export public class SkriptLogger {
 	private _hasError = false;
 	private readonly _errorContext: ErrorContext[] = [];
 	// File
-	private _fileName: string;
-	private _fileElements: FileElement[];
+	private _fileName: string = '';
+	private _fileElements: FileElement[] = [];
 	private _line = -1;
 	// Logs
 	private readonly _logEntries: LogEntry[] = [];
@@ -76,15 +77,15 @@ export public class SkriptLogger {
      */
 	public setFileInfo(fileName: string, fileElements: FileElement[]) {
 		this._fileName = fileName;
-		this._fileElements = flatten(fileElements);
+		this._fileElements = this._flatten(fileElements);
 	}
 
-	private flatten(fileElements: FileElement[]): FileElement[] {
+	private _flatten(fileElements: FileElement[]): FileElement[] {
 		let list: FileElement[] = [];
 		for (const element of fileElements) {
 			list.push(element);
 			if (element instanceof FileSection) {
-				list.push(...this.flatten(element.elements));
+				list.push(...this._flatten(element.elements));
 			}
 		}
 		return list;
@@ -138,7 +139,7 @@ export public class SkriptLogger {
         this._errorContext.push(context);
     }
 
-    private log(message: string, type: LogType, error: ErrorType, tip: string) {
+    private log(message: string, type: LogType, error: ErrorType | undefined, tip: string | undefined) {
         if (this._open) {
             let ctx: ErrorContext[] = this._errorContext;
             if (this._line == -1) {
@@ -146,13 +147,15 @@ export public class SkriptLogger {
             } else {
                 this._logEntries.push(new LogEntry(
                         StringUtils.format(
-                                SkriptLogger.LOG_FORMAT,
-                                message,
-                                `${this._line + 1}`,
-                                this._fileElements[this._line].content,
-                                this._fileName),
+                            SkriptLogger.LOG_FORMAT,
+                            message,
+                            `${this._line + 1}`,
+                            this._fileElements[this._line].content,
+                            this._fileName
+                        ),
                         type, this._line, ctx, error, tip
-                ));
+                    )
+                );
             }
         }
     }
@@ -162,7 +165,7 @@ export public class SkriptLogger {
      * @param message the error message
      * @param errorType the error type
      */
-    public error(message: string, errorType: ErrorType)
+    public error(message: string, errorType: ErrorType): void
 
     /**
      * Logs an error message with a tip on how to solve it.
@@ -170,9 +173,9 @@ export public class SkriptLogger {
      * @param errorType the error type
      * @param tip the tip for solving the error
      */
-    public error(message: string, errorType: ErrorType, tip: string)
+    public error(message: string, errorType: ErrorType, tip: string): void
     
-    public error(message: string, errorType: ErrorType, tip?: string) {
+    public error(message: string, errorType: ErrorType, tip?: string): void {
         if (!this._hasError) {
             this.clearNotError(); // Errors take priority over everything (except DEBUG), so we just delete all other logs
             this.log(message, LogType.ERROR, errorType, tip);
@@ -185,7 +188,7 @@ export public class SkriptLogger {
      * @param message the warning message
      */
     public warn(message: string) {
-        this.log(message, LogType.WARNING, null, null);
+        this.log(message, LogType.WARNING, undefined, '');
     }
 
     /**
@@ -193,7 +196,7 @@ export public class SkriptLogger {
      * @param message the info message
      */
     public info(message: string) {
-        this.log(message, LogType.INFO, null, null);
+        this.log(message, LogType.INFO, undefined, undefined);
     }
 
     /**
@@ -202,7 +205,7 @@ export public class SkriptLogger {
      */
     public debug(message: string) {
         if (this._debug)
-            this.log(message, LogType.DEBUG, null, null);
+            this.log(message, LogType.DEBUG, undefined, undefined);
     }
 
     /**
@@ -217,75 +220,96 @@ export public class SkriptLogger {
      * Clears every log that is not an error or a debug message.
      */
     public clearNotError() {
-        this._logEntries.removeIf(entry -> entry.getErrorContext().size() >= errorContext.size() && entry.getType() != LogType.ERROR && entry.getType() != LogType.DEBUG);
+        ArrayUtils.removeIf(this._logEntries, (entry) => {
+            return (
+                entry.errorContext.length >= this._errorContext.length
+                && entry.type != LogType.ERROR
+                && entry.type != LogType.DEBUG
+            );
+        });
     }
 
     /**
      * Clears every log that is an error message.
      */
-    public void clearErrors() {
-        logEntries.removeIf(entry -> entry.getErrorContext().size() >= errorContext.size() && entry.getType() == LogType.ERROR);
-        setContext(ErrorContext.MATCHING);
-        hasError = false;
+    public clearErrors() {
+        ArrayUtils.removeIf(this._logEntries, (entry) => {
+            return (
+                entry.errorContext.length >= this._errorContext.length
+                && entry.type != LogType.ERROR
+            );
+        });
+        this.setContext(ErrorContext.MATCHING);
+        this._hasError = false;
     }
 
 
     /**
      * Clears every log that is not a debug message.
      */
-    public void clearLogs() {
-        logEntries.removeIf(entry -> entry.getErrorContext().size() >= errorContext.size() && entry.getType() != LogType.DEBUG);
-        setContext(ErrorContext.MATCHING);
-        hasError = false;
+    public clearLogs() {
+        ArrayUtils.removeIf(this._logEntries, (entry) => {
+            return (
+                entry.errorContext.length >= this._errorContext.length
+                && entry.type != LogType.DEBUG
+            );
+        });
+        this.setContext(ErrorContext.MATCHING);
+        this._hasError = false;
     }
 
     /**
      * Finishes a logging process by making some logged entries definitive. All non-error logs are made definitive
      * and only the error that has the most priority is made definitive.
      */
-    public void finalizeLogs() {
-        logEntries.stream()
-                .filter(e -> e.getType() == LogType.ERROR)
-                .min(ERROR_COMPARATOR)
-                .ifPresent(logged::add);
-        for (var entry : logEntries) { // If no errors have been logged, then all other LogTypes get logged here, DEBUG being the special case
-            if (entry.getType() != LogType.ERROR) {
-                logged.add(entry);
+    public finalizeLogs() {
+
+        let loggedEntry = new Stream<LogEntry>(this._logEntries)
+            .filter((e) => e.type === LogType.ERROR)
+            .comparate(SkriptLogger.ERROR_COMPARATOR)
+            .min();
+        if (loggedEntry) {
+            this._logged.push(loggedEntry);
+        }
+
+        for (var entry of this._logEntries) { // If no errors have been logged, then all other LogTypes get logged here, DEBUG being the special case
+            if (entry.type != LogType.ERROR) {
+                this._logged.push(entry);
             }
         }
-        clearLogs();
+        this.clearLogs();
     }
 
     /**
      * Finishes this Logger object, making it impossible to edit.
      * @return the final logged entries
      */
-    public List<LogEntry> close() {
-        open = false;
-        logged.sort((e1, e2) -> { // Due to the load priority system, entries might not be ordered like their corresponding lines
-            if (e1.getLine() == -1 || e2.getLine() == -1)
+    public close(): LogEntry[] {
+        this._open = false;
+        this._logged.sort((e1, e2) => { // Due to the load priority system, entries might not be ordered like their corresponding lines
+            if (e1.line === -1 || e2.line === -1)
                 return 0;
-            return e1.getLine() - e2.getLine();
+            return e1.line - e2.line;
         });
-        return logged;
+        return this._logged;
     }
 
     /**
      * @return whether this Logger is in debug mode
      */
-    public boolean isDebug() {
-        return debug;
+    public isDebug(): boolean {
+        return this._debug;
     }
 
-    public String getFileName() {
-        return fileName;
+    public getFileName(): String {
+        return this._fileName;
     }
 
     /**
      * @return whether or not this Logger has an error stored
      */
-    public boolean hasError() {
-        return hasError;
+    public hasError(): boolean {
+        return this._hasError;
     }
 
 }
@@ -302,18 +326,18 @@ export class LogEntry {
 	private readonly _message: string;
 	private readonly _line: number;
 	private readonly _errorContext: ErrorContext[];
-	private readonly _errorType: ErrorType;
+	private readonly _errorType: ErrorType | undefined;
 	private readonly _tip: string | undefined;
 
-	constructor(message: string, verbosity: LogType, line: number, errorContext: ErrorContext[], errorType: ErrorType)
-	constructor(message: string, verbosity: LogType, line: number, errorContext: ErrorContext[], errorType: ErrorType, tip: string)
-	constructor(message: string, verbosity: LogType, line: number, errorContext: ErrorContext[], errorType: ErrorType, tip?: string) {
+	constructor(message: string, verbosity: LogType, line: number, errorContext: ErrorContext[], errorType: ErrorType | undefined)
+	constructor(message: string, verbosity: LogType, line: number, errorContext: ErrorContext[], errorType: ErrorType | undefined, tip: string | undefined)
+	constructor(message: string, verbosity: LogType, line: number, errorContext: ErrorContext[], errorType: ErrorType | undefined, tip?: string) {
 		this._type = verbosity;
 		this._message = message;
 		this._line = line;
 		this._errorContext = errorContext;
 		this._errorType = errorType;
-		if (this._errorType) this._tip = tip;
+		if (tip) this._tip = tip;
 	}
 
 	public get message(): string {
@@ -328,7 +352,7 @@ export class LogEntry {
 		return this._errorContext;
 	}
 	
-	public get errorType() : ErrorType {
+	public get errorType() : ErrorType | undefined {
 		return this._errorType;
 	}
 	

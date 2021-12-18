@@ -1,5 +1,5 @@
 import { StringBuilder } from '../../../Java';
-import * as StringUtil from '../../util/StringUtils';
+import { StringUtils } from '../../util/StringUtils';
 import { MatchContext } from './Parsing';
 
 class PatternParser {
@@ -44,7 +44,7 @@ class PatternParser {
 
 			// Optional 패턴
 			} else if (ch === '[') {
-				let enclosedText = StringUtil.getEnclosedText(pattern, '[', ']', i);
+				let enclosedText = StringUtils.getEnclosedText(pattern, '[', ']', i);
 				console.log('[Optional]', enclosedText)
 
 				if (!enclosedText) {
@@ -63,7 +63,7 @@ class PatternParser {
 
 				let optionalGroup: OptionalGroup | undefined;
 				let matcher = this.PARSE_MARK_PATTERN.exec(enclosedText);
-				let vertParts = StringUtil.splitVerticalBars(pattern);
+				let vertParts = StringUtils.splitVerticalBars(pattern);
 
 				if (!vertParts) {
 					return;
@@ -91,7 +91,7 @@ class PatternParser {
 
 			// Choice 패턴
 			} else if (ch === '(') {
-				let enclosedText = StringUtil.getEnclosedText(pattern, '(', ')', i);
+				let enclosedText = StringUtils.getEnclosedText(pattern, '(', ')', i);
 				console.log('[Choice]', enclosedText)
 
 				if (!enclosedText) {
@@ -106,7 +106,7 @@ class PatternParser {
 
 				i += enclosedText.length + 1;
 
-				let choises = StringUtil.splitVerticalBars(enclosedText);
+				let choises = StringUtils.splitVerticalBars(enclosedText);
 				if (!choises) {
 					return;
 				}
@@ -140,7 +140,7 @@ class PatternParser {
 			
 			// 정규식 패턴
 			} else if (ch === '<') {
-				let enclosedText = StringUtil.getEnclosedText(pattern, '<', '>', i);
+				let enclosedText = StringUtils.getEnclosedText(pattern, '<', '>', i);
 				console.log('[RegExp]', enclosedText);
 
 				if (!enclosedText) {

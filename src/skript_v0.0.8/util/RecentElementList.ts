@@ -1,5 +1,5 @@
 import { JavaObject } from "../../Java";
-import * as ArrayUtils from './ArrayUtils'
+import { ArrayUtils } from "./ArrayUtils";
 
 
 // https://github.com/SkriptLang/skript-parser/blob/master/src/main/java/io/github/syst3ms/skriptparser/util/RecentElementList.java

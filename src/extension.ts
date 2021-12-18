@@ -3,9 +3,9 @@ import { onSkriptEnable } from './skript_v0.0.7/Skript';
 import * as Provider from './skript_v0.0.7/provider/Provider';
 import TextDocumentChangeEvent from './skript_v0.0.7/event/TextDocumentChangeEvent';
 import { LEGEND } from './skript_v0.0.7/provider/SkriptDocumentSemanticTokensProvider';
-import { VisualSkript } from './skript_v0.0.8/skript/Skript';
-import { Class, StringBuilder } from './Java';
-import * as StringUtils from './skript_v0.0.8/util/StringUtils';
+import { ArrayUtils } from './skript_v0.0.8/util/ArrayUtils';
+import { Statement } from './skript_v0.0.8/skript/parser/lang';
+import { Comparator, JavaObject } from './Java';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -48,7 +48,9 @@ export function activate(_context:ExtensionContext) {
 	// console.log(FileParser.parseFileLines('alias', lines, 0, 0))
 
 	// console.log(StringUtils.compareTo('aa', 'a'))
-
+	
 }
 
 export function deactivate() {}
+
+
