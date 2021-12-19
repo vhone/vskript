@@ -7,6 +7,7 @@ import { SkriptEvent, Trigger, UnloadedTrigger } from './parser/lang';
 import * as FileUtils from '../util/FileUtils'
 import { FileParser, FileSection, VoidElement } from './parser/File';
 import { ScriptLoader, SyntaxParser } from './parser/Parsing';
+import { SkriptAddon } from './parser/Registration';
 
 
 
@@ -136,59 +137,11 @@ export class VisualSkript {
 
 
 
-// 
-/**
- * The base for all addons, modules that hook into the API to register syntax and handle triggers.
- */
-abstract class SkriptAddon {
-
-	private static readonly addons = new Array<SkriptAddon>();
-
-	// private name: string;
-	private readonly _handledEvents = new Array<Class<SkriptEvent>>();
-
-	constructor() {
-		SkriptAddon.addons.push(this);
-	}
-
-	public static getAddons(): SkriptAddon[] {
-		return this.addons;
-	}
-
-	/**
-     * When a {@linkplain Trigger} is successfully parsed, it is "broadcast" to all addons through this method,
-     * in the hopes that one of them will be able to handle it.
-     * @param trigger the trigger to be handled
-     * @see #canHandleEvent(SkriptEvent)
-     */
-	public abstract handleTrigger(trigger: Trigger): void;
-	
-    /**
-     * Is called when a script has finished loading. Optionally overridable.
-     */
-	public fishingedLoading(): void {}
-
-    /**
-     * Checks to see whether the given event has been registered by this SkriptAddon ; a basic way to filter out
-     * triggers you aren't able to deal with in {@link SkriptAddon#handleTrigger(Trigger)}.
-     * A simple example of application can be found in {@link Skript#handleTrigger(Trigger)}.
-     * @param event the event to check
-     * @return whether the event can be handled by the addon or not
-     * @see Skript#handleTrigger(Trigger)
-     */
-	public canHandleEvent(event: SkriptEvent): boolean {
-		return this._handledEvents.includes(event.constructor()) ;
-	}
-
-	addHandledEvent(event: Class<SkriptEvent>) {
-		this._handledEvents.push(event);
-	}
-}
 
 
 
 
-class Skript extends SkriptAddon {
+export class Skript extends SkriptAddon {
 
 	private readonly _mainArgs: string[];
 
@@ -215,6 +168,3 @@ class Skript extends SkriptAddon {
 	}
 	
 }
-
-
-

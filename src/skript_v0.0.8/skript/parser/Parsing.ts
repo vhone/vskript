@@ -328,7 +328,7 @@ export class MatchContext {
  */
 export class ScriptLoader {
 
-	private static readonly triggerMap = new  MultiMap<string, Trigger>();
+	private static readonly _triggerMap = new  MultiMap<string, Trigger>();
 
     /**
      * Parses and loads the provided script in memory
@@ -370,8 +370,13 @@ export class ScriptLoader {
 			}
 		}
 		unloadedTriggers.sort((a, b) => b.trigger.event.getLoadingPriority() - a.trigger.event.getLoadingPriority())
-		for (const uloaded of unloadedTriggers) {
-			
+		for (const unloaded of unloadedTriggers) {
+			logger.finalizeLogs();
+			logger.setLine(unloaded.line);
+			let loaded = unloaded.trigger;
+			loaded.loadSection(unloaded.section, unloaded.parserState, logger);
+			unloaded.eventInfo.registerer.handleTrigger(loaded);
+			this._triggerMap.putOne(scriptName, loaded);
 		}
 		return [];
 	}

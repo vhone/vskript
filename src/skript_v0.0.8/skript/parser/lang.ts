@@ -1,5 +1,6 @@
 import { Class } from "../../../Java";
 import { FileSection } from "./File";
+import { SkriptLogger } from "./Log";
 import { ParseContext, ParserState, ScriptLoader } from "./Parsing";
 import { SkriptEventInfo } from "./Registration";
 
@@ -186,12 +187,27 @@ export interface TriggerContext {
  */
 export abstract class CodeSection extends Statement {
 
-	protected _items!: Statement[];
+	protected _items: Statement[];
 	protected _first: Statement | undefined;
 	protected _last: Statement | undefined;
 
-	public loadSection(_section: FileSection, _parserState:ParserState) {
-		
+    /**
+     * This methods determines the logic of what is being done to the elements inside of this section.
+     * By default, this simply parses all items inside it, but this can be overridden.
+     * In case an extending class just needs to do some additional operations on top of what the default implementation
+     * already does, then call {@code super.loadSection(section)} before any such operations.
+     * @param section the {@link FileSection} representing this {@linkplain CodeSection}
+     * @param logger the logger
+     * @return {@code true} if the items inside of the section were loaded properly, {@code false} if there was a
+     *         problem
+     */
+	public loadSection(section: FileSection, parserState:ParserState, logger: SkriptLogger): boolean {
+		parserState.setSyntaxRestrictions(this.getAllowedSyntaxes(), this.isRestrictingExpressions());
+		parserState.addCurrentSection(this);
+		this.setItem(ScriptLoader.loadItems(section, parserState, logger));
+		parserState.removeCurrentSection();
+		parserState.clearSyntaxRestrictions();
+		return true;
 	}
 
 	public run(_ctx: TriggerContext): boolean {
@@ -201,6 +217,11 @@ export abstract class CodeSection extends Statement {
 
 	public abstract walk(ctx: TriggerContext): Statement | undefined;
 
+    /**
+     * Sets the items inside this lists, and also modifies other fields, reflected through the outputs of {@link #getFirst()},
+     * {@link #getLast()} and {@link Statement#getParent()}.
+     * @param items the items to set
+     */
 	public setItem(items: Statement[]) {
 		this._items = items;
 		for (const item of items) {
@@ -210,22 +231,51 @@ export abstract class CodeSection extends Statement {
 		this._last = items ? items[items.length - 1] : undefined;
 	}
 
+    /**
+     * The items returned by this method are not representative of the execution of the code, meaning that all items
+     * in the list may not be all executed. The list should rather be considered as a flat view of all the lines inside
+     * the section. Prefer {@link Statement#runAll(Statement, TriggerContext)} to run the contents of this section
+     * @return all items inside this section
+     */
 	public getItem(): Statement[] {
 		return this._items;
 	}
 
+    /**
+     * @return the first item of this section, or the item after the section if it's empty, or {@code null} if there is
+     * no item after this section, in the latter case
+     */
 	public getFirst(): Statement | undefined {
 		return this._first ? this._first : this.getNext();
 	}
 
+    /**
+     * @return the last item of this section, or the item after the section if it's empty, or {@code null} if there is
+     * no item after this section, in the latter case
+     */
 	protected getLast(): Statement | undefined {
 		return this._last ? this._last : this.getNext();
 	}
 
-	protected getAllowedSyntaxes(): Set<Class<SyntaxElement>> | undefined {
+    /**
+     * A list of the classes of every syntax that is allowed to be used inside of this CodeSection. The default behavior
+     * is to return an empty list, which equates to no restrictions. If overridden, this allows the creation of specialized,
+     * DSL-like sections in which only select {@linkplain Statement statements} and other {@linkplain CodeSection sections}
+     * (and potentially, but not necessarily, expressions).
+     * @return a list of the classes of each syntax allowed inside this CodeSection
+     * @see #isRestrictingExpressions()
+     */
+	protected getAllowedSyntaxes(): Set<Class<SyntaxElement>> {
 		return new Set<Class<SyntaxElement>>();
 	}
 
+    /**
+     * Whether the syntax restrictions outlined in {@link #getAllowedSyntaxes()} should also apply to expressions.
+     * This is usually undesirable, so it is false by default.
+     *
+     * This should return true <b>if and only if</b> {@link #getAllowedSyntaxes()} contains an {@linkplain Expression} class.
+     * @return whether the use of expressions is also restricted by {@link #getAllowedSyntaxes()}. False by default.
+     */
 	protected isRestrictingExpressions(): boolean {
 		return false;
 	}
