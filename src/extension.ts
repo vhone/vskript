@@ -3,9 +3,6 @@ import { onSkriptEnable } from './skript_v0.0.7/Skript';
 import * as Provider from './skript_v0.0.7/provider/Provider';
 import TextDocumentChangeEvent from './skript_v0.0.7/event/TextDocumentChangeEvent';
 import { LEGEND } from './skript_v0.0.7/provider/SkriptDocumentSemanticTokensProvider';
-import { ArrayUtils } from './skript_v0.0.8/util/ArrayUtils';
-import { Statement } from './skript_v0.0.8/skript/parser/lang';
-import { Comparator, JavaObject } from './Java';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -32,22 +29,6 @@ export function activate(_context:ExtensionContext) {
 	
 	// Event;
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
-	
-	// VisualSkript.onEnable()
-	
-	// let text = ['#test',
-	// 			'command /test:',
-	// 			'	trigger:',
-	// 			'	set {_a} to true']
-	// console.log(FileParser.parseFileLines('text', text, 0, 0));
-
-	
-	// let lang = FileSystem.readFileSync(`${context.extensionUri.fsPath}/src/resource/lang/default.lang`, 'utf-8');
-	// let lines: string[] = lang.split(/\r\n|\r|\n/);
-	// // console.log(lines);
-	// console.log(FileParser.parseFileLines('alias', lines, 0, 0))
-
-	// console.log(StringUtils.compareTo('aa', 'a'))
 	
 }
 

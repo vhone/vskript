@@ -323,6 +323,7 @@
 				"1": { "name": "vskript.expr.function" }
 			},
 			"patterns": [
+				{ "include": "#variable.option" },
 				{ "include": "#variable"},
 				{ "include": "#expression"},
 				{ "include": "#expression.fucntion.argument"}
