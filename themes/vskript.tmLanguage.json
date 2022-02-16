@@ -69,6 +69,7 @@
 			"captures": {
 				"1": { "name": "vskript.options.variable" },
 				"2": { "patterns": [
+						{ "include": "#nested" },
 						{ "include": "#hexcolor" },
 						{ "include": "#comment" }
 					] }
@@ -193,11 +194,20 @@
 		},
 		"grammar.segment": {
 			"name": "vskript.grammar",
-			"match": "^(\\t|\\s)*(if|else if|else|while|loop)"
+			"match": "^(\\t|\\s)*((parse )?if|else (parse )?if|else|(do )?while|loop[^-]|continue( loop)?)\\b"
 		},
 		"grammar.effect": {
 			"name": "vskript.grammar",
-			"match": "\\b(if|return|exit|where|otherwise)\\b"
+			"match": "\\b(if|return|(exit|stop)((( (1|a|the|this))? (section|loop|conditional))|( (\\d+|all)( (section|loop|conditional)s)?))?|where|otherwise)\\b",
+			"captures": {
+				"1": { "patterns": [
+					{ "include": "#expression.number"}
+				]}
+			}
+		},
+		"grammar.condition": {
+			"name": "vskript.grammar.condi",
+			"match": "\\b((is|are|did|can|has)(n't| not)?|(was|were)(n't| (not|neither))?|(will (not|neither) be|won't be)|do(es)?(n't| not) (have|contain)|contains?|ha(ve|s))\\b"
 		},
 
 		
@@ -243,7 +253,7 @@
 				{ "name": "vskript.type.attribute",		"match": "\\bsound\\scategor(ys?|ies)\\b" },
 				{ "name": "vskript.type.attribute",		"match": "\\bspawn\\s?reasons?\\b" },
 				{ "name": "vskript.type.attribute",		"match": "\\bteleport\\s?causes?\\b" },
-				{ "name": "vskript.type.text",			"match": "\\btexts?\\b" },
+				{ "name": "vskript.type.text",			"match": "\\b(text|string)s?\\b" },
 				{ "name": "vskript.type.attribute",		"match": "\\btimes?\\b" },
 				{ "name": "vskript.type.attribute",		"match": "\\btime\\s?periods?\\b" },
 				{ "name": "vskript.type.attribute",		"match": "\\btimespans?\\b" },
@@ -270,29 +280,30 @@
 			"begin": "\"",
 			"end": "\"",
 			"patterns": [
+				{ "include": "#variable.option" },
 				{ "include": "#nested.text" },
-				{ "match": "&0", "name": "vskript.color.0" },
-				{ "match": "&1", "name": "vskript.color.1" },
-				{ "match": "&2", "name": "vskript.color.2" },
-				{ "match": "&3", "name": "vskript.color.3" },
-				{ "match": "&4", "name": "vskript.color.4" },
-				{ "match": "&5", "name": "vskript.color.5" },
-				{ "match": "&6", "name": "vskript.color.6" },
-				{ "match": "&7", "name": "vskript.color.7" },
-				{ "match": "&8", "name": "vskript.color.8" },
-				{ "match": "&9", "name": "vskript.color.9" },
-				{ "match": "&[Aa]", "name": "vskript.color.a" },
-				{ "match": "&[Bb]", "name": "vskript.color.b" },
-				{ "match": "&[Cc]", "name": "vskript.color.c" },
-				{ "match": "&[Dd]", "name": "vskript.color.d" },
-				{ "match": "&[Ee]", "name": "vskript.color.e" },
-				{ "match": "&[Ff]", "name": "vskript.color.f" },
+				{ "match": "[&§]0|<black>", "name": "vskript.color.0" },
+				{ "match": "[&§]1|<(blue|dark blue)>", "name": "vskript.color.1" },
+				{ "match": "[&§]2|<(green|dark green)>", "name": "vskript.color.2" },
+				{ "match": "[&§]3|<(cyan|aqua|dark cyan|dark aqua|dark turquoise|dark turquois)>", "name": "vskript.color.3" },
+				{ "match": "[&§]4|<(red|dark red)>", "name": "vskript.color.4" },
+				{ "match": "[&§]5|<(purple|dark purple)>", "name": "vskript.color.5" },
+				{ "match": "[&§]6|<(orange|gold|dark yellow)>", "name": "vskript.color.6" },
+				{ "match": "[&§]7|<(grey|light grey|gray|light gray|silver)>", "name": "vskript.color.7" },
+				{ "match": "[&§]8|<(dark grey|dark gray)>", "name": "vskript.color.8" },
+				{ "match": "[&§]9|<(light blue|indigo)>", "name": "vskript.color.9" },
+				{ "match": "[&§][Aa]|<(light green|lime,lime green)>", "name": "vskript.color.a" },
+				{ "match": "[&§][Bb]|<(light cyan|light aqua|turquoise|turquois|light blue)>", "name": "vskript.color.b" },
+				{ "match": "[&§][Cc]|<(light red|pink)>", "name": "vskript.color.c" },
+				{ "match": "[&§][Dd]|<(magenta|light purple)>", "name": "vskript.color.d" },
+				{ "match": "[&§][Ee]|<(yellow|light yellow)>", "name": "vskript.color.e" },
+				{ "match": "[&§][Ff]|<white>", "name": "vskript.color.f" },
 				{ "include": "#expression.text" }
 			]
 		},
 		"expression.number": {
 			"name": "vskript.expr.number",
-			"match": "\\-?[\\d](\\.\\d)?"
+			"match": "\\-?[\\d](\\.\\d)?|true|false"
 		},
 		"expression.grammar": {
 			"name": "vskript.expr.grammar",
@@ -312,6 +323,7 @@
 				"1": { "name": "vskript.expr.function" }
 			},
 			"patterns": [
+				{ "include": "#variable.option" },
 				{ "include": "#variable"},
 				{ "include": "#expression"},
 				{ "include": "#expression.fucntion.argument"}

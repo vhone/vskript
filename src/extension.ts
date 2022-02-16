@@ -1,8 +1,8 @@
 import { ExtensionContext, IndentAction, languages, workspace } from 'vscode';
-import { onSkriptEnable } from './Skript';
-import * as Provider from './provider';
-import TextDocumentChangeEvent from './event/TextDocumentChangeEvent';
-import { LEGEND } from './provider/SkriptDocumentSemanticTokensProvider';
+import { onSkriptEnable } from './skript_v0.0.7/Skript';
+import * as Provider from './skript_v0.0.7/provider/Provider';
+import TextDocumentChangeEvent from './skript_v0.0.7/event/TextDocumentChangeEvent';
+import { LEGEND } from './skript_v0.0.7/provider/SkriptDocumentSemanticTokensProvider';
 
 // Options
 languages.setLanguageConfiguration('vskript', {
@@ -29,7 +29,9 @@ export function activate(_context:ExtensionContext) {
 	
 	// Event;
 	workspace.onDidChangeTextDocument(TextDocumentChangeEvent);
-
+	
 }
 
 export function deactivate() {}
+
+

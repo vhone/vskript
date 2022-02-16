@@ -143,6 +143,11 @@
 			"settings": { "foreground": "#f58a4d", "fontStyle": "bold" }
 		},
 		{
+			"name": "VSkript Grammar",
+			"scope":  "vskript.grammar.condi",
+			"settings": { "foreground": "#f58a4d", "fontStyle": "" }
+		},
+		{
 			"name": "VSkript Expression Grammar",
 			"scope": "vskript.expr.grammar",
 			"settings": { "fontStyle": "italic" }
