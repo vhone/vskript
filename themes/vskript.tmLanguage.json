@@ -1,278 +1,288 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "VSkript",
-	"scopeName": "source.sk",
+	"scopeName": "source.sk",	
 	"patterns": [
 		{ "include": "#comment" },
-		{ "include": "#options" },
 		{ "include": "#aliases" },
-		{ "include": "#command" },
-		{ "include": "#event" },
-		{ "include": "#function" },
-		{ "include": "#grammar" },
-		{ "include": "#variable.option" },
-		{ "include": "#variable" },
-		{ "include": "#expression" }
-	],
-
-	"repository": {
-
-		"hexcolor": {
-			"match": "\\<\\#\\#[0-9a-fA-F]{3,6}\\>"
-		},
-
-		"comment": {
-			"name": "vskript.comment",
-			"match": "(\\#.*)",
-			"captures": {
-				"1": { "patterns": [
-					{"include": "#docs"}
-				] }
-			}
-		},
-		"docs": {
-			"name": "vskript.docs",
-			"match": "(\\#\\>.*)",
-			"captures": {
-				"1": { "patterns": [
-					{"include": "#docs.parm"},
-					{"include": "#docs.return"}
-				] }
-			}
-		},
-		"docs.parm": {
-			"match": "(\\@param)\\s([^\\s]*)",
-			"captures": {
-				"1": { "name": "vskript.docs.annotation" },
-				"2": { "name": "vskript.docs.parm" }
-			}
-		},
-		"docs.return": {
-			"match": "\\@return",
-			"name": "vskript.docs.annotation"
-		},
-
-
-		"options": {
-			"begin": "^(options)\\:",
-			"end": "^(?!(?:\\t|\\s{4}|$))",
+		{
+			"_comment": "Skript Options Section",
+			"begin": "^(options?.*)\\:",
+			"end": "(?=^(?!(\\#|\\t| |$)))",
 			"beginCaptures": {
 				"1": { "name": "vskript.options" }
 			},
 			"patterns": [
 				{ "include": "#comment" },
-				{ "include": "#options.variable" }
+				{
+					"match": "([^:]+) *?\\: *?(.+)",
+					"captures": {
+						"1": { "name": "vskript.options.variable" },
+						"2": { "patterns": [
+								{ "include": "#sentence" },
+								{ "include": "#hexcolor" },
+								{ "include": "#comment" }
+							] }
+					}
+				},
+				{
+					"begin": "^(?:\\t| {4})(loop of|usable in|trigger|parse|event-values|get|add|set|remove(?: all)?|delete|reset|check):",
+					"end": "(?=^(?:\\t| {4})?(?!(?:\\#|\\t| |$)))",
+					"beginCaptures": { "1": { "name": "vskript.reflect.option" } },
+					"patterns": [ { "patterns": [ { "include": "#sentence" } ] } ]
+				}
 			]
 		},
-		"options.variable": {
-			"match": "([^:]+)\\s*?\\:\\s*?(.+)",
-			"captures": {
-				"1": { "name": "vskript.options.variable" },
-				"2": { "patterns": [
-						{ "include": "#nested" },
-						{ "include": "#hexcolor" },
-						{ "include": "#comment" }
-					] }
-			}
-		},
-
-
-		"aliases": {
-			"begin": "^(aliases)\\:",
-			"end": "^(?!(?:\\t|\\s{4}|$))",
+		{
+			"_comment": "Skript Command Section",
+			"begin": "^(command)(?: (\/?[^ ]+)((?: +?[^ \\:]+)*) *?\\:)?",
+			"end": "(?=^(?!(\\#|\\t| |$)))",
 			"beginCaptures": {
-				"1": { "name": "vskript.aliases" }
+				"1": { "name": "vskript.command" },
+				"2": { "patterns": [ { "include": "#variable.option" } ] },
+				"3": { "patterns": [ {
+					"match": "\\<([^\\>\\=]+)(?:\\=([^\\>]+))?\\>",
+					"captures": {
+						"1": { "patterns": [ { "include": "#type" } ] },
+						"2": { "patterns": [
+							{ "include": "#sentence" },
+							{
+								"begin": "\\%",
+								"end": "\\%",
+								"patterns": [
+									{ "include": "#sentence" }
+								]
+							}
+						] }
+					}
+				} ] }
 			},
 			"patterns": [
-				{ "include": "#comment" },
-				{ "include": "#aliases.variable" }
-			]
-		},
-		"aliases.variable": {
-			"match": "([^=]+)\\s*?\\=\\s*?(.+)",
-			"captures": {
-				"1": { "name": "vskript.aliases.variable" },
-				"2": { "patterns": [
-						{ "include": "#comment" },
-						{ "include": "#expression.minecraftitem" }
-				] }
-			}
-		},
-
-
-		"command": {
-			"patterns": [
-				{ "include": "#command.define"	},
-				{ "include": "#command.options"	}
-			]
-		},
-		"command.define": {
-			"match": "^(command)\\s(\/?[^\\s]+)((?:\\s+?[^\\s\\:]+)*)\\s*?\\:",
-			"captures": {
-				"1": { "name": "vskript.command" },
-				"2": { "patterns": [
-					{ "include": "#command.label" }
-				]},
-				"3": { "patterns": [
-					{ "include": "#command.aguments" },
-					{ "include": "#variable.option" }
-				]}
-			}
-		},
-		"command.label": {
-			"match": "(.*)",
-			"captures": {
-				"1": { "patterns": [
-					{ "include": "#variable.option" }
-				]}
-			}
-		},
-		"command.aguments": {
-			"match": "\\<([^\\>\\=]+)(\\=[^\\>]+)?\\>",
-			"captures": {
-				"1": { "patterns": [
-					{ "include": "#type" }
-				]}
-			}
-		},
-		"command.options": {
-			"match": "^(\\t|\\s{4})(aliases|description|usage|permission message|executable by|permission|cooldown|cooldown message|cooldown bypass|cooldown storage|trigger)\\:",
-			"captures": {
-				"2": { "name": "vskript.command.options"},
-				"3": {	
-					"patterns": [
-						{ "include": "#variable"	}
-					]
+				{
+					"begin": "^(?:\\t| {4})(aliases|description|usage|permission message|executable by|permission|cooldown|cooldown message|cooldown bypass|cooldown storage)\\:",
+					"end": "$",
+					"beginCaptures": {
+						"1": { "name": "vskript.command.options"},
+						"2": {	
+							"patterns": [
+								{ "include": "#variable"	}
+							]
+						}
+					},
+					"patterns": [ { "patterns": [ { "include": "#sentence" } ] } ]
+				},
+				{
+					"begin": "^(?:\\t| {4})(trigger):",
+					"end": "(?=^(?!(\\#|\\t| |$)))",
+					"beginCaptures": { "1": { "name": "vskript.command.options" } },
+					"patterns": [ { "patterns": [ { "include": "#sentence" } ] } ]
 				}
-			}
+			]
 		},
-
-
-		"event": {
-			"match": "^((?:on|every)\\s+(?:[^\\:]*)|at\\s+(?:\\d{1,2}\\:\\d{1,2}|[^\\:]*))\\:",
-			"captures": {
-				"1": { "name": "vskript.event" }
-			}
-		},
-
-
-		"function": {
-			"match": "^(function)\\s(\\w+\\()(.*)(\\))(?:\\:|\\s\\:\\:\\s([^:]+)\\:)",
-			"captures": {
+		{
+			"_comment": "Skript Function Section",
+			"begin": "^((?:local )?function) (\\w+\\()(.*)(\\))(?:(?: +(?:\\:\\:|(return)) +([^:]+))?\\:)",
+			"end": "(?=^(?!(\\#|\\t| |$)))",
+			"beginCaptures": {
 				"1": { "name": "vskript.function.keyword" },
 				"2": { "name": "vskript.function.name" },
-				"3": { "patterns": [ { "include": "#function.parameter" } ] },
+				"3": { "patterns": [ {
+					"match": "([^:]+):([^=(),]+)(?:=([^(),]+))?",
+					"captures": {
+						"1": { "name": "vskript.function.parameter" },
+						"2": { "patterns": [ { "include": "#type" } ] },
+						"3": { "patterns": [ { "include": "#sentence" } ] }
+					}
+				} ] },
 				"4": { "name": "vskript.function.name" },
-				"5": { "patterns": [ { "include": "#type" } ] }
+				"5": { "name": "vskript.grammar" },
+				"6": { "patterns": [ { "include": "#type" } ] }
 			},
-			"_comment": {
-				"1": "prefix",
-				"2": "function",
-				"3": "parameter",
-				"4": "return type",
-				"5": "data type"
-			}
+			"patterns": [ { "patterns": [ { "include": "#sentence" } ] } ]
 		},
-		"function.parameter": {
-			"match": "([^():,]+):([^():,]+)",
-			"captures": {
-				"1": { "name": "vskript.function.parameter" },
-				"2": { "patterns": [ { "include": "#type" } ] }
-			},
-			"_comment": {
-				"1": "name",
-				"2": "data type"
-			}
+		{
+			"_comment": "Skript Event Section",
+			"begin": "^(?:(?:on|every)(?: +(?:[^\\:]*)\\:)?|at(?: +(?:\\d{1,2}\\:\\d{1,2})?\\:)?)",
+			"end": "(?=^(?!(\\#|\\t| |$)))",
+			"beginCaptures": { "0": { "name": "vskript.event" } },
+			"patterns": [ { "patterns": [ { "include": "#sentence" } ] } ]
 		},
+		{ "include": "#reflect" }
+	],
+
+	"repository": {
 
 
-		"grammar": {
+		"bracket.amall": {
+			"begin": "\\(",
+			"end": "\\)",
 			"patterns": [
-				{ "include": "#grammar.segment" },
-				{ "include": "#grammar.effect" }
+				{ "include": "#sentence" },
+				{ "include": "#bracket.amall" }
 			]
 		},
-		"grammar.segment": {
-			"name": "vskript.grammar",
-			"match": "^(\\t|\\s)*((parse )?if|else (parse )?if|else|(do )?while|loop[^-]|continue( loop)?)\\b"
+
+
+		
+		"hexcolor": {
+			"match": "\\<\\#\\#[0-9a-fA-F]{3,6}\\>"
 		},
-		"grammar.effect": {
-			"name": "vskript.grammar",
-			"match": "\\b(if|return|(exit|stop)((( (1|a|the|this))? (section|loop|conditional))|( (\\d+|all)( (section|loop|conditional)s)?))?|where|otherwise)\\b",
-			"captures": {
-				"1": { "patterns": [
-					{ "include": "#expression.number"}
-				]}
-			}
+	
+
+
+		"sentence": {
+			"patterns": [
+				{ "include": "#comment" },
+				{
+					"_comment": "Grammar Pattern",
+					"patterns": [
+						{
+							"match": "^(?:\\t| {4})*((?:(?:parse )?if(?: (?:any|at least one (of)?|all))?|else(?: (?:parse )?if(?: (?:any|at least one (of)?|all))?)?|then|(?:do )?while|loop(?=[^-])|continue(?: loop)?))\\b",
+							"captures": { "1": { "name": "vskript.grammar" } }
+						},
+						{
+							"name": "vskript.grammar",
+							"match": "\\b(?:if|return|otherwise|(?:exit|stop)(?:(?:(?: (?:1|a|the|this))? (?:section|loop|conditional))| (\\d+|all) (?:section|loop|conditional)s)?)\\b",
+							"captures": {
+								"1": { "patterns": [ { "include": "#expr.number"} ] }
+							}
+						},
+						{
+							"match": "\\b(where)(?: ?(\\[)([^\\]]*)(\\])(?:\\B|$))?",
+							"captures": {
+								"1": { "name": "vskript.grammar"},
+								"2": { "name": "vskript.grammar"},
+								"3": { "patterns": [ { "include": "#sentence"} ] },
+								"4": { "name": "vskript.grammar"}
+							}
+						}
+					]
+				},
+				{ "include": "#expression" },
+				{ "include": "#variable" }
+			]
 		},
 		"grammar.condition": {
 			"name": "vskript.grammar.condi",
 			"match": "\\b((is|are|did|can|has)(n't| not)?|(was|were)(n't| (not|neither))?|(will (not|neither) be|won't be)|do(es)?(n't| not) (have|contain)|contains?|ha(ve|s))\\b"
 		},
 
-		
-		"type": {
+
+
+		"comment": {
+			"match": "(\\#\\> ?(.*))|(\\#.*)",
+			"captures": {
+				"1": { "name": "vskript.docs" },
+				"2": { "name": "vskript.docs", "patterns": [
+					{
+						"match": "(\\@param)(?: ([^ ]*))?",
+						"captures": {
+							"1": { "name": "vskript.docs.annotation" },
+							"2": { "name": "vskript.docs.param" }
+						}
+					},
+					{
+						"match": "\\@(return|invisible)",
+						"name": "vskript.docs.annotation"
+					}
+				] },
+				"3": { "name": "vskript.comment" }
+			}
+		},
+
+
+
+		"aliases": {
+			"begin": "^(aliases)\\:",
+			"end": "(?=^(?!(\\#|\\t| |$)))",
+			"beginCaptures": {
+				"1": { "name": "vskript.aliases" }
+			},
 			"patterns": [
-				{ "name": "vskript.type.attribute",		"match": "\\battribute\\s?types?\\b" },
-				{ "name": "vskript.type.biome",			"match": "\\bbiomes?\\b" },
-				{ "name": "vskript.type.block",			"match": "\\bblocks?\\b" },
-				{ "name": "vskript.type.blockdata",		"match": "\\bblock\\s?datas?\\b" },
-				{ "name": "vskript.type.boolean",		"match": "\\bbooleans?\\b" },
-				{ "name": "vskript.type.cat",			"match": "\\bcat\\s?types?\\b" },
-				{ "name": "vskript.type.chunk",			"match": "\\bchunks?\\b" },
-				{ "name": "vskript.type.click",			"match": "\\bclick\\s?types?\\b" },
-				{ "name": "vskript.type.color",			"match": "\\bcolou?rs?\\b" },
-				{ "name": "vskript.type.sender",		"match": "\\b(command\\s?)?senders?\\b" },
-				{ "name": "vskript.type.damagecause",	"match": "\\bdamage\\s?causes?\\b" },
-				{ "name": "vskript.type.date",			"match": "\\bdates?\\b" },
-				{ "name": "vskript.type.difficulty",	"match": "\\bdifficult(ys?|ies)\\b" },
-				{ "name": "vskript.type.direction",		"match": "\\bdirections?\\b" },
-				{ "name": "vskript.type.enchantment",	"match": "\\benchantment(\\s?type)?s?\\b" },
-				{ "name": "vskript.type.entity",		"match": "\\bentit(ys?|ies)(\\s?type)?s?\\b" },
-				{ "name": "vskript.type.experience",	"match": "\\bexperiences?\\b" },
-				{ "name": "vskript.type.firework",		"match": "\\bfirework\\s?(effect|type)s?\\b" },
-				{ "name": "vskript.type.gamemode",		"match": "\\bgame\\s?modes?\\b" },
-				{ "name": "vskript.type.gamerule",		"match": "\\bgamerule(\\svalue)?s?\\b" },
-				{ "name": "vskript.type.gene",			"match": "\\bgenes?\\b" },
-				{ "name": "vskript.type.healreasons",	"match": "\\bheal\\sreasons?\\b" },
-				{ "name": "vskript.type.integer",		"match": "\\bintegers?\\b" },
-				{ "name": "vskript.type.inventory",		"match": "\\binventor(y((\\s?(action|slot|type))?s?)|ies)\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bitem(\\s?type)?s?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bliving\\s?entit(ys?|ies)\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\blocations?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bmetadata\\s?holders?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bnumbers?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bobjects?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\boffline\\s?players?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bplayers?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bpotion\\s?effect\\s?types?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bprojectiles?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bregions?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bresource\\s?pack\\s?states?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bserver\\s?icons?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bsound\\scategor(ys?|ies)\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bspawn\\s?reasons?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bteleport\\s?causes?\\b" },
-				{ "name": "vskript.type.text",			"match": "\\b(text|string)s?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\btimes?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\btime\\s?periods?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\btimespans?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\btree(\\s?type)?s?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bvectors?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bvisual\\seffects?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bweather(\\s?type)?s?\\b" },
-				{ "name": "vskript.type.attribute",		"match": "\\bworlds?\\b" }
+				{ "include": "#comment" },
+				{
+					"match": "([^=]+) *?\\= *?(.+)",
+					"captures": {
+						"1": { "name": "vskript.aliases.variable" },
+						"2": { "patterns": [
+								{ "include": "#comment" },
+								{ "include": "#expr.minecraftitem" },
+								{ "include": "#aliases.nbt"}
+						] }
+					}
+				}
 			]
 		},
+		"aliases.nbt": {
+			"name": "vskript.aliases.nbt",
+			"begin": "\\{",
+			"end": "\\}",
+			"patterns": [ 
+				{ "include": "#aliases.nbt.value"}
+			]
+		},
+		"aliases.nbt.value": {
+			"name": "vskript.aliases.nbt.value",
+			"begin": "([^':]*)(:)",
+			"end": ",|(?=})",
+			"beginCaptures": {
+				"1": { "name": "vskript.aliases.nbt.key" },
+				"2": { "name": "vskript.default" }
+			},
+			"endCaptures": {
+				"0": { "name": "vskript.default" }
+			},
+			"patterns": [
+				{ "include": "#expression" },
+				{ "include": "#aliases.nbt.text" },
+				{ "include": "#aliases.nbt.array" },
+				{ "include": "#aliases.nbt" }
+			]
+		},
+		"aliases.nbt.array": {
+			"begin": "\\[",
+			"end": "\\]",
+			"patterns": [
+				{ "include": "#expression" },
+				{ "include": "#aliases.nbt.text" },
+				{ "include": "#aliases.nbt.array" },
+				{ "include": "#aliases.nbt" }
+			]
+		},
+		"aliases.nbt.text": {
+			"name": "vskript.expr.text",
+			"begin": "\\'",
+			"end": "\\'"
+		},
+
 
 
 		"expression": {
 			"patterns": [
 				{ "include": "#expression.text" },
-				{ "include": "#expression.number" },
-				{ "include": "#expression.grammar" },
-				{ "include": "#expression.minecraftitem" },
-				{ "include": "#expression.fucntion" }
+				{
+					"name": "vskript.expr.number",
+					"match": "\\-?[\\d](\\.\\d)?|true|false"
+				},
+				{
+					"name": "vskript.expr.grammar",
+					"match": "(the )?(event\\-\\w*|arg\\-\\w*|loop\\-\\w*(\\-\\d)?|expr\\-\\d+|change value)"
+				},
+				{
+					"name": "vskript.expr.minecraftitem",
+					"match": "minecraft\\:[^ \\,]*"
+				},
+				{
+					"begin": "(\\w\\.?)+\\(",
+					"end": "\\)",
+					"beginCaptures": { "0": { "name": "vskript.expr.function" } },
+					"endCaptures": { "0": { "name": "vskript.expr.function" } },
+					"patterns": [
+						{ "include": "#bracket.amall" },
+						{ "include": "#expression"},
+						{ "include": "#variable"}
+					]
+				}
 			]
 		},
 		"expression.text": {
@@ -281,69 +291,38 @@
 			"end": "\"",
 			"patterns": [
 				{ "include": "#variable.option" },
-				{ "include": "#nested.text" },
-				{ "match": "[&§]0|<black>", "name": "vskript.color.0" },
-				{ "match": "[&§]1|<(blue|dark blue)>", "name": "vskript.color.1" },
-				{ "match": "[&§]2|<(green|dark green)>", "name": "vskript.color.2" },
-				{ "match": "[&§]3|<(cyan|aqua|dark cyan|dark aqua|dark turquoise|dark turquois)>", "name": "vskript.color.3" },
-				{ "match": "[&§]4|<(red|dark red)>", "name": "vskript.color.4" },
-				{ "match": "[&§]5|<(purple|dark purple)>", "name": "vskript.color.5" },
-				{ "match": "[&§]6|<(orange|gold|dark yellow)>", "name": "vskript.color.6" },
-				{ "match": "[&§]7|<(grey|light grey|gray|light gray|silver)>", "name": "vskript.color.7" },
-				{ "match": "[&§]8|<(dark grey|dark gray)>", "name": "vskript.color.8" },
-				{ "match": "[&§]9|<(light blue|indigo)>", "name": "vskript.color.9" },
-				{ "match": "[&§][Aa]|<(light green|lime,lime green)>", "name": "vskript.color.a" },
-				{ "match": "[&§][Bb]|<(light cyan|light aqua|turquoise|turquois|light blue)>", "name": "vskript.color.b" },
-				{ "match": "[&§][Cc]|<(light red|pink)>", "name": "vskript.color.c" },
-				{ "match": "[&§][Dd]|<(magenta|light purple)>", "name": "vskript.color.d" },
-				{ "match": "[&§][Ee]|<(yellow|light yellow)>", "name": "vskript.color.e" },
-				{ "match": "[&§][Ff]|<white>", "name": "vskript.color.f" },
-				{ "include": "#expression.text" }
-			]
-		},
-		"expression.number": {
-			"name": "vskript.expr.number",
-			"match": "\\-?[\\d](\\.\\d)?|true|false"
-		},
-		"expression.grammar": {
-			"name": "vskript.expr.grammar",
-			"match": "(the )?(event\\-\\w*|arg\\-\\w*|loop\\-\\w*(\\-\\d)?)"
-		},
-		"expression.minecraftitem": {
-			"name": "vskript.expr.minecraftitem",
-			"match": "minecraft\\:[^\\s\\,]*"
-		},
-		"expression.fucntion": {
-			"begin": "(\\w+\\()",
-			"end": "(\\))",
-			"beginCaptures": {
-				"1": { "name": "vskript.expr.function" }
-			},
-			"endCaptures": {
-				"1": { "name": "vskript.expr.function" }
-			},
-			"patterns": [
-				{ "include": "#variable.option" },
-				{ "include": "#variable"},
-				{ "include": "#expression"},
-				{ "include": "#expression.fucntion.argument"}
-			]
-		},
-		"expression.fucntion.argument": {
-			"match": "(\"[^\"]*\")|(\\,)",
-			"captures": {
-				"1": { 
-					"patterns": [
-						{ "include": "#expression.text"}
-					]
+				{
+					"name": "vskript.default",
+					"begin": "\\%",
+					"end": "\\%",
+					"beginCaptures": { "0": { "name": "vskript.expr.text"} },
+					"endCaptures": { "0": { "name": "vskript.expr.text"} },
+					"patterns": [ { "include": "#sentence" } ]
 				},
-				"2": { }
-			}
+				{ "name": "vskript.color.0", "match": "[&§]0|<black>" },
+				{ "name": "vskript.color.1", "match": "[&§]1|<(blue|dark blue)>" },
+				{ "name": "vskript.color.2", "match": "[&§]2|<(green|dark green)>" },
+				{ "name": "vskript.color.3", "match": "[&§]3|<(cyan|aqua|dark cyan|dark aqua|dark turquoise|dark turquois)>" },
+				{ "name": "vskript.color.4", "match": "[&§]4|<(red|dark red)>" },
+				{ "name": "vskript.color.5", "match": "[&§]5|<(purple|dark purple)>" },
+				{ "name": "vskript.color.6", "match": "[&§]6|<(orange|gold|dark yellow)>" },
+				{ "name": "vskript.color.7", "match": "[&§]7|<(grey|light grey|gray|light gray|silver)>" },
+				{ "name": "vskript.color.8", "match": "[&§]8|<(dark grey|dark gray)>" },
+				{ "name": "vskript.color.9", "match": "[&§]9|<(light blue|indigo)>" },
+				{ "name": "vskript.color.a", "match": "[&§][Aa]|<(light green|lime,lime green)>" },
+				{ "name": "vskript.color.b", "match": "[&§][Bb]|<(light cyan|light aqua|turquoise|turquois|light blue)>" },
+				{ "name": "vskript.color.c", "match": "[&§][Cc]|<(light red|pink)>" },
+				{ "name": "vskript.color.d", "match": "[&§][Dd]|<(magenta|light purple)>" },
+				{ "name": "vskript.color.e", "match": "[&§][Ee]|<(yellow|light yellow)>" },
+				{ "name": "vskript.color.f", "match": "[&§][Ff]|<white>" }
+			]
 		},
+
 
 
 		"variable": {
 			"patterns": [
+				{ "include": "#variable.option" },
 				{ "include": "#variable.local" },
 				{ "include": "#variable.runtime" },
 				{ "include": "#variable.normal" }
@@ -361,8 +340,7 @@
 			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"patterns": [
-				{ "include": "#variable.inner" },
-				{ "include": "#variable" }
+				{ "include": "#variable.nested" }
 			]
 		},
 		"variable.runtime": {
@@ -372,8 +350,7 @@
 			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"patterns": [
-				{ "include": "#variable.inner" },
-				{ "include": "#variable" }
+				{ "include": "#variable.nested" }
 			]
 		},
 		"variable.normal": {
@@ -383,49 +360,161 @@
 			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
 			"patterns": [
-				{ "include": "#variable.inner" },
-				{ "include": "#variable" }
+				{ "include": "#variable.nested" }
 			]
 		},
-		"variable.inner": {
+		"variable.nested": {
 			"patterns": [
-				{ "include": "#variable.colon" },
-				{ "include": "#nested.variable" }
+				{ "include": "#variable.local" },
+				{ "include": "#variable.runtime" },
+				{ "include": "#variable.normal" },
+				{
+					"name": "vskript.variable.bracket",
+					"match": "::"
+				},
+				{
+					"name": "vskript.default",
+					"begin": "%",
+					"end": "%",
+					"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
+					"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
+					"patterns": [
+						{ "include": "#sentence" }
+					]
+				}
 			]
 		},
-		"variable.colon": {
-			"name": "vskript.variable.bracket",
-			"match": "::"
+
+		
+
+		"type": {
+			"patterns": [
+				{ "name": "vskript.type.attribute",			"match": "\\battribute ?types?\\b" },
+				{ "name": "vskript.type.biome",				"match": "\\bbiomes?\\b" },
+				{ "name": "vskript.type.block",				"match": "\\bblocks?\\b" },
+				{ "name": "vskript.type.blockdata",			"match": "\\bblock ?datas?\\b" },
+				{ "name": "vskript.type.boolean",			"match": "\\bbooleans?\\b" },
+				{ "name": "vskript.type.cattype",			"match": "\\bcat ?types?\\b" },
+				{ "name": "vskript.type.chunk",				"match": "\\bchunks?\\b" },
+				{ "name": "vskript.type.clicktype",			"match": "\\bclick ?types?\\b" },
+				{ "name": "vskript.type.color",				"match": "\\bcolou?rs?\\b" },
+				{ "name": "vskript.type.commandsender",		"match": "\\b(command ?)?senders?\\b" },
+				{ "name": "vskript.type.damagecause",		"match": "\\bdamage ?causes?\\b" },
+				{ "name": "vskript.type.date",				"match": "\\bdates?\\b" },
+				{ "name": "vskript.type.difficulty",		"match": "\\bdifficult(ys?|ies)\\b" },
+				{ "name": "vskript.type.direction",			"match": "\\bdirections?\\b" },
+				{ "name": "vskript.type.enchantment",		"match": "\\benchantment( ?type)?s?\\b" },
+				{ "name": "vskript.type.entity",			"match": "\\bentit(ys?|ies)( ?type)?s?\\b" },
+				{ "name": "vskript.type.experience",		"match": "\\bexperiences?\\b" },
+				{ "name": "vskript.type.firework",			"match": "\\bfirework ?(effect|type)s?\\b" },
+				{ "name": "vskript.type.gamemode",			"match": "\\bgame ?modes?\\b" },
+				{ "name": "vskript.type.gamerule",			"match": "\\bgamerule( value)?s?\\b" },
+				{ "name": "vskript.type.gene",				"match": "\\bgenes?\\b" },
+				{ "name": "vskript.type.healreasons",		"match": "\\bheal reasons?\\b" },
+				{ "name": "vskript.type.integer",			"match": "\\bintegers?\\b" },
+				{ "name": "vskript.type.inventory",			"match": "\\binventor(y(( ?(action|slot|type))?s?)|ies)\\b" },
+				{ "name": "vskript.type.item",				"match": "\\bitem( ?type)?s?\\b" },
+				{ "name": "vskript.type.livingentity",		"match": "\\bliving ?entit(ys?|ies)\\b" },
+				{ "name": "vskript.type.location",			"match": "\\blocations?\\b" },
+				{ "name": "vskript.type.metadataholder",	"match": "\\bmetadata ?holders?\\b" },
+				{ "name": "vskript.type.moonphase",			"match": "\\bmoon ?parses?\\b" },
+				{ "name": "vskript.type.number",			"match": "\\bnumbers?\\b" },
+				{ "name": "vskript.type.object",			"match": "\\bobjects?\\b" },
+				{ "name": "vskript.type.offlineplayer",		"match": "\\boffline ?players?\\b" },
+				{ "name": "vskript.type.player",			"match": "\\bplayers?\\b" },
+				{ "name": "vskript.type.potioneffecttype",	"match": "\\bpotion ?effect ?types?\\b" },
+				{ "name": "vskript.type.projectile",		"match": "\\bprojectiles?\\b" },
+				{ "name": "vskript.type.region",			"match": "\\bregions?\\b" },
+				{ "name": "vskript.type.resourcepackstate",	"match": "\\bresource ?pack ?states?\\b" },
+				{ "name": "vskript.type.servericon",		"match": "\\bserver ?icons?\\b" },
+				{ "name": "vskript.type.soundcategory",		"match": "\\bsound categor(ys?|ies)\\b" },
+				{ "name": "vskript.type.spawnreason",		"match": "\\bspawn ?reasons?\\b" },
+				{ "name": "vskript.type.teleportcause",		"match": "\\bteleport ?causes?\\b" },
+				{ "name": "vskript.type.text",				"match": "\\b(text|string)s?\\b" },
+				{ "name": "vskript.type.time",				"match": "\\btimes?\\b" },
+				{ "name": "vskript.type.timeperiod",		"match": "\\btime ?periods?\\b" },
+				{ "name": "vskript.type.timespan",			"match": "\\btimespans?\\b" },
+				{ "name": "vskript.type.tree",				"match": "\\btree( ?type)?s?\\b" },
+				{ "name": "vskript.type.vector",			"match": "\\bvectors?\\b" },
+				{ "name": "vskript.type.visualeffect",		"match": "\\bvisual effects?\\b" },
+				{ "name": "vskript.type.weather",			"match": "\\bweather( ?type)?s?\\b" },
+				{ "name": "vskript.type.world",				"match": "\\bworlds?\\b" }
+			]
 		},
 
 
-		"nested": {
+
+		"reflect": {
 			"patterns": [
-				{ "include": "#function" },
-				{ "include": "#grammar.effect" },
-				{ "include": "#expression" },
-				{ "include": "#variable" }
+				{
+					"_comment": "Reflect Import Section",
+					"begin": "^(import)\\:",
+					"end": "(?=^(?!(\\#|\\t| |$)))",
+					"beginCaptures": {
+						"1": { "name": "vskript.reflect.import" }
+					},
+					"patterns": [
+						{
+							"match": "(\\w+)\\.?",
+							"captures": {
+								"1": { "name":"vskript.reflect.import.class" }
+							}
+						},
+						{ "include": "#comment" }
+		
+					]
+				},
+				{
+					"_comment": "Reflect Section",
+					"begin": "^((?:local )?(?:(?:custom )?event|effect|(?:(.*) property)?condition|(?:(?:(?:plural|non(?:\\-| )single) )?expression|(?:(.*) property)))) ?([^:]*)\\:",
+					"end": "(?=^(?!(\\#|\\t| |$)))",
+					"beginCaptures": {
+						"1": { "name": "vskript.reflect.effect" },
+						"2": { "patterns": [ { "include": "#type" } ] },
+						"3": { "patterns": [ { "include": "#type" } ] },
+						"4": { "patterns": [ { "include": "#reflect.pattern" } ] }
+					},
+					"patterns": [
+						{ "include": "#comment" },
+						{
+							"begin": "^(?:\\t| {4})(patterns?):",
+							"end": "(?=^(?:\\t| {4})?(?!(?:\\#|\\t| |$)))",
+							"beginCaptures": { "1": { "name": "vskript.reflect.options" } },
+							"patterns": [ { "include": "#reflect.pattern" } ]
+						},
+						{
+							"begin": "^(?:\\t| {4})(loop of|usable in|trigger|parse|event-values|get|add|set|remove(?: all)?|delete|reset|check):",
+							"end": "(?=^(?:\\t| {4})?(?!(?:\\#|\\t| |$)))",
+							"beginCaptures": { "1": { "name": "vskript.reflect.options" } },
+							"patterns": [ { "patterns": [ { "include": "#sentence" }, { "include": "#type" } ] } ]
+						},
+						{
+							"begin": "^(?:\\t| {4})(return type|event\\-value):",
+							"end": "(?=^(?:\\t| {4})?(?!(?:\\#|\\t| |$)))",
+							"beginCaptures": { "1": { "name": "vskript.reflect.options" } },
+							"patterns": [
+								{ "include": "#type"},
+								{ "include": "#comment" }
+							]
+						}
+					]
+				}
 			]
 		},
-		"nested.variable": {
-			"name": "vskript.nested",
-			"begin": "%",
-			"end": "%",
-			"beginCaptures": { "0": { "name": "vskript.variable.bracket"} },
-			"endCaptures": { "0": { "name": "vskript.variable.bracket"} },
+		"reflect.pattern": {
 			"patterns": [
-				{ "include": "#nested" }
-			]
-		},
-		"nested.text": {
-			"name": "vskript.nested",
-			"begin": "%",
-			"end": "%",
-			"beginCaptures": { "0": { "name": "vskript.expr.text"} },
-			"endCaptures": { "0": { "name": "vskript.expr.text"} },
-			"patterns": [
-				{ "include": "#nested" }
+				{
+					"begin": "\\%",
+					"end": "\\%",
+					"patterns": [
+						{ "include": "#type" }
+					]
+				},
+				{ "include": "#expression.text" }
 			]
 		}
+
+
+		
 	}
 }

@@ -1,0 +1,242 @@
+{
+	"$schema": "vscode://schemas/color-theme",
+	"name": "VSkript - light+",
+	"type": "light",
+	"include": "./light_plus.json",
+	"colors": {
+		"editor.background": "#FCFCFC",
+		"editor.foreground": "#444444"
+	},
+	"semanticHighlighting": true,
+	"semanticTokenColors": {
+		"aliases": { "foreground": "#00BBAA" },
+		"parameter": { "foreground": "#55AACC", "italic": true }
+	},
+	"tokenColors": [
+
+		{
+			"name": "VSkript Default",
+			"scope": [ "vskript.default" ],
+			"settings": { "foreground": "#444444", "fontStyle": "" }
+		},
+		{ "name": "Vskript Color 0", "scope": [ "vskript.color.0" ], "settings": { "foreground": "#000000", "fontStyle": "" } },
+		{ "name": "Vskript Color 1", "scope": [ "vskript.color.1" ], "settings": { "foreground": "#0000AA", "fontStyle": "" } },
+		{ "name": "Vskript Color 2", "scope": [ "vskript.color.2" ], "settings": { "foreground": "#00AA00", "fontStyle": "" } },
+		{ "name": "Vskript Color 3", "scope": [ "vskript.color.3" ], "settings": { "foreground": "#00AAAA", "fontStyle": "" } },
+		{ "name": "Vskript Color 4", "scope": [ "vskript.color.4" ], "settings": { "foreground": "#AA0000", "fontStyle": "" } },
+		{ "name": "Vskript Color 5", "scope": [ "vskript.color.5" ], "settings": { "foreground": "#AA00AA", "fontStyle": "" } },
+		{ "name": "Vskript Color 6", "scope": [ "vskript.color.6" ], "settings": { "foreground": "#FFAA00", "fontStyle": "" } },
+		{ "name": "Vskript Color 7", "scope": [ "vskript.color.7" ], "settings": { "foreground": "#AAAAAA", "fontStyle": "" } },
+		{ "name": "Vskript Color 8", "scope": [ "vskript.color.8" ], "settings": { "foreground": "#555555", "fontStyle": "" } },
+		{ "name": "Vskript Color 9", "scope": [ "vskript.color.9" ], "settings": { "foreground": "#5555FF", "fontStyle": "" } },
+		{ "name": "Vskript Color A", "scope": [ "vskript.color.a" ], "settings": { "foreground": "#55FF55", "fontStyle": "" } },
+		{ "name": "Vskript Color B", "scope": [ "vskript.color.b" ], "settings": { "foreground": "#55FFFF", "fontStyle": "" } },
+		{ "name": "Vskript Color C", "scope": [ "vskript.color.c" ], "settings": { "foreground": "#FF5555", "fontStyle": "" } },
+		{ "name": "Vskript Color D", "scope": [ "vskript.color.d" ], "settings": { "foreground": "#FF55FF", "fontStyle": "" } },
+		{ "name": "Vskript Color E", "scope": [ "vskript.color.e" ], "settings": { "foreground": "#FFFF55", "fontStyle": "" } },
+		{ "name": "Vskript Color F", "scope": [ "vskript.color.f" ], "settings": { "foreground": "#FFFFFF", "fontStyle": "" } },
+			
+		{
+			"name": "VSkript Comment",
+			"scope": [ "vskript.comment" ],
+			"settings": { "foreground": "#CCCCCC", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Docs",
+			"scope": [ "vskript.docs" ],
+			"settings": { "foreground": "#888888", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Docs Annotation",
+			"scope": [ "vskript.docs.annotation" ],
+			"settings": { "foreground": "#99DDFF", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Docs Parameter",
+			"scope": [ "vskript.docs.param" ],
+			"settings": { "foreground": "#0088FF", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Options",
+			"scope": "vskript.options",
+			"settings": { "foreground": "#EE0088", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Options Variable ",
+			"scope": "vskript.options.variable",
+			"settings": { "foreground": "#EE0088", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Refelct Option",
+			"scope": "vskript.reflect.option",
+			"settings": { "foreground": "#EE0088", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Aliases",
+			"scope": "vskript.aliases",
+			"settings": { "foreground": "#00CCCC", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Aliases Variable",
+			"scope": [
+				"vskript.aliases.variable",
+				"vskript.expr.minecraftitem"
+			],
+			"settings": { "foreground": "#009999", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Aliases NBT",
+			"scope": [
+				"vskript.aliases.nbt"
+			],
+			"settings": { "foreground": "#0f1414", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Aliases NBT Key",
+			"scope": [
+				"vskript.aliases.nbt.key"
+			],
+			"settings": { "foreground": "#A0A0A0", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Aliases NBT Value",
+			"scope": [
+				"vskript.aliases.nbt.value"
+			],
+			"settings": { "foreground": "#009999", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Type",
+			"scope": [ "vskript.type" ],
+			"settings": { "foreground": "#44CCFF", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Event",
+			"scope": [
+				"vskript.event",
+				"vskript.reflect.effect"
+			],
+			"settings": { "foreground": "#FFCC00", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Command",
+			"scope": ["vskript.command"],
+			"settings": { "foreground": "#FFCC00", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Command Label & Options",
+			"scope": [
+				"vskript.command.label",
+				"vskript.command.options",
+				"vskript.reflect.options"
+			],
+			"settings": { "foreground": "#FFCC00", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Function Keyword",
+			"scope": [ "vskript.function.keyword" ],
+			"settings": { "foreground": "#CC00CC", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Function Name",
+			"scope": [ "vskript.function.name" ],
+			"settings": { "foreground": "#CC00CC", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Function Parameter",
+			"scope": [ "vskript.function.parameter" ],
+			"settings": { "foreground": "#0077ff", "fontStyle": "italic" }
+		},
+		{
+			"name": "VSkript Expression Function",
+			"scope": "vskript.expr.function",
+			"settings": { "foreground": "#CC00CC", "fontStyle": "" }
+		},
+
+
+
+		{
+			"name": "VSkript Grammar",
+			"scope":  "vskript.grammar",
+			"settings": { "foreground": "#FF8844", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Grammar",
+			"scope":  "vskript.grammar.condi",
+			"settings": { "foreground": "#FF8844", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Expression Grammar",
+			"scope": "vskript.expr.grammar",
+			"settings": { "fontStyle": "italic" }
+		},
+		{
+			"name": "VSkript Expression Number",
+			"scope": "vskript.expr.number",
+			"settings": { "foreground": "#000000", "fontStyle": "" }
+		},
+
+
+		
+		{
+			"name": "VSkript Expression Text",
+			"scope": "vskript.expr.text",
+			"settings": { "foreground": "#008800", "fontStyle": "" }
+		},
+
+		
+		{
+			"name": "VSkript Variable Local",
+			"scope": "vskript.variable.local",
+			"settings": { "foreground": "#0077ff", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Variable Normal, Runtime",
+			"scope": [
+				"vskript.variable.normal",
+				"vskript.variable.runtime"
+			],
+			"settings": { "foreground": "#0077ff", "fontStyle": "" }
+		},
+		{
+			"name": "VSkript Variable Backet",
+			"scope": [
+				"vskript.variable.bracket"
+			],
+			"settings": { "foreground": "#0077ff", "fontStyle": "" }
+		},
+
+
+		{
+			"name": "VSkript Reflect Import",
+			"scope": [
+				"vskript.reflect.import"
+			],
+			"settings": { "foreground": "#444444", "fontStyle": "bold" }
+		},
+		{
+			"name": "VSkript Reflect Import Class",
+			"scope": [
+				"vskript.reflect.import.class"
+			],
+			"settings": { "foreground": "#444444", "fontStyle": "" }
+		}
+
+
+	]
+}

@@ -1,3 +1,12 @@
+# Updata v0.0.9
+1. Syntax Highlight
+	- 2.8 버전 컬러 테마 지원
+	- White 버전 테마 추가
+
+# Updata v0.0.8
+1. Syntax Highlight
+	- skript-reflect 애드온 패턴 추가
+
 # Update v0.0.7
 1. Syntax Highlight
    - 문자 표현에서 모든 종류 컬러 표시 (&7, §7, \<grey\> 등) (참조 : https://skriptlang.github.io/Skript/text.html)

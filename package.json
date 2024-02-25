@@ -7,7 +7,7 @@
 		"email": "v_hone@naver.com",
 		"url": "https://blog.naver.com/v_hone"
 	},
-	"version": "0.0.7",
+	"version": "0.0.9",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -19,7 +19,7 @@
 	"icon": "img/cover.png",
 	"categories": [],
 	"activationEvents": [
-		"*"
+		"onLanguage:vskript"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -44,10 +44,16 @@
 		],
 		"themes": [
 			{
-				"label": "VSkript (Dark)",
+				"label": "VSkript (Light+)",
+				"id": "vskript",
+				"uiTheme": "vs",
+				"path": "./themes/vskript_light.json"
+			},
+			{
+				"label": "VSkript (Dark+)",
 				"id": "vskript",
 				"uiTheme": "vs-dark",
-				"path": "./themes/vskript_default.json"
+				"path": "./themes/vskript_dark.json"
 			}
 		],
 		"semanticTokenTypes": [
